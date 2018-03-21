@@ -1,0 +1,269 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F70536F3-A55F-4C05-8D77-A1B51E1CF6F2}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OctoPlus</RootNamespace>
+    <AssemblyName>OctoPlus</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>OctoPlus.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>octoplus.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Octopus.Client, Version=4.13.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octopus.Client.4.13.0\lib\net45\Octopus.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
+    <Reference Include="StructureMap, Version=4.4.3.564, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StructureMap.4.4.3\lib\net45\StructureMap.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ChangeLogs\ChangeLogChange.cs" />
+    <Compile Include="ChangeLogs\ChangeLogCollection.cs" />
+    <Compile Include="ChangeLogs\IChangeLogProvider.cs" />
+    <Compile Include="ChangeLogs\Issue.cs" />
+    <Compile Include="ChangeLogs\TeamCity\ChangeBuild.cs" />
+    <Compile Include="ChangeLogs\TeamCity\Change.cs" />
+    <Compile Include="ChangeLogs\TeamCity\ChangeBuilds.cs" />
+    <Compile Include="ChangeLogs\TeamCity\ChangedFile.cs" />
+    <Compile Include="ChangeLogs\TeamCity\ChangeList.cs" />
+    <Compile Include="ChangeLogs\TeamCity\TeamCity.cs" />
+    <Compile Include="ChangeLogs\TeamCity\VcsRootInstance.cs" />
+    <Compile Include="Configuration\ConfigurationValidationResult.cs" />
+    <Compile Include="Configuration\InitResult.cs" />
+    <Compile Include="Configuration\Interfaces\ChangeLogProviderConfiguration.cs" />
+    <Compile Include="Configuration\Interfaces\IConfiguration.cs" />
+    <Compile Include="Configuration\Interfaces\ILogger.cs" />
+    <Compile Include="Configuration\JsonConfigurationProvider.cs" />
+    <Compile Include="Configuration\Logger.cs" />
+    <Compile Include="Configuration\OctoPlusOptions.cs" />
+    <Compile Include="Console\ConsoleDoJob.cs" />
+    <Compile Include="Console\ConsoleManager.cs" />
+    <Compile Include="Console\Interfaces\IConsoleDoJob.cs" />
+    <Compile Include="Deployment\Deployer.cs" />
+    <Compile Include="Deployment\Interfaces\IDeployer.cs" />
+    <Compile Include="Dtos\Channel.cs" />
+    <Compile Include="Dtos\LifeCycle.cs" />
+    <Compile Include="Dtos\Phase.cs" />
+    <Compile Include="Dtos\ProjectStub.cs" />
+    <Compile Include="Dtos\ProjectGroup.cs" />
+    <Compile Include="Dtos\ProjectDeployment.cs" />
+    <Compile Include="Dtos\Environment.cs" />
+    <Compile Include="Dtos\EnvironmentDeployment.cs" />
+    <Compile Include="Dtos\Interfaces\IOctoJob.cs" />
+    <Compile Include="Dtos\PackageStub.cs" />
+    <Compile Include="Dtos\Project.cs" />
+    <Compile Include="Dtos\Release.cs" />
+    <Compile Include="Logging\Interfaces\IUiLogger.cs" />
+    <Compile Include="Octopus\Interfaces\IOctopusHelper.cs" />
+    <Compile Include="Octopus\OctopusHelper.cs" />
+    <Compile Include="Resources\DeploymentWindowStrings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DeploymentWindowStrings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\MiscStrings.Designer.cs">
+      <DependentUpon>MiscStrings.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Resources\ChangeLogStrings.Designer.cs">
+      <DependentUpon>ChangeLogStrings.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Startup\BootStrap.cs" />
+    <Compile Include="StructureMap\UtilitiesRegistry.cs" />
+    <Compile Include="StructureMap\MiscRegistry.cs" />
+    <Compile Include="Utilities\StandardSerialiser.cs" />
+    <Compile Include="Utilities\WebRequestHelper.cs" />
+    <Compile Include="VersionChecking\IVersionChecker.cs" />
+    <Compile Include="VersionChecking\IVersionCheckingProvider.cs" />
+    <Compile Include="VersionChecking\GitHub\GitHubVersionChecker.cs" />
+    <Compile Include="VersionChecking\IRelease.cs" />
+    <Compile Include="VersionChecking\GitHub\Release.cs" />
+    <Compile Include="VersionChecking\VersionChecker.cs" />
+    <Compile Include="Windows\ChangeLog.xaml.cs">
+      <DependentUpon>ChangeLog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Interfaces\IChangeLog.cs" />
+    <Compile Include="Windows\Interfaces\ILoadingWindow.cs" />
+    <Compile Include="StructureMap\ConfigurationRegistry.cs" />
+    <Compile Include="StructureMap\WindowRegistry.cs" />
+    <Compile Include="Windows\Deployment.xaml.cs">
+      <DependentUpon>Deployment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\DoJob.xaml.cs">
+      <DependentUpon>DoJob.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Interfaces\IDeployment.cs" />
+    <Compile Include="Windows\Interfaces\IDoJob.cs" />
+    <Compile Include="Windows\Interfaces\IWindow.cs" />
+    <Compile Include="Windows\Interfaces\IWindowProvider.cs" />
+    <Compile Include="Windows\WindowProvider.cs" />
+    <Compile Include="Windows\LoadingWindow.xaml.cs">
+      <DependentUpon>LoadingWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\ConfigurationLoadResult.cs" />
+    <Compile Include="Configuration\ConfigurationProvider.cs" />
+    <Compile Include="Resources\ConfigurationStrings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Windows\ChangeLog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Deployment.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\DoJob.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\LoadingWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\DeploymentWindowStrings.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>DeploymentWindowStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MiscStrings.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MiscStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ChangeLogStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ChangeLogStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ConfigurationStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="changelog.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="FodyWeavers.xml" />
+    <Resource Include="octoplus.png" />
+    <Resource Include="octoplus.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

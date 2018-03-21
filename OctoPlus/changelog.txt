@@ -1,0 +1,14 @@
+﻿-- 5 --
+By default the console will not only do deployments if the packages have a different version.
+
+-- 4 --
+Fixed GUI deployments
+
+-- 3 --
+Fixed package id fetching for the new Octopus version
+
+-- 2 --
+Added version checking on startup :)
+
+-- 1 --
+Initial Release

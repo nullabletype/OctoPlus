@@ -1,0 +1,124 @@
+﻿<!--
+	OctoPlus Deployment Coordinator. Provides extra tooling to help deploy
+	software through Octopus Deploy.
+
+	Copyright (C) 2018  Steven Davies
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<Window x:Name="DeploymentWindow" x:Class="OctoPlus.Windows.Deployment"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OctoPlus"
+        xmlns:o="clr-namespace:OctoPlus.Resources"
+        mc:Ignorable="d"
+        Title="{x:Static o:DeploymentWindowStrings.WindowTitle}" Height="580.775" Width="853" Icon="/OctoPlus;component/octoplus.ico">
+    <Grid Name="MainGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Name="Menu">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <DockPanel HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Header="{x:Static o:DeploymentWindowStrings.File}">
+                    <MenuItem Header="{x:Static o:DeploymentWindowStrings.SaveProfile}" Click="GenerateProfileButton_Click" />
+                    <MenuItem Header="{x:Static o:MiscStrings.Exit}" Click="Close"/>
+                </MenuItem>
+                <MenuItem Header="{x:Static o:DeploymentWindowStrings.Promote}">
+                    <MenuItem Header="{x:Static o:DeploymentWindowStrings.PromoteSelected}" />
+                </MenuItem>
+                <MenuItem Header="{x:Static o:DeploymentWindowStrings.Help}" HorizontalAlignment="Right">
+                    <MenuItem Header="{x:Static o:DeploymentWindowStrings.About}" />
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+        <ListView x:Name="ProjectList" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                  Margin="10,62,10,51" ItemsSource="{Binding ElementName=DeploymentWindow, Path=Projects}">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Width="60" Header="{x:Static o:MiscStrings.Deploy}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox Name="projectselectioncheckbox" IsChecked="{Binding Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="300" Header="{x:Static o:MiscStrings.Project}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ProjectName}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="100" Header="{x:Static o:DeploymentWindowStrings.CurrentPackage}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=CurrentRelease.DisplayPackageVersion, Mode=TwoWay}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="120" Header="{x:Static o:DeploymentWindowStrings.NewPackage}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox Width="100" Name="packagecombo" ItemsSource="{Binding AvailablePackages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMemberPath="Version" SelectedValuePath="Id" SelectedIndex="0" SelectionChanged="Packagecombo_OnSelectionChanged"
+                                              SelectedItem="{Binding SelectedPackageStub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="120" Header="{x:Static o:DeploymentWindowStrings.ViewChangelog}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Name="viewchangelogbutton" Content="{x:Static o:DeploymentWindowStrings.ViewChangelog}" Click="Viewchangelogbutton_OnClick " Padding="5, 3, 5, 3"></Button>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="120" Header="{x:Static o:DeploymentWindowStrings.ViewHistory}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Name="viewhistorybutton" Content="{x:Static o:DeploymentWindowStrings.ViewHistory}" Click="Viewhistorybutton_OnClick " Padding="5, 3, 5, 3"></Button>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
+                </GridView>
+
+
+            </ListView.View>
+        </ListView>
+
+        <ComboBox x:Name="EnvironmentsBox" HorizontalAlignment="Left" Margin="92,30,0,0" VerticalAlignment="Top"
+                  Width="120" ItemsSource="{Binding ElementName=DeploymentWindow, Path=Environments}"
+                  DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="EnvironmentsBox_SelectionChanged" />
+        <Label x:Name="EnvironementLabel" Content="{x:Static o:MiscStrings.Environment}" HorizontalAlignment="Left" Margin="10,26,0,0"
+               VerticalAlignment="Top" />
+        <Label x:Name="ChannelsLabel" Content="{x:Static o:MiscStrings.Channel}" HorizontalAlignment="Left" Margin="217,26,0,0"
+               VerticalAlignment="Top" Width="68" />
+        <ComboBox x:Name="ChannelsBox" HorizontalAlignment="Left" Margin="275,30,0,0" VerticalAlignment="Top"
+                  Width="120" ItemsSource="{Binding ElementName=DeploymentWindow, Path=Channels}"
+                  DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="ChannelsBox_SelectionChanged" />
+        <Button x:Name="DeployButton" Content="{x:Static o:MiscStrings.Deploy}" HorizontalAlignment="Stretch" Margin="10,0,10,10"
+                VerticalAlignment="Bottom" Click="DeployButton_Click" Height="36" />
+        <Button x:Name="LoadButton" Content="{x:Static o:DeploymentWindowStrings.Load}" HorizontalAlignment="Left" Margin="410,31,10,0"
+                VerticalAlignment="Top" Width="100" Click="LoadButton_Click" />
+        <Button x:Name="DeselectAllButton" Content="{x:Static o:DeploymentWindowStrings.DeselectAll}" HorizontalAlignment="Right" Margin="0,32,10,0"
+                VerticalAlignment="Top" Width="100" Click="DeselectAllButton_Click" />
+
+    </Grid>
+</Window>
