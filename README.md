@@ -1,2 +1,4 @@
 # octoplus
-Octoplus deployment coordinator
+OctoPlus deployment coordinator
+
+Current status: Pre alpha
