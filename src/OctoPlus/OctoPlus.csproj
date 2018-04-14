@@ -105,11 +105,6 @@
   <ItemGroup>
     <Compile Include="Configuration\InitResult.cs" />
     <Compile Include="Configuration\Logger.cs" />
-    <Compile Include="Console\ConsoleDoJob.cs" />
-    <Compile Include="Console\ConsoleManager.cs" />
-    <Compile Include="Console\Interfaces\IConsoleDoJob.cs" />
-    <Compile Include="Deployment\Deployer.cs" />
-    <Compile Include="Deployment\Interfaces\IDeployer.cs" />
     <Compile Include="Resources\DeploymentWindowStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -128,12 +123,6 @@
     <Compile Include="Startup\BootStrap.cs" />
     <Compile Include="StructureMap\UtilitiesRegistry.cs" />
     <Compile Include="StructureMap\MiscRegistry.cs" />
-    <Compile Include="VersionChecking\IVersionChecker.cs" />
-    <Compile Include="VersionChecking\IVersionCheckingProvider.cs" />
-    <Compile Include="VersionChecking\GitHub\GitHubVersionChecker.cs" />
-    <Compile Include="VersionChecking\IRelease.cs" />
-    <Compile Include="VersionChecking\GitHub\Release.cs" />
-    <Compile Include="VersionChecking\VersionChecker.cs" />
     <Compile Include="Windows\ChangeLog.xaml.cs">
       <DependentUpon>ChangeLog.xaml</DependentUpon>
     </Compile>

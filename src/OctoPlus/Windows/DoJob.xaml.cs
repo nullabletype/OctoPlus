@@ -24,8 +24,8 @@
 using System.Threading.Tasks;
 using System.Windows;
 using Octopus.Client;
-using OctoPlus.Deployment;
-using OctoPlus.Deployment.Interfaces;
+using OctoPlusCore.Deployment;
+using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Dtos.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlus.Windows.Interfaces;

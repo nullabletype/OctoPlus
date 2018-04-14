@@ -21,24 +21,12 @@
 #endregion
 
 
-using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OctoPlusCore.Dtos
+namespace OctoPlusCore.VersionChecking
 {
-    public class ProjectDeployment
+    public interface IVersionChecker
     {
-        public string ProjectId { get; set; }
-        public string ProjectName { get; set; }
-        public string PackageName { get; set; }
-        public string PackageId { get; set; }
-        public string StepName { get; set; }
-        public string ChannelId { get; set; }
-        public string ChannelVersionRange { get; set; }
-        public string ReleaseMessage { get; set; }
-        public string ReleaseVersion { get; set; }
-        public string LifeCycleId { get; set; }
+        Task<VersionCheckResult> GetLatestVersion();
     }
 }

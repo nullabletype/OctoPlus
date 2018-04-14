@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console\ConsoleDoJob.cs" />
+    <Compile Include="Console\ConsoleManager.cs" />
+    <Compile Include="Console\Interfaces\IConsoleDoJob.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

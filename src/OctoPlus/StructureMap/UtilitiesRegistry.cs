@@ -24,15 +24,13 @@
 using System.ComponentModel;
 using OctoPlusCore.ChangeLogs;
 using OctoPlusCore.ChangeLogs.TeamCity;
-using OctoPlus.Console;
-using OctoPlus.Console.Interfaces;
-using OctoPlus.Deployment;
-using OctoPlus.Deployment.Interfaces;
+using OctoPlusCore.Deployment;
+using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Octopus;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
-using OctoPlus.VersionChecking;
-using OctoPlus.VersionChecking.GitHub;
+using OctoPlusCore.VersionChecking;
+using OctoPlusCore.VersionChecking.GitHub;
 using StructureMap;
 
 namespace OctoPlus.StructureMap
@@ -43,7 +41,6 @@ namespace OctoPlus.StructureMap
         {
             For<IOctopusHelper>().Use<OctopusHelper>().Singleton();
             For<IDeployer>().Use<Deployer>().Singleton();
-            For<IConsoleDoJob>().Use<ConsoleDoJob>();
             For<IChangeLogProvider>().Use<TeamCity>();
             For<IWebRequestHelper>().Use<WebRequestHelper>();
             For<IVersionCheckingProvider>().Use<GitHubVersionChecker>();

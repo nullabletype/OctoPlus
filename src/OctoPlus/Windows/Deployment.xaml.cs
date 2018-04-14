@@ -38,7 +38,7 @@ using Octopus.Client;
 using Octopus.Client.Model;
 using OctoPlusCore.ChangeLogs;
 using OctoPlusCore.ChangeLogs.TeamCity;
-using OctoPlus.Configuration;
+using OctoPlusCore.Configuration;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Dtos;
 using OctoPlusCore.Octopus.Interfaces;

@@ -26,17 +26,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OctoPlus.Console.Interfaces;
-using OctoPlus.Deployment;
-using OctoPlus.Deployment.Interfaces;
+using OctoPlusConsole.Console.Interfaces;
+using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Dtos;
-using OctoPlusCore.Dtos.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
 
-namespace OctoPlus.Console
-{
+namespace OctoPlusConsole.Console {
     public class ConsoleDoJob : IUiLogger, IConsoleDoJob
     {
         private IDeployer _deployer;

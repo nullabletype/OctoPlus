@@ -23,11 +23,9 @@
 
 using System;
 using CommandLine;
-using OctoPlus;
-using OctoPlus.Configuration;
-using OctoPlus.Console;
-using OctoPlus.Console.Interfaces;
 using OctoPlus.Startup;
+using OctoPlusConsole.Console;
+using OctoPlusConsole.Console.Interfaces;
 using OctoPlusCore.Configuration;
 
 namespace OctoPlusConsole
@@ -36,11 +34,15 @@ namespace OctoPlusConsole
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Starting in console mode...");
+            System.Console.WriteLine("Starting in console mode...");
             var initResult = BootStrap.CheckConfigurationAndInit().GetAwaiter().GetResult();
             if (!initResult.ConfigResult.Success)
             {
-                Console.Write(string.Join(Environment.NewLine, initResult.ConfigResult.Errors));
+                initResult.container.Configure(c => 
+                {
+                    c.For<IConsoleDoJob>().Use<ConsoleDoJob>();
+                });
+                System.Console.Write(string.Join(Environment.NewLine, initResult.ConfigResult.Errors));
                 return;
             }
             var container = initResult.container;
@@ -48,7 +50,7 @@ namespace OctoPlusConsole
         }
 
         private static void RunConsole(StructureMap.IContainer container, OctoPlusOptions consoleOptions) {
-            Console.WriteLine("Using key " + consoleOptions.ApiKey + " and profile at path " +
+            System.Console.WriteLine("Using key " + consoleOptions.ApiKey + " and profile at path " +
                                               consoleOptions.ProfileFile);
             var doJob = container.GetInstance<IConsoleDoJob>();
             doJob.StartJob(consoleOptions.ProfileFile, consoleOptions.ReleaseMessage, consoleOptions.ReleaseVersion,

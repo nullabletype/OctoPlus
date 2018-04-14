@@ -22,31 +22,17 @@
 
 
 using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using CommandLine;
-using Newtonsoft.Json.Linq;
-using Octopus.Client;
-using OctoPlusCore.ChangeLogs.TeamCity;
-using OctoPlus.Configuration;
 using OctoPlusCore.Configuration.Interfaces;
-using OctoPlus.Console;
-using OctoPlus.Console.Interfaces;
-using OctoPlus.Resources;
-using OctoPlus.Startup;
-using OctoPlus.StructureMap;
-using OctoPlus.VersionChecking;
+using OctoPlusCore.VersionChecking;
 using OctoPlus.Windows;
 using OctoPlus.Windows.Interfaces;
 using StructureMap;
-using OctoPlusCore.Configuration;
+using OctoPlus.Startup;
+using OctoPlus.Resources;
 
-namespace OctoPlus
-{
+namespace OctoPlus {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -55,29 +41,12 @@ namespace OctoPlus
         private static IContainer _container;
 
         [STAThread]
-        public static void Main()
-        {
-            var args = System.Environment.GetCommandLineArgs();
-            if (args.Length <= 1)
-            {
-                var application = new App();
-                application.InitializeComponent();
-                application.Run();
-            }
-            else
-            {
-                ConsoleManager.Show();
-                System.Console.WriteLine("Starting in console mode...");
-                Parser.Default.ParseArguments<OctoPlusOptions>(args).WithParsed(opts => RunConsole(opts));
-            }
-        }
-
-        private static void RunConsole(OctoPlusOptions consoleOptions) {
-            System.Console.WriteLine("Using key " + consoleOptions.ApiKey + " and profile at path " +
-                              consoleOptions.ProfileFile);
-            _container.GetInstance<IConsoleDoJob>()
-                .StartJob(consoleOptions.ProfileFile, consoleOptions.ReleaseMessage,
-                    consoleOptions.ReleaseVersion, consoleOptions.ForceDeploymentIfSamePackage);
+        public static void Main() 
+        { 
+            var application = new App();
+            application.InitializeComponent();
+            application.Run();
+            
         }
 
         private async void Application_Startup(object sender, StartupEventArgs e)

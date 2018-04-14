@@ -23,10 +23,10 @@
 
 using System.Threading.Tasks;
 
-namespace OctoPlus.VersionChecking
+namespace OctoPlusConsole.Console.Interfaces
 {
-    internal interface IVersionCheckingProvider
+    public interface IConsoleDoJob
     {
-        Task<IRelease> GetLatestRelease();
+        Task StartJob(string pathToProfile, string message, string releaseVersion, bool forceDeploymentIfSamePackage);
     }
 }

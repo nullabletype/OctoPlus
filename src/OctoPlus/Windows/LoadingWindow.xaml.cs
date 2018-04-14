@@ -22,20 +22,14 @@
 
 
 using System;
-using System.IO;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Newtonsoft.Json.Linq;
-using OctoPlus.Configuration;
-using OctoPlusCore.Configuration.Interfaces;
 using OctoPlus.Resources;
 using OctoPlus.Windows.Interfaces;
 
-namespace OctoPlus.Windows
-{
+namespace OctoPlus.Windows {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

@@ -21,24 +21,14 @@
 #endregion
 
 
-using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using OctoPlusCore.Dtos.Interfaces;
+using OctoPlusCore.Logging.Interfaces;
 
-namespace OctoPlusCore.Dtos
+namespace OctoPlusCore.Deployment.Interfaces
 {
-    public class ProjectDeployment
+    public interface IDeployer
     {
-        public string ProjectId { get; set; }
-        public string ProjectName { get; set; }
-        public string PackageName { get; set; }
-        public string PackageId { get; set; }
-        public string StepName { get; set; }
-        public string ChannelId { get; set; }
-        public string ChannelVersionRange { get; set; }
-        public string ReleaseMessage { get; set; }
-        public string ReleaseVersion { get; set; }
-        public string LifeCycleId { get; set; }
+        Task StartJob(IOctoJob job, IUiLogger uiLogger, bool suppressMessages = false);
     }
 }

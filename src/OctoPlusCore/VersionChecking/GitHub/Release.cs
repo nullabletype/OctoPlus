@@ -21,12 +21,25 @@
 #endregion
 
 
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace OctoPlus.Console.Interfaces
+namespace OctoPlusCore.VersionChecking.GitHub
 {
-    public interface IConsoleDoJob
+    internal class Release : IRelease
     {
-        Task StartJob(string pathToProfile, string message, string releaseVersion, bool forceDeploymentIfSamePackage);
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("tag_name")]
+        public string TagName { get; set; }
+
+        [JsonProperty("prerelease")]
+        public bool PreRelease { get; set; }
+
+        [JsonProperty("body")]
+        public string ChangeLog { get; set; }
     }
 }

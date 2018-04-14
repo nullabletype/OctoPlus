@@ -27,7 +27,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace OctoPlus.Console
+namespace OctoPlusConsole.Console
 {
     [SuppressUnmanagedCodeSecurity]
     public static class ConsoleManager

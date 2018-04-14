@@ -22,13 +22,11 @@
 
 
 using System.Threading.Tasks;
-using OctoPlusCore.Dtos.Interfaces;
-using OctoPlusCore.Logging.Interfaces;
 
-namespace OctoPlus.Deployment.Interfaces
+namespace OctoPlusCore.VersionChecking
 {
-    public interface IDeployer
+    public interface IVersionCheckingProvider
     {
-        Task StartJob(IOctoJob job, IUiLogger uiLogger, bool suppressMessages = false);
+        Task<IRelease> GetLatestRelease();
     }
 }
