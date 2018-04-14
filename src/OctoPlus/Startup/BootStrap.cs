@@ -29,9 +29,10 @@ using log4net.Core;
 using log4net.Layout;
 using Octopus.Client;
 using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 using OctoPlus.StructureMap;
 using StructureMap;
+using OctoPlusCore.Configuration;
 
 namespace OctoPlus.Startup
 {

@@ -77,6 +77,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OctoPlusCore\OctoPlusCore.csproj">
+      <Project>{1b72518d-986c-425d-aa81-13a5fceb2148}</Project>
+      <Name>OctoPlusCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OctoPlus\OctoPlus.csproj">
       <Project>{f70536f3-a55f-4c05-8d77-a1b51e1cf6f2}</Project>
       <Name>OctoPlus</Name>

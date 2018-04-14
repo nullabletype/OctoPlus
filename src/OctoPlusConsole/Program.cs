@@ -28,6 +28,7 @@ using OctoPlus.Configuration;
 using OctoPlus.Console;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Startup;
+using OctoPlusCore.Configuration;
 
 namespace OctoPlusConsole
 {

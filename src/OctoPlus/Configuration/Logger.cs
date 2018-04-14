@@ -23,9 +23,9 @@
 
 using System;
 using log4net;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 
-namespace OctoPlus.Configuration {
+namespace OctoPlusCore.Configuration {
     class Logger<T> : ILogger<T> where T : class
     {
 

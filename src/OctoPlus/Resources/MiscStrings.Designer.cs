@@ -124,6 +124,15 @@ namespace OctoPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Configuration file could not be loaded.
+        /// </summary>
+        public static string LoadErrorCaption {
+            get {
+                return ResourceManager.GetString("LoadErrorCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading.
         /// </summary>
         public static string Loading {

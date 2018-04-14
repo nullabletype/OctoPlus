@@ -103,45 +103,13 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChangeLogs\ChangeLogChange.cs" />
-    <Compile Include="ChangeLogs\ChangeLogCollection.cs" />
-    <Compile Include="ChangeLogs\IChangeLogProvider.cs" />
-    <Compile Include="ChangeLogs\Issue.cs" />
-    <Compile Include="ChangeLogs\TeamCity\ChangeBuild.cs" />
-    <Compile Include="ChangeLogs\TeamCity\Change.cs" />
-    <Compile Include="ChangeLogs\TeamCity\ChangeBuilds.cs" />
-    <Compile Include="ChangeLogs\TeamCity\ChangedFile.cs" />
-    <Compile Include="ChangeLogs\TeamCity\ChangeList.cs" />
-    <Compile Include="ChangeLogs\TeamCity\TeamCity.cs" />
-    <Compile Include="ChangeLogs\TeamCity\VcsRootInstance.cs" />
-    <Compile Include="Configuration\ConfigurationValidationResult.cs" />
     <Compile Include="Configuration\InitResult.cs" />
-    <Compile Include="Configuration\Interfaces\ChangeLogProviderConfiguration.cs" />
-    <Compile Include="Configuration\Interfaces\IConfiguration.cs" />
-    <Compile Include="Configuration\Interfaces\ILogger.cs" />
-    <Compile Include="Configuration\JsonConfigurationProvider.cs" />
     <Compile Include="Configuration\Logger.cs" />
-    <Compile Include="Configuration\OctoPlusOptions.cs" />
     <Compile Include="Console\ConsoleDoJob.cs" />
     <Compile Include="Console\ConsoleManager.cs" />
     <Compile Include="Console\Interfaces\IConsoleDoJob.cs" />
     <Compile Include="Deployment\Deployer.cs" />
     <Compile Include="Deployment\Interfaces\IDeployer.cs" />
-    <Compile Include="Dtos\Channel.cs" />
-    <Compile Include="Dtos\LifeCycle.cs" />
-    <Compile Include="Dtos\Phase.cs" />
-    <Compile Include="Dtos\ProjectStub.cs" />
-    <Compile Include="Dtos\ProjectGroup.cs" />
-    <Compile Include="Dtos\ProjectDeployment.cs" />
-    <Compile Include="Dtos\Environment.cs" />
-    <Compile Include="Dtos\EnvironmentDeployment.cs" />
-    <Compile Include="Dtos\Interfaces\IOctoJob.cs" />
-    <Compile Include="Dtos\PackageStub.cs" />
-    <Compile Include="Dtos\Project.cs" />
-    <Compile Include="Dtos\Release.cs" />
-    <Compile Include="Logging\Interfaces\IUiLogger.cs" />
-    <Compile Include="Octopus\Interfaces\IOctopusHelper.cs" />
-    <Compile Include="Octopus\OctopusHelper.cs" />
     <Compile Include="Resources\DeploymentWindowStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -160,8 +128,6 @@
     <Compile Include="Startup\BootStrap.cs" />
     <Compile Include="StructureMap\UtilitiesRegistry.cs" />
     <Compile Include="StructureMap\MiscRegistry.cs" />
-    <Compile Include="Utilities\StandardSerialiser.cs" />
-    <Compile Include="Utilities\WebRequestHelper.cs" />
     <Compile Include="VersionChecking\IVersionChecker.cs" />
     <Compile Include="VersionChecking\IVersionCheckingProvider.cs" />
     <Compile Include="VersionChecking\GitHub\GitHubVersionChecker.cs" />
@@ -193,14 +159,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Configuration\ConfigurationLoadResult.cs" />
-    <Compile Include="Configuration\ConfigurationProvider.cs" />
-    <Compile Include="Resources\ConfigurationStrings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
-    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -252,10 +210,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ChangeLogStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\ConfigurationStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -273,6 +227,12 @@
     <Resource Include="FodyWeavers.xml" />
     <Resource Include="octoplus.png" />
     <Resource Include="octoplus.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OctoPlusCore\OctoPlusCore.csproj">
+      <Project>{1b72518d-986c-425d-aa81-13a5fceb2148}</Project>
+      <Name>OctoPlusCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.3.0.3\build\Fody.targets" Condition="Exists('..\packages\Fody.3.0.3\build\Fody.targets')" />

@@ -21,8 +21,8 @@
 #endregion
 
 
-using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration;
+using OctoPlusCore.Configuration.Interfaces;
 using StructureMap;
 
 namespace OctoPlus.StructureMap

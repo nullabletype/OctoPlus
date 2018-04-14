@@ -22,15 +22,15 @@
 
 
 using System.ComponentModel;
-using OctoPlus.ChangeLogs;
-using OctoPlus.ChangeLogs.TeamCity;
+using OctoPlusCore.ChangeLogs;
+using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlus.Console;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Deployment;
 using OctoPlus.Deployment.Interfaces;
-using OctoPlus.Octopus;
-using OctoPlus.Octopus.Interfaces;
-using OctoPlus.Utilities;
+using OctoPlusCore.Octopus;
+using OctoPlusCore.Octopus.Interfaces;
+using OctoPlusCore.Utilities;
 using OctoPlus.VersionChecking;
 using OctoPlus.VersionChecking.GitHub;
 using StructureMap;

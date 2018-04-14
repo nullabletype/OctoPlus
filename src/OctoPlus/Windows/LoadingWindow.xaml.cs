@@ -30,7 +30,7 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using Newtonsoft.Json.Linq;
 using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 using OctoPlus.Resources;
 using OctoPlus.Windows.Interfaces;
 

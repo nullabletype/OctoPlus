@@ -22,7 +22,7 @@
 
 
 using System.Threading.Tasks;
-using OctoPlus.Dtos.Interfaces;
+using OctoPlusCore.Dtos.Interfaces;
 
 namespace OctoPlus.Windows.Interfaces
 {

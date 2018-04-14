@@ -31,9 +31,9 @@ using System.Windows.Threading;
 using CommandLine;
 using Newtonsoft.Json.Linq;
 using Octopus.Client;
-using OctoPlus.ChangeLogs.TeamCity;
+using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 using OctoPlus.Console;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Resources;
@@ -43,6 +43,7 @@ using OctoPlus.VersionChecking;
 using OctoPlus.Windows;
 using OctoPlus.Windows.Interfaces;
 using StructureMap;
+using OctoPlusCore.Configuration;
 
 namespace OctoPlus
 {
@@ -88,7 +89,7 @@ namespace OctoPlus
             _container = initResult.container;
             if (!initResult.ConfigResult.Success) {
                 MessageBox.Show(string.Join(Environment.NewLine, initResult.ConfigResult.Errors),
-                    ConfigurationStrings.LoadErrorCaption);
+                    MiscStrings.LoadErrorCaption);
                 Shutdown();
                 return;
             }

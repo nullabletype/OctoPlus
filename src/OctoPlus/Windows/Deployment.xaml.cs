@@ -36,16 +36,16 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using Octopus.Client;
 using Octopus.Client.Model;
-using OctoPlus.ChangeLogs;
-using OctoPlus.ChangeLogs.TeamCity;
+using OctoPlusCore.ChangeLogs;
+using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
-using OctoPlus.Dtos;
-using OctoPlus.Octopus.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Dtos;
+using OctoPlusCore.Octopus.Interfaces;
 using OctoPlus.Resources;
-using OctoPlus.Utilities;
+using OctoPlusCore.Utilities;
 using OctoPlus.Windows.Interfaces;
-using Environment = OctoPlus.Dtos.Environment;
+using Environment = OctoPlusCore.Dtos.Environment;
 
 namespace OctoPlus.Windows
 {

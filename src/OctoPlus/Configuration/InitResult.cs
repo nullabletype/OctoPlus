@@ -21,12 +21,12 @@
 #endregion
 
 
+using OctoPlusCore.Configuration;
 using StructureMap;
 
 namespace OctoPlus.Configuration
 {
-    public class InitResult
-    {
+    public class InitResult : InitResultCore {
         
         public IContainer container { get; set; }
         public ConfigurationLoadResult ConfigResult { get; set; }

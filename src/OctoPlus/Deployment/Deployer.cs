@@ -29,13 +29,13 @@ using System.Windows;
 using Octopus.Client;
 using Octopus.Client.Model;
 using OctoPlus.Configuration;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 using OctoPlus.Deployment.Interfaces;
-using OctoPlus.Dtos;
-using OctoPlus.Dtos.Interfaces;
-using OctoPlus.Logging.Interfaces;
-using OctoPlus.Octopus.Interfaces;
-using OctoPlus.Utilities;
+using OctoPlusCore.Dtos;
+using OctoPlusCore.Dtos.Interfaces;
+using OctoPlusCore.Logging.Interfaces;
+using OctoPlusCore.Octopus.Interfaces;
+using OctoPlusCore.Utilities;
 
 namespace OctoPlus.Deployment
 {

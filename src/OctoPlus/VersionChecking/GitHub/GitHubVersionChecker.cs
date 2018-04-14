@@ -29,7 +29,7 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using Newtonsoft.Json;
-using OctoPlus.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
 
 namespace OctoPlus.VersionChecking.GitHub
 {
