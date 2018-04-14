@@ -84,9 +84,13 @@
       <Project>{f11a7555-8aed-4cbc-ade2-8d8a8ca7d4fe}</Project>
       <Name>OctoPlusCore.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Models.csproj">
+    <ProjectReference Include="..\OctoPlusCore.Deployment\OctoPlusCore.Deployment.csproj">
+      <Project>{e64afdd5-2f03-4ddb-aae1-0e8c8f41864e}</Project>
+      <Name>OctoPlusCore.Deployment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Deployment.Models.csproj">
       <Project>{fd9f84f6-7f53-4d0d-a27b-285f0eab3b59}</Project>
-      <Name>OctoPlusCore.Models</Name>
+      <Name>OctoPlusCore.Deployment.Models</Name>
     </ProjectReference>
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj">
       <Project>{a39c3bd9-358a-457b-a801-8ebd8cd382e7}</Project>

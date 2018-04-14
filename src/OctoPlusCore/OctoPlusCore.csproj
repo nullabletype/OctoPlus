@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OctoPlusCore.ChangeLogs\OctoPlusCore.ChangeLogs.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Configuration\OctoPlusCore.Configuration.csproj" />
-    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Models.csproj" />
+    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Deployment.Models.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Utilities\OctoPlusCore.Utilities.csproj" />
   </ItemGroup>

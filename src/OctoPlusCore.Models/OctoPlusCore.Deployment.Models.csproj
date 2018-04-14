@@ -4,14 +4,7 @@
     <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     <TargetFrameworkIdentifier Condition="'$(_ShortFrameworkIdentifier)'=='net'">.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkIdentifier Condition="'$(_ShortFrameworkIdentifier)'=='netstandard'">.NETStandard</TargetFrameworkIdentifier>
+    <AssemblyName>OctoPlusCore.Deployment.Models</AssemblyName>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Octopus.Client" Version="4.32.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Deployment.Models.csproj" />
-  </ItemGroup>
 
 </Project>

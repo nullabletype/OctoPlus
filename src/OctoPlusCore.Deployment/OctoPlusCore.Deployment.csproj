@@ -6,4 +6,10 @@
     <TargetFrameworkIdentifier Condition="'$(_ShortFrameworkIdentifier)'=='netstandard'">.NETStandard</TargetFrameworkIdentifier>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OctoPlusCore.Configuration\OctoPlusCore.Configuration.csproj" />
+    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Deployment.Models.csproj" />
+    <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
+  </ItemGroup>
+
 </Project>
