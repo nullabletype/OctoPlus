@@ -21,15 +21,22 @@
 #endregion
 
 
-using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
+using OctoPlusCore.Models;
 
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore
 {
-    public interface IDoJob : IWindow
+    public class PackageStub
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+        public string Id { get; set; }
+        public string Version { get; set; }
+        public string StepName { get; set; }
+    }
+
+    public class PackageFull 
+    {
+        public string Id { get; set; }
+        public string Version { get; set; }
+        public string StepName { get; set; }
+        public string Message { get; set; }
     }
 }

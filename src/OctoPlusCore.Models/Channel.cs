@@ -21,15 +21,12 @@
 #endregion
 
 
-using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
-
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Models
 {
-    public interface IDoJob : IWindow
+    public class Channel
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string VersionRange { get; set; }
     }
 }

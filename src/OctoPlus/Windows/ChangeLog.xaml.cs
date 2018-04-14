@@ -37,7 +37,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OctoPlusCore.ChangeLogs;
-using OctoPlusCore.Dtos;
+using OctoPlusCore.Models;
 using OctoPlus.Resources;
 using OctoPlus.Windows.Interfaces;
 

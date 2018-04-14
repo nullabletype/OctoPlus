@@ -22,7 +22,7 @@
 
 
 using System.Threading.Tasks;
-using OctoPlusCore.Dtos.Interfaces;
+using OctoPlusCore.Models.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 
 namespace OctoPlusCore.Deployment.Interfaces

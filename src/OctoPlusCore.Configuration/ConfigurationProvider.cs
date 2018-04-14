@@ -22,14 +22,26 @@
 
 
 using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
+using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Configuration.Resources;
 
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Configuration
 {
-    public interface IDoJob : IWindow
+    public abstract class ConfigurationProvider
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+        public abstract Task<ConfigurationLoadResult> LoadConfiguration();
+
+        protected virtual IConfiguration GetSampleConfig()
+        {
+            return new Configuration
+            {
+                ApiKey = ConfigurationStrings.SampleApiKey,
+                ChannelSeedProjectName = ConfigurationStrings.SampleChannelSeedAppName,
+                OctopusUrl = ConfigurationStrings.SampleOctopusUrl,
+                ProjectGroupFilterString = ConfigurationStrings.SampleProjectGroupFilterString,
+                DefaultChannelName = ConfigurationStrings.SampleChannelName,
+                DefaultEnvironmentName = ConfigurationStrings.SamepleDefaultEnvironmentName
+            };
+        }
     }
 }

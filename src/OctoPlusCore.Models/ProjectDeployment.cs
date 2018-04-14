@@ -21,15 +21,24 @@
 #endregion
 
 
+using System;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
 
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Models
 {
-    public interface IDoJob : IWindow
+    public class ProjectDeployment
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+        public string ProjectId { get; set; }
+        public string ProjectName { get; set; }
+        public string PackageName { get; set; }
+        public string PackageId { get; set; }
+        public string StepName { get; set; }
+        public string ChannelId { get; set; }
+        public string ChannelVersionRange { get; set; }
+        public string ReleaseMessage { get; set; }
+        public string ReleaseVersion { get; set; }
+        public string LifeCycleId { get; set; }
     }
 }

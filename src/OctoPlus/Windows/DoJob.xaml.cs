@@ -26,7 +26,7 @@ using System.Windows;
 using Octopus.Client;
 using OctoPlusCore.Deployment;
 using OctoPlusCore.Deployment.Interfaces;
-using OctoPlusCore.Dtos.Interfaces;
+using OctoPlusCore.Models.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlus.Windows.Interfaces;
 

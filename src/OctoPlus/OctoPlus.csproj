@@ -105,6 +105,8 @@
   <ItemGroup>
     <Compile Include="Configuration\InitResult.cs" />
     <Compile Include="Configuration\Logger.cs" />
+    <Compile Include="Proxies\VersionedPackageProxy.cs" />
+    <Compile Include="Proxies\VersionedProjectProxy.cs" />
     <Compile Include="Resources\DeploymentWindowStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -218,6 +220,26 @@
     <Resource Include="octoplus.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OctoPlusCore.ChangeLogs\OctoPlusCore.ChangeLogs.csproj">
+      <Project>{e7d235d9-14d9-4ce7-b6df-c1f01a413f17}</Project>
+      <Name>OctoPlusCore.ChangeLogs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OctoPlusCore.Configuration\OctoPlusCore.Configuration.csproj">
+      <Project>{f11a7555-8aed-4cbc-ade2-8d8a8ca7d4fe}</Project>
+      <Name>OctoPlusCore.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Models.csproj">
+      <Project>{fd9f84f6-7f53-4d0d-a27b-285f0eab3b59}</Project>
+      <Name>OctoPlusCore.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj">
+      <Project>{a39c3bd9-358a-457b-a801-8ebd8cd382e7}</Project>
+      <Name>OctoPlusCore.Octopus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OctoPlusCore.Utilities\OctoPlusCore.Utilities.csproj">
+      <Project>{67c633c8-f85f-4db9-8227-c66492d1cda3}</Project>
+      <Name>OctoPlusCore.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OctoPlusCore\OctoPlusCore.csproj">
       <Project>{1b72518d-986c-425d-aa81-13a5fceb2148}</Project>
       <Name>OctoPlusCore</Name>

@@ -40,12 +40,15 @@ using OctoPlusCore.ChangeLogs;
 using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlusCore.Configuration;
 using OctoPlusCore.Configuration.Interfaces;
-using OctoPlusCore.Dtos;
+using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlus.Resources;
 using OctoPlusCore.Utilities;
 using OctoPlus.Windows.Interfaces;
-using Environment = OctoPlusCore.Dtos.Environment;
+using Environment = OctoPlusCore.Models.Environment;
+using OctoPlusCore;
+using OctoPlusCore.ChangeLogs.Interfaces;
+using OctoPlus.Proxies;
 
 namespace OctoPlus.Windows
 {
@@ -485,11 +488,11 @@ namespace OctoPlus.Windows
             if (project.CurrentRelease != null && project.CurrentRelease.SelectedPackages.Any())
             {
                 var fullFrom = await this._helper.GetFullPackage(project.CurrentRelease.SelectedPackages[0]);
-                changes = this._changeLogProvider.GetChanges(fullFrom, fullTo, project);
+                changes = this._changeLogProvider.GetChanges(new VersionedPackageProxy(fullFrom), new VersionedPackageProxy(fullTo), new VersionedProjectProxy(project));
             }
             else
             {
-                changes = this._changeLogProvider.GetChanges(fullTo, project);
+                changes = this._changeLogProvider.GetChanges(new VersionedPackageProxy(fullTo), new VersionedProjectProxy(project));
             }
             var changelog = this._windowProvider.CreateWindow<IChangeLog>();
             this._loadingWindow.Hide();
@@ -538,7 +541,7 @@ namespace OctoPlus.Windows
             var button = (Button)sender;
             var project = (Project)button.DataContext;
             var fullFrom = await this._helper.GetFullPackage(project.CurrentRelease.SelectedPackages[0]);
-            ChangeLogCollection changes = this._changeLogProvider.GetChanges(fullFrom, project);
+            ChangeLogCollection changes = this._changeLogProvider.GetChanges(new VersionedPackageProxy(fullFrom), new VersionedProjectProxy(project));
             var changelog = this._windowProvider.CreateWindow<IChangeLog>();
             this._loadingWindow.Hide();
             changelog.Show();

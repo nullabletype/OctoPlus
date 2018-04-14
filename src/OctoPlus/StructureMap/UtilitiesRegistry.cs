@@ -23,6 +23,7 @@
 
 using System.ComponentModel;
 using OctoPlusCore.ChangeLogs;
+using OctoPlusCore.ChangeLogs.Interfaces;
 using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlusCore.Deployment;
 using OctoPlusCore.Deployment.Interfaces;

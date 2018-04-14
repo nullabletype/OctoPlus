@@ -21,15 +21,9 @@
 #endregion
 
 
-using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
-
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Models.Interfaces
 {
-    public interface IDoJob : IWindow
+    public interface IOctoJob
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
     }
 }

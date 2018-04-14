@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 /*
     OctoPlus Deployment Coordinator. Provides extra tooling to help 
     deploy software through Octopus Deploy.
@@ -21,15 +21,19 @@
 #endregion
 
 
-using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Models
 {
-    public interface IDoJob : IWindow
-    {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+    public class ProjectStub {
+
+        public bool Checked { get; set; }
+        public string ProjectName { get; set; }
+        public string ProjectId { get; set; }
+        public string ProjectGroupId { get; set; }
+        public string LifeCycleId { get; set; }
+
     }
 }

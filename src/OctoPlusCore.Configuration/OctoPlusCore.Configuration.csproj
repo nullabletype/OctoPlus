@@ -8,16 +8,26 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.2.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Octopus.Client" Version="4.32.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OctoPlusCore.ChangeLogs\OctoPlusCore.ChangeLogs.csproj" />
-    <ProjectReference Include="..\OctoPlusCore.Configuration\OctoPlusCore.Configuration.csproj" />
-    <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Models.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Utilities\OctoPlusCore.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\ConfigurationStrings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\ConfigurationStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

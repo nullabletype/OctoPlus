@@ -28,7 +28,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OctoPlusConsole.Console.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
-using OctoPlusCore.Dtos;
+using OctoPlusCore.Models;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;

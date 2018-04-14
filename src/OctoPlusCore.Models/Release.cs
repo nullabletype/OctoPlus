@@ -21,15 +21,20 @@
 #endregion
 
 
-using System.Threading.Tasks;
-using OctoPlusCore.Models.Interfaces;
+using System.Collections.Generic;
 
-namespace OctoPlus.Windows.Interfaces
+namespace OctoPlusCore.Models
 {
-    public interface IDoJob : IWindow
+    public class Release
     {
-        void Show();
-        bool? ShowDialog();
-        Task StartDeployment(IOctoJob job);
+        public Release()
+        {
+            this.SelectedPackages = new List<PackageStub>();
+        }
+
+        public string Id { get; set; }
+        public string Version { get; set; }
+        public string DisplayPackageVersion { get; set; }
+        public List<PackageStub> SelectedPackages { get; set; }
     }
 }
