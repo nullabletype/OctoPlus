@@ -19,7 +19,7 @@ namespace OctoPlus.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ConfigurationStrings {
@@ -106,7 +106,7 @@ namespace OctoPlus.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your Octopus Deploy API key. You can get this from your profile page..
+        ///   Looks up a localized string similar to Your Octopus Deploy API key. You can get this fromPackage your profile page..
         /// </summary>
         internal static string SampleApiKey {
             get {
@@ -178,7 +178,7 @@ namespace OctoPlus.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No seed project specified. This is needed to pull the available channels from.
+        ///   Looks up a localized string similar to No seed project specified. This is needed to pull the available channels fromPackage.
         /// </summary>
         internal static string ValidationSeedProject {
             get {

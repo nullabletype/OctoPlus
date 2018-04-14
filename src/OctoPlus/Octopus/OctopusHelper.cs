@@ -57,26 +57,24 @@ namespace OctoPlus.Octopus
                 {
                     foreach (var action in step.Actions)
                     {
-                        if (action.ActionType == "Octopus.TentaclePackage")
+                        if (action.Properties["Octopus.Action.Package.FeedId"] != null &&
+                            action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin")
                         {
-                            if (action.Properties["Octopus.Action.Package.FeedId"] != null &&
-                                action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin")
+                            if (action.Properties["Octopus.Action.Package.PackageId"] != null &&
+                                !string.IsNullOrEmpty(action.Properties["Octopus.Action.Package.PackageId"].Value))
                             {
-                                if (action.Properties["Octopus.Action.Package.PackageId"] != null &&
-                                    !string.IsNullOrEmpty(action.Properties["Octopus.Action.Package.PackageId"].Value))
+                                var packageId = action.Properties["Octopus.Action.Package.PackageId"].Value;
+                                if (!string.IsNullOrEmpty(packageId))
                                 {
-                                    var packageId = action.Properties["Octopus.Action.Package.PackageId"].Value;
-                                    if (!string.IsNullOrEmpty(packageId))
+                                    return new PackageIdResult
                                     {
-                                        return new PackageIdResult
-                                        {
-                                            PackageId = packageId,
-                                            StepName = step.Name
-                                        };
-                                    }
+                                        PackageId = packageId,
+                                        StepName = step.Name
+                                    };
                                 }
                             }
                         }
+                       
                     }
                 }
             }
