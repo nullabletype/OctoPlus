@@ -23,7 +23,7 @@
 
 using CommandLine;
 
-namespace OctoPlusCore.Configuration
+namespace OctoPlus.Console.ConsoleOptions 
 {
     [Verb("listenvs", HelpText="List all environments")]
     public class OctoPlusListEnvironmentsOptions

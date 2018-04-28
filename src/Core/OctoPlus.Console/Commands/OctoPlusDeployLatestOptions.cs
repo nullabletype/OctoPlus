@@ -23,12 +23,12 @@
 
 using CommandLine;
 
-namespace OctoPlusCore.Configuration
+namespace OctoPlus.Console.ConsoleOptions
 {
     [Verb("deploylatest", HelpText="Deploy multiple projects")]
     public class OctoPlusDeployLatestOptions
     {
-        [Option('p', "profile", Required = false, HelpText = "The path to a json profile file exported from OctoPlus")]
+        [Option('f', "profilefile", Required = false, HelpText = "The path to a json profile file exported from OctoPlus")]
         public string ProfileFile { get; set; }
 
         [Option('k', "key", Required = false, HelpText = "The API key to use for the deployment")]
@@ -49,7 +49,7 @@ namespace OctoPlusCore.Configuration
         [Option('g', "groupfilter", Required = false, HelpText = "Group filter keyword")]
         public bool GroupFilter { get; set; }
 
-        [Option('f', "projectfilter", Required = false, HelpText = "Project filter keyword")]
+        [Option('p', "projectfilter", Required = false, HelpText = "Project filter keyword")]
         public bool ProjectFilter { get; set; }
     }
 }

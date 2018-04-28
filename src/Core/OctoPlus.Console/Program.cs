@@ -21,8 +21,10 @@
 #endregion
 
 using CommandLine;
+using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OctoPlus.Console.ConsoleOptions;
 using OctoPlus.Console.Interfaces;
 using OctoPlusCore.ChangeLogs.Interfaces;
 using OctoPlusCore.ChangeLogs.TeamCity;
@@ -38,6 +40,7 @@ using OctoPlusCore.VersionChecking;
 using OctoPlusCore.VersionChecking.GitHub;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OctoPlus.Console
@@ -54,6 +57,12 @@ namespace OctoPlus.Console
                 return;
             }
             var container = initResult.Item2;
+
+            var app = new CommandLineApplication();
+            app.Name = "OctoPlus";
+            app.HelpOption("-?|-h|--help");
+            
+
             Parser.Default.ParseArguments<OctoPlusDeployLatestOptions, OctoPlusListEnvironmentsOptions>(args)
                 .MapResult(
                     (OctoPlusDeployLatestOptions opts) => DeployLatest(container, opts), 
