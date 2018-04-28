@@ -34,6 +34,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<Release> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);
         Task<List<Environment>> GetEnvironments();
+        Task<List<Environment>> GetMatchingEnvironments(string keyword);
         Task<Environment> GetEnvironment(string idOrName);
         Task<Channel> GetChannelByName(string projectIdOrName, string channelName);
         Task<Channel> GetChannel(string channelIdOrName);

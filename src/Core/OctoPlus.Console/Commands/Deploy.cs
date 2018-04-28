@@ -21,8 +21,13 @@
 #endregion
 
 using McMaster.Extensions.CommandLineUtils;
+using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Console.Resources;
+using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Models;
+using OctoPlusCore.Octopus;
+using OctoPlusCore.Octopus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +38,14 @@ namespace OctoPlus.Console.Commands {
     class Deploy : BaseCommand {
 
         private IConsoleDoJob consoleDoJob;
-        public Deploy(IConsoleDoJob consoleDoJob)
+        private IOctopusHelper octoHelper;
+        private IConfiguration configuration;
+
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper)
         {
             this.consoleDoJob = consoleDoJob;
+            this.configuration = configuration;
+            this.octoHelper = octoHelper;
         }
 
         public async void Configure(CommandLineApplication command) 
@@ -44,11 +54,129 @@ namespace OctoPlus.Console.Commands {
             command.Description = OptionsStrings.DeployProjects;
 
             command.Command("profile", profile => ConfigureProfileBasedDeployment(profile));
+            command.Command("int", profile => ConfigureInteractiveMode(profile));
 
             command.OnExecute(async () =>
             {
                 command.ShowHelp();
             });
+        }
+
+        private void ConfigureInteractiveMode(CommandLineApplication command)
+        {
+            base.Configure(command);
+
+            command.OnExecute(async () =>
+            {
+                await RunInteractively(command);
+            });
+        }
+
+        private async Task RunInteractively(CommandLineApplication command)
+        {
+            var projectStubs = await octoHelper.GetProjectStubs();
+            var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
+
+            if (found == null)
+            {
+                System.Console.WriteLine("Provided seed project couldn't be found. I can't continue!");
+                return;
+            }
+
+            var channelName = PromptForStringWithoutQuitting("Which channel do you wish to deploy?");
+            var environmentName = PromptForStringWithoutQuitting("Which environment do you wish to deploy to?");
+            var groupRestriction = Prompt.GetString("Do you want to restrict to certain product groups?");
+            var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
+
+            if (matchingEnvironments.Count() > 1)
+            {
+                System.Console.WriteLine("Too many enviroments match your criteria: " + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
+                return;
+            }
+            else if (matchingEnvironments.Count() == 0)
+            {
+                System.Console.WriteLine("No environments match your criteria!");
+                return;
+            }
+
+            var groupIds = new List<string>();
+            if (!string.IsNullOrEmpty(groupRestriction))
+            {
+                groupIds =
+                    (await octoHelper.GetFilteredProjectGroups(groupRestriction))
+                    .Select(g => g.Id).ToList();
+            }
+
+            var channel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, channelName);
+            var environment = await octoHelper.GetEnvironment(matchingEnvironments.First().Id);
+            var projects = new List<Project>();
+            foreach (var projectStub in projectStubs)
+            {
+                if (!string.IsNullOrEmpty(groupRestriction))
+                {
+                    if (!groupIds.Contains(projectStub.ProjectGroupId))
+                    {
+                        continue;
+                    }
+                }
+                var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
+                var currentPackage = project.CurrentRelease.SelectedPackages.FirstOrDefault();
+                projects.Add(project);
+            }
+
+            await InteractivePrompt(channel, environment, projects);
+        }
+
+        private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
+        {
+            bool run = true;
+            while (run)
+            {
+                var table = new ConsoleTable("Project Name", "Current Release", "Current Package", "New Package");
+
+                foreach (var project in projects)
+                {
+                    table.AddRow(new[] {
+                        project.ProjectName,
+                        project.CurrentRelease.Version,
+                        project.CurrentRelease.DisplayPackageVersion,
+                        project.AvailablePackages.Count() > 0 ? project.AvailablePackages.First().Version : String.Empty
+                    });
+                }
+
+                table.Write();
+
+                System.Console.WriteLine(" Update: 1 | Remove: 2 | Continue: c | Exit: e");
+                var prompt = Prompt.GetString("");
+
+                switch (prompt)
+                {
+                    case "1":
+                        break;
+                    case "2":
+                        break;
+                    case "c":
+                        break;
+                    case "e":
+                        run = false;
+                        break;
+                    default:
+                        await InteractivePrompt(channel, environment, projects);
+                        break;
+                }
+            }
+
+            return null;
+        }
+
+        private string PromptForStringWithoutQuitting(string prompt)
+        {
+            var channel = Prompt.GetString(prompt);
+            if (string.IsNullOrEmpty(channel))
+            {
+                return PromptForStringWithoutQuitting(prompt);
+            }
+            return channel;
         }
 
         private void ConfigureProfileBasedDeployment(CommandLineApplication command) 

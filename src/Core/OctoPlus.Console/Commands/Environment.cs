@@ -58,9 +58,7 @@ namespace OctoPlus.Console.Commands {
         private async Task ExecuteListCommand(CommandLineApplication command) 
         {
             var envs = await  OctopusHelper.Default.GetEnvironments();
-
             var table = new ConsoleTable(UiStrings.Name, UiStrings.Id);
-
             foreach (var env in envs)
             {
                 table.AddRow(new [] { env.Name, env.Id });

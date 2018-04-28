@@ -58,6 +58,7 @@ namespace OctoPlus.Console
             app.Name = "OctoPlus";
             app.HelpOption("-?|-h|--help");
             app.ThrowOnUnexpectedArgument = true;
+            app.Conventions.UseConstructorInjection(container);
 
             app.Command("deploy", deploy => container.GetService<Deploy>().Configure(deploy));
             app.Command("env", env => new Commands.Environment(env));

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "OctoPlus.Console": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": " deploy int"
     }
   }
 }

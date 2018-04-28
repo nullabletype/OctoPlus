@@ -143,6 +143,17 @@ namespace OctoPlusCore.Octopus
             return envs.Select(ConvertEnvironment).ToList();
         }
 
+        public async Task<List<Environment>> GetMatchingEnvironments(string keyword)
+        {
+            var environments = await GetEnvironments();
+            var matchingEnvironments = environments.Where(env => env.Name.Equals(keyword, StringComparison.CurrentCultureIgnoreCase));
+            if (matchingEnvironments.Count() == 0)
+            {
+                matchingEnvironments = environments.Where(env => env.Name.ToLower().Contains(keyword.ToLower()));
+            }
+            return matchingEnvironments.ToList();
+        }
+
         public async Task<Environment> GetEnvironment(string idOrName) 
         {
             return ConvertEnvironment(await client.Repository.Environments.Get(idOrName));
@@ -151,7 +162,7 @@ namespace OctoPlusCore.Octopus
         public async Task<List<ProjectGroup>> GetFilteredProjectGroups(string filter) 
         {
             var groups = await client.Repository.ProjectGroups.GetAll();
-            return groups.Where(g => g.Name.ToLower().Contains(filter)).Select(ConvertProjectGroup).ToList();
+            return groups.Where(g => g.Name.ToLower().Contains(filter.ToLower())).Select(ConvertProjectGroup).ToList();
         }
 
         public async Task<List<ProjectGroup>> GetProjectGroups() 
@@ -216,9 +227,9 @@ namespace OctoPlusCore.Octopus
             return ConvertChannel(await client.Repository.Channels.FindByName(project, channelName));
         }
 
-        public async Task<Channel> GetChannel(string channelIdOrName) 
+        public async Task<Channel> GetChannel(string channelIdOrHref) 
         {
-            return ConvertChannel(await client.Repository.Channels.Get(channelIdOrName));
+            return ConvertChannel(await client.Repository.Channels.Get(channelIdOrHref));
         }
 
         public async Task<List<Channel>> GetChannelsForProject(string projectIdOrHref) 
