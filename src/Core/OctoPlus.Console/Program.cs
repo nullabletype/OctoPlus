@@ -21,7 +21,7 @@
 #endregion
 
 using CommandLine;
-using Microsoft.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OctoPlus.Console.ConsoleOptions;

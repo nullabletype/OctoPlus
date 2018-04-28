@@ -70,6 +70,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deploy using a stored profile.
+        /// </summary>
+        internal static string DeployFromProfile {
+            get {
+                return ResourceManager.GetString("DeployFromProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deploy multiple projects.
         /// </summary>
         internal static string DeployLatest {
@@ -147,6 +156,15 @@ namespace OctoPlus.Console.Resources {
         internal static string ReleaseVersion {
             get {
                 return ResourceManager.GetString("ReleaseVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Url for your octopus install.
+        /// </summary>
+        internal static string Url {
+            get {
+                return ResourceManager.GetString("Url", resourceCulture);
             }
         }
     }

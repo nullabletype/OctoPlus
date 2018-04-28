@@ -120,6 +120,9 @@
   <data name="ApiKey" xml:space="preserve">
     <value>The API key to use for deployment</value>
   </data>
+  <data name="DeployFromProfile" xml:space="preserve">
+    <value>Deploy using a stored profile</value>
+  </data>
   <data name="DeployLatest" xml:space="preserve">
     <value>Deploy multiple projects</value>
   </data>
@@ -146,5 +149,8 @@
   </data>
   <data name="ReleaseVersion" xml:space="preserve">
     <value>Release version number (must follow semantic versioning)</value>
+  </data>
+  <data name="Url" xml:space="preserve">
+    <value>Url for your octopus install</value>
   </data>
 </root>

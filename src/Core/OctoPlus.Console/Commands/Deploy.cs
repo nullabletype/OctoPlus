@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.CommandLineUtils;
+﻿using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Resources;
 using System;
 using System.Collections.Generic;
@@ -13,9 +13,13 @@ namespace OctoPlus.Console.Commands
         {
             BaseConfigure(command);
             command.Description = OptionsStrings.DeployProjects;
-            
-        }
 
+            command.Argument("profile", OptionsStrings.DeployFromProfile);
+
+            command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue);
+            command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue);
+            command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue);
+        }
     }
 
     class BaseCommand 
