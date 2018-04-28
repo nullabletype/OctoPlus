@@ -97,6 +97,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Commands for dealing with environments.
+        /// </summary>
+        internal static string EnvironmentCommands {
+            get {
+                return ResourceManager.GetString("EnvironmentCommands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name the of the environment to deploy to.
         /// </summary>
         internal static string EnvironmentName {

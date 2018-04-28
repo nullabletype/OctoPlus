@@ -20,11 +20,9 @@
 */
 #endregion
 
-using CommandLine;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using OctoPlus.Console.ConsoleOptions;
+using OctoPlus.Console.Commands;
 using OctoPlus.Console.Interfaces;
 using OctoPlusCore.ChangeLogs.Interfaces;
 using OctoPlusCore.ChangeLogs.TeamCity;
@@ -39,35 +37,52 @@ using OctoPlusCore.Utilities;
 using OctoPlusCore.VersionChecking;
 using OctoPlusCore.VersionChecking.GitHub;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OctoPlus.Console
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            System.Console.WriteLine("Starting in console mode...");
+            AppDomain.CurrentDomain.UnhandledException += HandleException;
             var initResult = CheckConfigurationAndInit().GetAwaiter().GetResult();
             if (!initResult.Item1.Success) 
             {
-                System.Console.Write(string.Join(Environment.NewLine, initResult.Item1.Errors));
-                return;
+                System.Console.Write(string.Join(System.Environment.NewLine, initResult.Item1.Errors));
+                return -1;
             }
             var container = initResult.Item2;
 
             var app = new CommandLineApplication();
             app.Name = "OctoPlus";
             app.HelpOption("-?|-h|--help");
-            
+            app.ThrowOnUnexpectedArgument = true;
 
-            Parser.Default.ParseArguments<OctoPlusDeployLatestOptions, OctoPlusListEnvironmentsOptions>(args)
-                .MapResult(
-                    (OctoPlusDeployLatestOptions opts) => DeployLatest(container, opts), 
-                    (OctoPlusListEnvironmentsOptions opts) => ListEnvironments(container, opts), 
-                    errs => 1);
+            app.Command("deploy", deploy => container.GetService<Deploy>().Configure(deploy));
+            app.Command("env", env => new Commands.Environment(env));
+
+            app.OnExecute(async () =>
+            {
+                System.Console.WriteLine("Main");
+            });
+
+            return app.Execute(args);
+        }
+
+        private static void HandleException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if(e.ExceptionObject is CommandParsingException)
+            {
+                var colorBefore = System.Console.ForegroundColor;
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine($"Error: {(((CommandParsingException)e.ExceptionObject).Message)}");
+                System.Console.ForegroundColor = colorBefore;
+                System.Console.WriteLine();
+                System.Console.WriteLine("Command wasn't recognised. Try -? for help if you're stuck.");
+                System.Console.WriteLine();
+                System.Environment.Exit(1);
+            }
         }
 
         public static async Task<Tuple<ConfigurationLoadResult, IServiceProvider>> CheckConfigurationAndInit() 
@@ -101,26 +116,8 @@ namespace OctoPlus.Console
             .AddTransient<IWebRequestHelper, WebRequestHelper>()
             .AddTransient<IVersionCheckingProvider, GitHubVersionChecker>()
             .AddTransient<IVersionChecker, VersionChecker>()
-            .AddTransient<IConsoleDoJob, ConsoleDoJob>();
-        }
-
-        private static int ListEnvironments(IServiceProvider container, OctoPlusListEnvironmentsOptions consoleOptions) 
-        {
-            System.Console.WriteLine("Environments: ");
-            var envs = OctopusHelper.Default.GetEnvironments().GetAwaiter().GetResult();
-            foreach(var env in envs)
-            {
-                System.Console.WriteLine($"{(env.Id)} : {(env.Name)}");
-            }
-            return 0;
-        }
-        private static int DeployLatest(IServiceProvider container, OctoPlusDeployLatestOptions consoleOptions) 
-        {
-            System.Console.WriteLine("Using profile at path " + consoleOptions.ProfileFile);
-            var doJob = container.GetService<IConsoleDoJob>();
-            doJob.StartJob(consoleOptions.ProfileFile, consoleOptions.ReleaseMessage, consoleOptions.ReleaseVersion,
-                consoleOptions.ForceDeploymentIfSamePackage).GetAwaiter().GetResult();
-            return 0;
+            .AddTransient<IConsoleDoJob, ConsoleDoJob>()
+            .AddTransient<Deploy, Deploy>();
         }
     }
 }

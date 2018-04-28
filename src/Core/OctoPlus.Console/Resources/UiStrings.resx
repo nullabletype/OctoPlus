@@ -117,43 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ApiKey" xml:space="preserve">
-    <value>The API key to use for deployment</value>
+  <data name="Id" xml:space="preserve">
+    <value>Id</value>
   </data>
-  <data name="DeployFromProfile" xml:space="preserve">
-    <value>Deploy using a stored profile</value>
-  </data>
-  <data name="DeployLatest" xml:space="preserve">
-    <value>Deploy multiple projects</value>
-  </data>
-  <data name="DeployProjects" xml:space="preserve">
-    <value>Deploy projects to environments</value>
-  </data>
-  <data name="EnvironmentCommands" xml:space="preserve">
-    <value>Commands for dealing with environments</value>
-  </data>
-  <data name="EnvironmentName" xml:space="preserve">
-    <value>Name the of the environment to deploy to</value>
-  </data>
-  <data name="ForceDeployOfSamePackage" xml:space="preserve">
-    <value>Force redeployment of the same package if no new one exists</value>
-  </data>
-  <data name="GroupFilter" xml:space="preserve">
-    <value>Group filter keyword</value>
-  </data>
-  <data name="ProfileFile" xml:space="preserve">
-    <value>The path to the json profile file you wish to deploy</value>
-  </data>
-  <data name="ProjectFilter" xml:space="preserve">
-    <value>Project filter keyword</value>
-  </data>
-  <data name="ReleaseMessage" xml:space="preserve">
-    <value>Release message to set</value>
-  </data>
-  <data name="ReleaseVersion" xml:space="preserve">
-    <value>Release version number (must follow semantic versioning)</value>
-  </data>
-  <data name="Url" xml:space="preserve">
-    <value>Url for your octopus install</value>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
   </data>
 </root>
