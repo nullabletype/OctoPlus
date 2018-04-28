@@ -74,6 +74,7 @@ namespace OctoPlus.Console.Commands {
 
         private async Task RunInteractively(CommandLineApplication command)
         {
+            WriteStatusLine("Fetching project list");
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
@@ -86,6 +87,7 @@ namespace OctoPlus.Console.Commands {
             var channelName = PromptForStringWithoutQuitting("Which channel do you wish to deploy?");
             var environmentName = PromptForStringWithoutQuitting("Which environment do you wish to deploy to?");
             var groupRestriction = Prompt.GetString("Do you want to restrict to certain product groups?");
+            WriteStatusLine("Checking your options...");
             var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
 
             if (matchingEnvironments.Count() > 1)
@@ -102,6 +104,7 @@ namespace OctoPlus.Console.Commands {
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
+                WriteStatusLine("Getting group info");
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -110,8 +113,10 @@ namespace OctoPlus.Console.Commands {
             var channel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, channelName);
             var environment = await octoHelper.GetEnvironment(matchingEnvironments.First().Id);
             var projects = new List<Project>();
+            CleanCurrentLine();
             foreach (var projectStub in projectStubs)
             {
+                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(), $"Loading Info for {(projectStub.ProjectName)}");
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
                     if (!groupIds.Contains(projectStub.ProjectGroupId))
@@ -123,6 +128,7 @@ namespace OctoPlus.Console.Commands {
                 var currentPackage = project.CurrentRelease.SelectedPackages.FirstOrDefault();
                 projects.Add(project);
             }
+            CleanCurrentLine();
 
             await InteractivePrompt(channel, environment, projects);
         }
