@@ -126,6 +126,12 @@ namespace OctoPlus.Console.Commands {
                 }
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
                 var currentPackage = project.CurrentRelease.SelectedPackages.FirstOrDefault();
+                if (project.SelectedPackageStub == null ||
+                        (currentPackage == null ? "" : currentPackage.Version) == project.SelectedPackageStub.Version ||
+                        !project.AvailablePackages.Any())
+                {
+                    project.Checked = false;
+                }
                 projects.Add(project);
             }
             CleanCurrentLine();
@@ -138,16 +144,21 @@ namespace OctoPlus.Console.Commands {
             bool run = true;
             while (run)
             {
-                var table = new ConsoleTable("Project Name", "Current Release", "Current Package", "New Package");
+                var table = new ConsoleTable("#", "*", "Project Name", "Current Release", "Current Package", "New Package");
+
+                var rowPosition = 1;
 
                 foreach (var project in projects)
                 {
                     table.AddRow(new[] {
+                        rowPosition.ToString(),
+                        project.Checked ? "*" : String.Empty,
                         project.ProjectName,
                         project.CurrentRelease.Version,
                         project.CurrentRelease.DisplayPackageVersion,
                         project.AvailablePackages.Count() > 0 ? project.AvailablePackages.First().Version : String.Empty
                     });
+                    rowPosition++;
                 }
 
                 table.Write();
@@ -158,8 +169,10 @@ namespace OctoPlus.Console.Commands {
                 switch (prompt)
                 {
                     case "1":
+                        SelectProjectsForDeployment(projects, true);
                         break;
                     case "2":
+                        SelectProjectsForDeployment(projects, false);
                         break;
                     case "c":
                         break;
@@ -173,6 +186,15 @@ namespace OctoPlus.Console.Commands {
             }
 
             return null;
+        }
+
+        private void SelectProjectsForDeployment(IList<Project> projects, bool select)
+        {
+            var range = GetRangeFromPrompt(projects.Count());
+            foreach(var index in range)
+            {
+                projects[index - 1].Checked = select;
+            }
         }
 
         private string PromptForStringWithoutQuitting(string prompt)
