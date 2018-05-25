@@ -103,57 +103,5 @@ namespace OctoPlus.Console.Commands {
             System.Console.Write(builder.ToString());
         }
 
-        protected IEnumerable<int> GetRangeFromPrompt(int max)
-        {
-            bool rangeValid = false;
-            var intRange = new List<int>();
-            while (!rangeValid)
-            {
-                intRange.Clear();
-                var userInput = Prompt.GetString("Please make a selection using ranges 1-2 or comma separated 1,2,3 etc.");
-                if (string.IsNullOrEmpty(userInput))
-                {
-                    return new List<int>();
-                }
-                if (!userInput.All(c => c >= 0 || c <= 9 || c == '-'))
-                {
-                    continue;
-                }
-                var segments = userInput.Split(",");
-                foreach(var segment in segments)
-                {
-                    var match = Regex.Match(segment, "([0-9]+)-([0-9]+)");
-                    if (match.Success)
-                    {
-                        var start = Convert.ToInt32(match.Groups[1].Value);
-                        var end = Convert.ToInt32(match.Groups[2].Value);
-                        if(start > end || end > max)
-                        {
-                            continue;
-                        }
-                        intRange.AddRange(Enumerable.Range(start, (end - start) + 1).ToList());
-                    }
-                    else
-                    {
-                        var number = 0;
-                        if(!Int32.TryParse(segment, out number))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            if(number > max || number < 1)
-                            {
-                                continue;
-                            }
-                            intRange.Add(number);
-                        }
-                    }
-                }
-                rangeValid = true;
-            }
-            return intRange.Distinct().OrderBy(i => i);
-        }
-
     }
 }

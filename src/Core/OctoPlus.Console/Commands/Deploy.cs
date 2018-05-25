@@ -141,60 +141,20 @@ namespace OctoPlus.Console.Commands {
 
         private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
-            bool run = true;
-            while (run)
+            var runner = new InteractiveRunner(String.Empty, "Project Name", "Current Release", "Current Package", "New Package");
+            foreach (var project in projects)
             {
-                var table = new ConsoleTable("#", "*", "Project Name", "Current Release", "Current Package", "New Package");
-
-                var rowPosition = 1;
-
-                foreach (var project in projects)
-                {
-                    table.AddRow(new[] {
-                        rowPosition.ToString(),
-                        project.Checked ? "*" : String.Empty,
+                runner.AddRow(new[] {
                         project.ProjectName,
                         project.CurrentRelease.Version,
                         project.CurrentRelease.DisplayPackageVersion,
                         project.AvailablePackages.Count() > 0 ? project.AvailablePackages.First().Version : String.Empty
                     });
-                    rowPosition++;
-                }
-
-                table.Write();
-
-                System.Console.WriteLine(" Update: 1 | Remove: 2 | Continue: c | Exit: e");
-                var prompt = Prompt.GetString("");
-
-                switch (prompt)
-                {
-                    case "1":
-                        SelectProjectsForDeployment(projects, true);
-                        break;
-                    case "2":
-                        SelectProjectsForDeployment(projects, false);
-                        break;
-                    case "c":
-                        break;
-                    case "e":
-                        run = false;
-                        break;
-                    default:
-                        await InteractivePrompt(channel, environment, projects);
-                        break;
-                }
             }
+            runner.Run();
+            var indexes = runner.GetSelectedIndexes();
 
             return null;
-        }
-
-        private void SelectProjectsForDeployment(IList<Project> projects, bool select)
-        {
-            var range = GetRangeFromPrompt(projects.Count());
-            foreach(var index in range)
-            {
-                projects[index - 1].Checked = select;
-            }
         }
 
         private string PromptForStringWithoutQuitting(string prompt)
