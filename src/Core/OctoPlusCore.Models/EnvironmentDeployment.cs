@@ -28,6 +28,11 @@ namespace OctoPlusCore.Models
 {
     public class EnvironmentDeployment : IOctoJob
     {
+        public EnvironmentDeployment()
+        {
+            ProjectDeployments = new List<ProjectDeployment>();
+        }
+
         public string EnvironmentId { get; set; }
         public string EnvironmentName { get; set; }
         public List<ProjectDeployment> ProjectDeployments { get; set; }

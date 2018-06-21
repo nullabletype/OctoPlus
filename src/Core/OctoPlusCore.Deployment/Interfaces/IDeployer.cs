@@ -24,11 +24,13 @@
 using System.Threading.Tasks;
 using OctoPlusCore.Models.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
+using OctoPlusCore.Models;
 
 namespace OctoPlusCore.Deployment.Interfaces
 {
     public interface IDeployer
     {
         Task StartJob(IOctoJob job, IUiLogger uiLogger, bool suppressMessages = false);
+        Task<DeploymentCheckResult> CheckDeployment(EnvironmentDeployment deployment);
     }
 }

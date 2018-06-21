@@ -117,73 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CheckingOptions" xml:space="preserve">
-    <value>Checking your options...</value>
-  </data>
-  <data name="CurrentPackage" xml:space="preserve">
-    <value>Current Package</value>
-  </data>
-  <data name="CurrentRelease" xml:space="preserve">
-    <value>Current Release</value>
-  </data>
-  <data name="Error" xml:space="preserve">
-    <value>Error: </value>
-  </data>
-  <data name="ErrorColumnHeadingMismatch" xml:space="preserve">
-    <value>You specified {0} columns but the table has {1} headings?</value>
-  </data>
-  <data name="Exiting" xml:space="preserve">
-    <value>Exiting...</value>
-  </data>
-  <data name="FetchingProjectList" xml:space="preserve">
-    <value>Fetching project list</value>
-  </data>
-  <data name="GettingGroupInfo" xml:space="preserve">
-    <value>Getting group info</value>
-  </data>
-  <data name="Id" xml:space="preserve">
-    <value>Id</value>
-  </data>
-  <data name="InteractiveRunnerInstructions" xml:space="preserve">
-    <value>Update: 1 | Remove: 2 | Continue: c | Exit: e</value>
-  </data>
-  <data name="InteractiveRunnerSelectionInstructions" xml:space="preserve">
-    <value>Please make a selection using ranges 1-2 or comma separated 1,2,3 etc.</value>
-  </data>
-  <data name="LoadingInfoFor" xml:space="preserve">
-    <value>Loading Info for {0}</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="NewPackage" xml:space="preserve">
-    <value>New Package</value>
-  </data>
-  <data name="NoMatchingEnvironments" xml:space="preserve">
-    <value>No environments match your criteria!</value>
-  </data>
-  <data name="NothingSelected" xml:space="preserve">
-    <value>Nothing selected!</value>
-  </data>
-  <data name="ProjectName" xml:space="preserve">
-    <value>Project Name</value>
-  </data>
-  <data name="ProjectNotFound" xml:space="preserve">
-    <value>Provided seed project couldn't be found. I can't continue!</value>
-  </data>
-  <data name="RestrictToGroupsPrompt" xml:space="preserve">
-    <value>Do you want to restrict to certain product groups?</value>
-  </data>
-  <data name="TooManyMatchingEnvironments" xml:space="preserve">
-    <value>Too many enviroments match your criteria: </value>
-  </data>
-  <data name="UsingProfileAtPath" xml:space="preserve">
-    <value>Using profile at path </value>
-  </data>
-  <data name="WhichChannelPrompt" xml:space="preserve">
-    <value>Which channel do you wish to deploy?</value>
-  </data>
-  <data name="WhichEnvironmentPrompt" xml:space="preserve">
-    <value>Which environment do you wish to deploy to?</value>
+  <data name="FailedValidation" xml:space="preserve">
+    <value>I can't deploy {{projectname}} to {{environmentname}} as it may violate its lifecycle. If you're trying to promote a package to another environment, use the promote feature.</value>
   </data>
 </root>

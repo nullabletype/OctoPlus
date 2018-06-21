@@ -10,4 +10,19 @@
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\DeploymentStrings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DeploymentStrings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\DeploymentStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DeploymentStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

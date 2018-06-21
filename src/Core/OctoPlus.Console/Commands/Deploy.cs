@@ -25,6 +25,8 @@ using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Console.Resources;
 using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Deployment.Interfaces;
+using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus;
 using OctoPlusCore.Octopus.Interfaces;
@@ -40,12 +42,16 @@ namespace OctoPlus.Console.Commands {
         private IConsoleDoJob consoleDoJob;
         private IOctopusHelper octoHelper;
         private IConfiguration configuration;
+        private IDeployer deployer;
+        private IUiLogger uilogger;
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper)
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
             this.octoHelper = octoHelper;
+            this.deployer = deployer;
+            this.uilogger = uilogger;
         }
 
         public async void Configure(CommandLineApplication command) 
@@ -74,37 +80,37 @@ namespace OctoPlus.Console.Commands {
 
         private async Task RunInteractively(CommandLineApplication command)
         {
-            WriteStatusLine("Fetching project list");
+            WriteStatusLine(UiStrings.FetchingProjectList);
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
             if (found == null)
             {
-                System.Console.WriteLine("Provided seed project couldn't be found. I can't continue!");
+                System.Console.WriteLine(UiStrings.ProjectNotFound);
                 return;
             }
 
-            var channelName = PromptForStringWithoutQuitting("Which channel do you wish to deploy?");
-            var environmentName = PromptForStringWithoutQuitting("Which environment do you wish to deploy to?");
-            var groupRestriction = Prompt.GetString("Do you want to restrict to certain product groups?");
-            WriteStatusLine("Checking your options...");
+            var channelName = PromptForStringWithoutQuitting(UiStrings.WhichChannelPrompt);
+            var environmentName = PromptForStringWithoutQuitting(UiStrings.WhichEnvironmentPrompt);
+            var groupRestriction = Prompt.GetString(UiStrings.RestrictToGroupsPrompt);
+            WriteStatusLine(UiStrings.CheckingOptions);
             var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
 
             if (matchingEnvironments.Count() > 1)
             {
-                System.Console.WriteLine("Too many enviroments match your criteria: " + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
+                System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
                 return;
             }
             else if (matchingEnvironments.Count() == 0)
             {
-                System.Console.WriteLine("No environments match your criteria!");
+                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
                 return;
             }
 
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                WriteStatusLine("Getting group info");
+                WriteStatusLine(UiStrings.GettingGroupInfo);
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -114,9 +120,10 @@ namespace OctoPlus.Console.Commands {
             var environment = await octoHelper.GetEnvironment(matchingEnvironments.First().Id);
             var projects = new List<Project>();
             CleanCurrentLine();
+
             foreach (var projectStub in projectStubs)
             {
-                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(), $"Loading Info for {(projectStub.ProjectName)}");
+                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(), String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
                     if (!groupIds.Contains(projectStub.ProjectGroupId))
@@ -134,14 +141,36 @@ namespace OctoPlus.Console.Commands {
                 }
                 projects.Add(project);
             }
+
             CleanCurrentLine();
 
-            await InteractivePrompt(channel, environment, projects);
+            var deploymentOk = false;
+            EnvironmentDeployment deployment;
+
+            do
+            {
+                deployment = await InteractivePrompt(channel, environment, projects);
+                if(deployment == null)
+                {
+                    return;
+                }
+                var result = await this.deployer.CheckDeployment(deployment);
+                if (result.Success)
+                {
+                    deploymentOk = true;
+                }
+                else
+                {
+                    System.Console.WriteLine(UiStrings.Error + result.ErrorMessage);
+                }
+            } while (!deploymentOk);
+
+            await this.deployer.StartJob(deployment, this.uilogger);
         }
 
         private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
-            var runner = new InteractiveRunner(String.Empty, "Project Name", "Current Release", "Current Package", "New Package");
+            var runner = new InteractiveRunner(String.Empty, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
             foreach (var project in projects)
             {
                 runner.AddRow(new[] {
@@ -154,7 +183,44 @@ namespace OctoPlus.Console.Commands {
             runner.Run();
             var indexes = runner.GetSelectedIndexes();
 
-            return null;
+            if(!indexes.Any())
+            {
+                System.Console.WriteLine(UiStrings.NothingSelected);
+                return null;
+            }
+
+            var deployment = new EnvironmentDeployment
+            {
+                ChannelName = channel.Name,
+                DeployAsync = true,
+                EnvironmentId = environment.Id,
+                EnvironmentName = environment.Name
+            };
+
+            var depProjects = new List<ProjectDeployment>();
+
+            foreach (var index in indexes)
+            {
+                var current = projects[index];
+
+                if (current.AvailablePackages.Any())
+                {
+                    var projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, channel.Name);
+                    deployment.ProjectDeployments.Add(new ProjectDeployment
+                    {
+                        ProjectId = current.ProjectId,
+                        ProjectName = current.ProjectName,
+                        PackageId = current.AvailablePackages.First().Id,
+                        PackageName = current.AvailablePackages.First().Version,
+                        StepName = current.AvailablePackages.First().StepName,
+                        ChannelId = projectChannel.Id,
+                        ChannelVersionRange = channel.VersionRange,
+                        LifeCycleId = current.LifeCycleId
+                    });
+                }
+            }
+
+            return deployment;
         }
 
         private string PromptForStringWithoutQuitting(string prompt)
@@ -184,7 +250,7 @@ namespace OctoPlus.Console.Commands {
         private async Task<int> DeployWithProfile(CommandLineApplication command)
         {
             var profilePath = GetOption("file").Value();
-            System.Console.WriteLine("Using profile at path " + profilePath);
+            System.Console.WriteLine(UiStrings.UsingProfileAtPath + profilePath);
             await this.consoleDoJob.StartJob(profilePath, null, null, true);
             return 0;
         }

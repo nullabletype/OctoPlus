@@ -31,6 +31,7 @@ using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Logging;
+using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
@@ -118,7 +119,8 @@ namespace OctoPlus.Console
             .AddTransient<IVersionCheckingProvider, GitHubVersionChecker>()
             .AddTransient<IVersionChecker, VersionChecker>()
             .AddTransient<IConsoleDoJob, ConsoleDoJob>()
-            .AddTransient<Deploy, Deploy>();
+            .AddTransient<Deploy, Deploy>()
+            .AddTransient<IUiLogger, ConsoleDoJob>();
         }
     }
 }

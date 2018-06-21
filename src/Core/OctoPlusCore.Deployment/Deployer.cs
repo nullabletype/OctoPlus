@@ -34,6 +34,7 @@ using OctoPlusCore.Models.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
+using OctoPlusCore.Deployment.Resources;
 
 namespace OctoPlusCore.Deployment {
     public class Deployer : IDeployer
@@ -45,6 +46,41 @@ namespace OctoPlusCore.Deployment {
         {
             this.helper = helper;
             this.configuration = configuration;
+        }
+
+        public async Task<DeploymentCheckResult> CheckDeployment(EnvironmentDeployment deployment)
+        {
+            foreach (var project in deployment.ProjectDeployments)
+            {
+                var lifeCyle = await this.helper.GetLifeCycle(project.LifeCycleId);
+                if (lifeCyle.Phases.Any())
+                {
+                    var safe = false;
+                    if (lifeCyle.Phases[0].OptionalDeploymentTargetEnvironmentIds.Any())
+                    {
+                        if (lifeCyle.Phases[0].OptionalDeploymentTargetEnvironmentIds.Contains(deployment.EnvironmentId))
+                        {
+                            safe = true;
+                        }
+                    }
+                    if (!safe && lifeCyle.Phases[0].AutomaticDeploymentTargetEnvironmentIds.Any())
+                    {
+                        if (lifeCyle.Phases[0].AutomaticDeploymentTargetEnvironmentIds.Contains(deployment.EnvironmentId))
+                        {
+                            safe = true;
+                        }
+                    }
+                    if (!safe)
+                    {
+
+                        return new DeploymentCheckResult {
+                            Success = false,
+                            ErrorMessage = DeploymentStrings.FailedValidation.Replace("{{projectname}}", project.ProjectName).Replace("{{environmentname}}", deployment.EnvironmentName)
+                        };
+                    }
+                }
+            }
+            return new DeploymentCheckResult { Success = true };
         }
 
         public async Task StartJob(IOctoJob job, IUiLogger uiLogger, bool suppressMessages = false)

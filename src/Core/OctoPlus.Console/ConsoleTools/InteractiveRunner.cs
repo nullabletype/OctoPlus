@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using OctoPlus.Console.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace OctoPlus.Console.ConsoleTools
         private List<string> Columns;
         private List<string[]> Rows;
         private List<int> Selected;
+        private bool Cancelled;
 
         internal InteractiveRunner(string promptText, params string[] columns)
         {
@@ -23,7 +25,7 @@ namespace OctoPlus.Console.ConsoleTools
         {
             if (values.Count() != Columns.Count())
             {
-                throw new Exception($"You specified {(values.Count())} columns but the table has {(Columns.Count())} headings?");
+                throw new Exception(String.Format(UiStrings.ErrorColumnHeadingMismatch, values.Count(), Columns.Count()));
             }
             Rows.Add(values);
         }
@@ -49,9 +51,9 @@ namespace OctoPlus.Console.ConsoleTools
                     rowPosition++;
                 }
 
-                table.Write();
+                table.Write(Format.Minimal);
 
-                System.Console.WriteLine(" Update: 1 | Remove: 2 | Continue: c | Exit: e");
+                System.Console.WriteLine(UiStrings.InteractiveRunnerInstructions);
                 var prompt = Prompt.GetString("");
 
                 switch (prompt)
@@ -63,11 +65,14 @@ namespace OctoPlus.Console.ConsoleTools
                         SelectProjectsForDeployment(false);
                         break;
                     case "c":
-                        break;
-                    case "e":
                         run = false;
                         break;
+                    case "e":
+                        System.Console.WriteLine(UiStrings.Exiting);
+                        Environment.Exit(0);
+                        break;
                     default:
+                        System.Console.WriteLine(Environment.NewLine);
                         break;
                 }
             }
@@ -107,7 +112,7 @@ namespace OctoPlus.Console.ConsoleTools
             while (!rangeValid)
             {
                 intRange.Clear();
-                var userInput = Prompt.GetString("Please make a selection using ranges 1-2 or comma separated 1,2,3 etc.");
+                var userInput = Prompt.GetString(UiStrings.InteractiveRunnerSelectionInstructions);
                 if (string.IsNullOrEmpty(userInput))
                 {
                     return new List<int>();
