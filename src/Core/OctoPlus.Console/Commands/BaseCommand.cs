@@ -153,12 +153,23 @@ namespace OctoPlus.Console.Commands {
             System.Console.Write(builder.ToString());
         }
 
-        protected string GetStringFromUser(string optionName, string prompt)
+        protected string GetStringFromUser(string optionName, string prompt, bool allowEmpty = false)
         {
             var option = GetStringValueFromOption(optionName);
-            if (string.IsNullOrEmpty(option))
+
+            if (InInteractiveMode)
             {
-                option = PromptForStringWithoutQuitting(prompt);
+                if (allowEmpty)
+                {
+                    option = Prompt.GetString(prompt);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(option) && !allowEmpty)
+                    {
+                        option = PromptForStringWithoutQuitting(prompt);
+                    }
+                }
             }
 
             return option;
@@ -166,11 +177,12 @@ namespace OctoPlus.Console.Commands {
 
         protected string PromptForStringWithoutQuitting(string prompt)
         {
-            var channel = Prompt.GetString(prompt);
-            if (string.IsNullOrEmpty(channel))
+            string channel;
+            do
             {
-                return PromptForStringWithoutQuitting(prompt);
-            }
+                channel = Prompt.GetString(prompt);
+            } while (string.IsNullOrEmpty(channel));
+
             return channel;
         }
 

@@ -168,6 +168,9 @@
   <data name="NewPackage" xml:space="preserve">
     <value>New Package</value>
   </data>
+  <data name="NoMatchingChannel" xml:space="preserve">
+    <value>No channel found with the specified name! </value>
+  </data>
   <data name="NoMatchingEnvironments" xml:space="preserve">
     <value>No environments match your criteria!</value>
   </data>

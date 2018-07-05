@@ -214,6 +214,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No channel found with the specified name! .
+        /// </summary>
+        internal static string NoMatchingChannel {
+            get {
+                return ResourceManager.GetString("NoMatchingChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No environments match your criteria!.
         /// </summary>
         internal static string NoMatchingEnvironments {

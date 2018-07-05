@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NuGet.Versioning;
 
 namespace OctoPlus.Console.Commands {
     class Deploy : BaseCommand {
@@ -86,8 +87,7 @@ namespace OctoPlus.Console.Commands {
 
             var channelName = GetStringFromUser(DeployOptionNames.ChannelName, UiStrings.WhichChannelPrompt);
             var environmentName = GetStringFromUser(DeployOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
-            var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt);
-            var releaseName = GetStringFromUser(DeployOptionNames.ReleaseName, UiStrings.ReleaseNamePrompt);
+            var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt, allowEmpty: true);
 
             WriteStatusLine(UiStrings.CheckingOptions);
             var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
@@ -97,7 +97,7 @@ namespace OctoPlus.Console.Commands {
                 System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
                 return -1;
             }
-            else if (matchingEnvironments.Count() == 0)
+            else if (!matchingEnvironments.Any())
             {
                 System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
                 return -1;
@@ -113,6 +113,13 @@ namespace OctoPlus.Console.Commands {
             }
 
             var channel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, channelName);
+
+            if (channel == null)
+            {
+                System.Console.WriteLine(UiStrings.NoMatchingChannel);
+                return -1;
+            }
+
             var environment = await octoHelper.GetEnvironment(matchingEnvironments.First().Id);
             var projects = new List<Project>();
             CleanCurrentLine();
@@ -144,21 +151,38 @@ namespace OctoPlus.Console.Commands {
 
             CleanCurrentLine();
 
-            var deploymentOk = false;
             EnvironmentDeployment deployment;
 
             if (this.InInteractiveMode)
             {
+                bool deploymentOk;
                 do
                 {
                     deployment = await InteractivePrompt(channel, environment, projects);
-                    if (await ValidateDeployment(deployment, deployer)) return -1;
+                    deploymentOk = await ValidateDeployment(deployment, deployer);
                 } while (!deploymentOk);
             }
             else
             {
                 deployment = await PrepareEnvironmentDeployment(channel, environment, projects, all: true);
                 if (await ValidateDeployment(deployment, deployer)) return -2;
+            }
+
+            string releaseName;
+
+            do
+            {
+                releaseName = GetStringFromUser(DeployOptionNames.ReleaseName, UiStrings.ReleaseNamePrompt,
+                    allowEmpty: true);
+
+            } while (InInteractiveMode && !string.IsNullOrEmpty(releaseName) && !SemanticVersion.TryParse(releaseName, out _));
+
+            if (!string.IsNullOrEmpty(releaseName))
+            {
+                foreach (var project in deployment.ProjectDeployments)
+                {
+                    project.ReleaseVersion = releaseName;
+                }
             }
 
             await this.deployer.StartJob(deployment, this.uilogger);

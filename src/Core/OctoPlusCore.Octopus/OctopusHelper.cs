@@ -446,6 +446,10 @@ namespace OctoPlusCore.Octopus
 
         private Channel ConvertChannel(ChannelResource channel)
         {
+            if (channel == null)
+            {
+                return null;
+            }
             var versionRange = String.Empty;
             if (channel.Rules.Any())
             {
