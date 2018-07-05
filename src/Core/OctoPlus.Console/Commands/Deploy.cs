@@ -249,28 +249,6 @@ namespace OctoPlus.Console.Commands {
             return runner;
         }
 
-        private void ConfigureProfileBasedDeployment(CommandLineApplication command) 
-        {
-            base.Configure(command);
-
-            AddToRegister(DeployOptionNames.File, command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
-            AddToRegister(DeployOptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
-            AddToRegister(DeployOptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
-
-            command.OnExecute(async () =>
-            {
-                await DeployWithProfile();
-            });
-        }
-
-        private async Task<int> DeployWithProfile()
-        {
-            var profilePath = GetOption(DeployOptionNames.File).Value();
-            System.Console.WriteLine(UiStrings.UsingProfileAtPath + profilePath);
-            await this.consoleDoJob.StartJob(profilePath, null, null, true);
-            return 0;
-        }
-
         struct DeployOptionNames
         {
             public const string File = "file";
