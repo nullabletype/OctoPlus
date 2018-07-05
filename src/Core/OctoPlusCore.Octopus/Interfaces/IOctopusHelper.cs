@@ -56,5 +56,6 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<List<ProjectStub>> GetProjectStubs();
         Task<Project> ConvertProject(ProjectStub project, string env, string channelRange);
         Task<LifeCycle> GetLifeCycle(string idOrHref);
+        Task<IEnumerable<Deployment>> GetDeployments(string releaseId);
     }
 }

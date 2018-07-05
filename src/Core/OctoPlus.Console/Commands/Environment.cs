@@ -30,32 +30,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OctoPlus.Console.Commands {
-    class Environment : BaseCommand {
+    class Environment : BaseCommand
+    {
 
-        public Environment(CommandLineApplication command) 
+        protected override bool SupportsInteractiveMode => false;
+        public override string CommandName => "env";
+
+        public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
             command.Description = OptionsStrings.EnvironmentCommands;
 
-            command.Command("list", list => ConfigureListCommand(list));
-
-            command.OnExecute(async () =>
-            {
-                
-            });
+            command.Command("list", ConfigureListCommand);
         }
 
         private void ConfigureListCommand(CommandLineApplication command) 
         {
             base.Configure(command);
-
-            command.OnExecute(async () =>
-            {
-                await ExecuteListCommand(command);
-            });
         }
 
-        private async Task ExecuteListCommand(CommandLineApplication command) 
+        protected override async Task<int> Run(CommandLineApplication command)
         {
             var envs = await  OctopusHelper.Default.GetEnvironments();
             var table = new ConsoleTable(UiStrings.Name, UiStrings.Id);
@@ -65,6 +59,8 @@ namespace OctoPlus.Console.Commands {
             }
 
             table.Write();
+            return 0;
         }
+
     }
 }

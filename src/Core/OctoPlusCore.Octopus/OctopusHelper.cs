@@ -334,6 +334,16 @@ namespace OctoPlusCore.Octopus
             return await client.Repository.Tasks.GetRawOutputLog(task);
         }
 
+        public async Task<IEnumerable<Deployment>> GetDeployments(string releaseId)
+        {
+            if(string.IsNullOrEmpty(releaseId))
+            {
+                return new Deployment[0];
+            }
+            var deployments = await client.Repository.Releases.GetDeployments(await client.Repository.Releases.Get(releaseId), 0, 100);
+            return deployments.Items.ToList().Select(ConvertDeployment);
+        }
+
         public bool Search(DeploymentResource deploymentResource, string projectId, string envId)
         {
             return deploymentResource.ProjectId == projectId && deploymentResource.EnvironmentId == envId;
@@ -344,10 +354,20 @@ namespace OctoPlusCore.Octopus
             return new Environment {Id = env.Id, Name = env.Name};
         }
 
+        private Deployment ConvertDeployment(DeploymentResource dep)
+        {
+            return new Deployment
+            {
+                EnvironmentId = dep.EnvironmentId,
+                ReleaseId = dep.ReleaseId,
+                TaskId = dep.TaskId
+            };
+        }
+
         public async Task<Project> ConvertProject(ProjectStub project, string env, string channelRange)
         {
             var projectRes = await this.client.Repository.Projects.Get(project.ProjectId);
-            var packages = await this.GetPackages(projectRes, channelRange);
+            var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange);
             return new Project {
                 CurrentRelease = await this.GetReleasedVersion(project.ProjectId, env),
                 ProjectName = project.ProjectName,
@@ -399,11 +419,13 @@ namespace OctoPlusCore.Octopus
             {
                 foreach (var phase in lifeCycle.Phases)
                 {
+                    
                     var newPhase = new Phase
                     {
                         Name = phase.Name,
-                        Id = phase.Id
-
+                        Id = phase.Id,
+                        MinimumEnvironmentsBeforePromotion = phase.MinimumEnvironmentsBeforePromotion,
+                        Optional = phase.IsOptionalPhase
                     };
                     if (phase.OptionalDeploymentTargets != null)
                     {

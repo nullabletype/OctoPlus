@@ -9,25 +9,30 @@ namespace OctoPlus.Console.ConsoleTools
 {
     class InteractiveRunner
     {
-        private List<string> Columns;
-        private List<string[]> Rows;
-        private List<int> Selected;
-        private bool Cancelled;
+        private readonly List<string> _columns;
+        private readonly List<string[]> _rows;
+        private readonly List<int> _selected;
+        private readonly string _promptText;
 
         internal InteractiveRunner(string promptText, params string[] columns)
         {
-            Columns = new List<string>(columns);
-            Rows = new List<string[]>();
-            Selected = new List<int>();
+            _columns = new List<string>(columns);
+            _rows = new List<string[]>();
+            _selected = new List<int>();
+            this._promptText = promptText;
         }
 
-        public void AddRow(params string[] values)
+        public void AddRow(bool selected, params string[] values)
         {
-            if (values.Count() != Columns.Count())
+            if (values.Count() != _columns.Count())
             {
-                throw new Exception(String.Format(UiStrings.ErrorColumnHeadingMismatch, values.Count(), Columns.Count()));
+                throw new Exception(String.Format(UiStrings.ErrorColumnHeadingMismatch, values.Count(), _columns.Count()));
             }
-            Rows.Add(values);
+            _rows.Add(values);
+            if (selected)
+            {
+                _selected.Add(_rows.Count() - 1);
+            }
         }
 
         public void Run()
@@ -35,22 +40,23 @@ namespace OctoPlus.Console.ConsoleTools
             bool run = true;
             while (run)
             {
-                var newColumns = Columns.ToList();
+                var newColumns = _columns.ToList();
                 newColumns.Insert(0, "#");
                 newColumns.Insert(1, "*");
                 var table = new ConsoleTable(newColumns.ToArray());
 
                 var rowPosition = 1;
 
-                foreach (var row in Rows)
+                foreach (var row in _rows)
                 {
                     var newRow = row.ToList();
                     newRow.Insert(0, rowPosition.ToString());
-                    newRow.Insert(1, Selected.Contains(rowPosition - 1) ? "*" : string.Empty);
+                    newRow.Insert(1, _selected.Contains(rowPosition - 1) ? "*" : string.Empty);
                     table.AddRow(newRow.ToArray());
                     rowPosition++;
                 }
 
+                System.Console.WriteLine(Environment.NewLine + this._promptText + Environment.NewLine);
                 table.Write(Format.Minimal);
 
                 System.Console.WriteLine(UiStrings.InteractiveRunnerInstructions);
@@ -80,26 +86,26 @@ namespace OctoPlus.Console.ConsoleTools
 
         public IEnumerable<int> GetSelectedIndexes()
         {
-            return Selected.ToList();
+            return _selected.ToList();
         }
 
         private void SelectProjectsForDeployment(bool select)
         {
-            var range = GetRangeFromPrompt(Rows.Count());
+            var range = GetRangeFromPrompt(_rows.Count());
             foreach (var index in range)
             {
                 if (select)
                 {
-                    if (!Selected.Contains(index-1))
+                    if (!_selected.Contains(index-1))
                     {
-                        Selected.Add(index-1);
+                        _selected.Add(index-1);
                     }
                 }
                 else
                 {
-                    if (Selected.Contains(index-1))
+                    if (_selected.Contains(index-1))
                     {
-                        Selected.Remove(index-1);
+                        _selected.Remove(index-1);
                     }
                 }
             }

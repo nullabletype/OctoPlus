@@ -61,12 +61,16 @@ namespace OctoPlus.Console
             app.ThrowOnUnexpectedArgument = true;
             app.Conventions.UseConstructorInjection(container);
 
-            app.Command("deploy", deploy => container.GetService<Deploy>().Configure(deploy));
-            app.Command("env", env => new Commands.Environment(env));
+            var deployer = container.GetService<Deploy>();
+            app.Command(deployer.CommandName, deploy => deployer.Configure(deploy));
+            var promoter = container.GetService<Promote>();
+            app.Command(promoter.CommandName, promote => promoter.Configure(promote));
+            var environment = container.GetService<Commands.Environment>();
+            app.Command(environment.CommandName, env => environment.Configure(env));
 
-            app.OnExecute(async () =>
+            app.OnExecute(() =>
             {
-                System.Console.WriteLine("Main");
+                app.ShowHelp();
             });
 
             return app.Execute(args);
@@ -120,6 +124,9 @@ namespace OctoPlus.Console
             .AddTransient<IVersionChecker, VersionChecker>()
             .AddTransient<IConsoleDoJob, ConsoleDoJob>()
             .AddTransient<Deploy, Deploy>()
+            .AddTransient<Promote, Promote>()
+            .AddTransient<DeployWithProfile, DeployWithProfile>()
+            .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>();
         }
     }

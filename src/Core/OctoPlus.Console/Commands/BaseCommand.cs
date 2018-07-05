@@ -26,33 +26,83 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using OctoPlus.Console.Resources;
+using OctoPlusCore.Deployment.Interfaces;
+using OctoPlusCore.Models;
 
 namespace OctoPlus.Console.Commands {
     abstract class BaseCommand 
     {
-        private Dictionary<string, CommandOption> OptionRegister;
-
-        public BaseCommand()
-        {
-            OptionRegister = new Dictionary<string, CommandOption>();
-        }
+        protected abstract bool SupportsInteractiveMode { get; }
+        public abstract string CommandName { get; }
+        protected abstract Task<int> Run(CommandLineApplication command);
 
         protected const string HelpOption = "-?|-h|--help";
+        private readonly Dictionary<string, CommandOption> _optionRegister;
+        private readonly List<BaseCommand> _subCommands;
+        protected bool InInteractiveMode { get; private set; }
 
-        protected void Configure(CommandLineApplication command) 
+        protected BaseCommand()
+        {
+            _optionRegister = new Dictionary<string, CommandOption>();
+            _subCommands = new List<BaseCommand>();
+        }
+
+        public virtual void Configure(CommandLineApplication command) 
         {
             command.HelpOption(HelpOption);
             command.ThrowOnUnexpectedArgument = true;
+            if (this.SupportsInteractiveMode)
+            {
+                AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", OptionsStrings.InteractiveDeploy, CommandOptionType.NoValue));
+            }
+            command.OnExecute(async () =>
+            {
+                if (GetOption(OptionNames.Interactive).HasValue())
+                {
+                    SetInteractiveMode((true));
+                }
+
+                var code = await this.Run(command);
+                if (code != 0)
+                {
+                    if (code == -1)
+                    {
+                        command.ShowHelp();
+                    }
+                }
+            });
+        }
+
+        protected void ConfigureSubCommand(BaseCommand child, CommandLineApplication command)
+        {
+            command.Command(child.CommandName, child.Configure);
+        }
+
+        protected void SetInteractiveMode(bool mode)
+        {
+            this.InInteractiveMode = mode;
         }
 
         protected void AddToRegister(string key, CommandOption option)
         {
-            OptionRegister.Add(key, option);
+            _optionRegister.Add(key, option);
         }
 
         protected CommandOption GetOption(string key)
         {
-            return OptionRegister[key];
+            return _optionRegister[key];
+        }
+
+        protected string GetStringValueFromOption(string key)
+        {
+            var option = GetOption(key);
+            if (option.HasValue())
+            {
+                return option.Value();
+            }
+            return string.Empty;
         }
 
         protected void WriteStatusLine(string status)
@@ -101,6 +151,52 @@ namespace OctoPlus.Console.Commands {
             }
             System.Console.SetCursorPosition(0, System.Console.CursorTop);
             System.Console.Write(builder.ToString());
+        }
+
+        protected string GetStringFromUser(string optionName, string prompt)
+        {
+            var option = GetStringValueFromOption(optionName);
+            if (string.IsNullOrEmpty(option))
+            {
+                option = PromptForStringWithoutQuitting(prompt);
+            }
+
+            return option;
+        }
+
+        protected string PromptForStringWithoutQuitting(string prompt)
+        {
+            var channel = Prompt.GetString(prompt);
+            if (string.IsNullOrEmpty(channel))
+            {
+                return PromptForStringWithoutQuitting(prompt);
+            }
+            return channel;
+        }
+
+        protected async Task<bool> ValidateDeployment(EnvironmentDeployment deployment, IDeployer deployer)
+        {
+            if (deployment == null)
+            {
+                return true;
+            }
+
+            var result = await deployer.CheckDeployment(deployment);
+            if (result.Success)
+            {
+                return true;
+            }
+            else
+            {
+                System.Console.WriteLine(UiStrings.Error + result.ErrorMessage);
+            }
+
+            return false;
+        }
+
+        public struct OptionNames
+        {
+            public const string Interactive = "interactive";
         }
 
     }

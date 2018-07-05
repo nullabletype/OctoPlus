@@ -44,41 +44,35 @@ namespace OctoPlus.Console.Commands {
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
+        private readonly DeployWithProfile profile;
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger)
+        protected override bool SupportsInteractiveMode => true;
+        public override string CommandName => "deploy";
+
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
             this.octoHelper = octoHelper;
             this.deployer = deployer;
             this.uilogger = uilogger;
+            this.profile = profile;
         }
 
-        public async void Configure(CommandLineApplication command) 
+        public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
             command.Description = OptionsStrings.DeployProjects;
 
-            command.Command("profile", profile => ConfigureProfileBasedDeployment(profile));
-            command.Command("int", profile => ConfigureInteractiveMode(profile));
+            ConfigureSubCommand(profile, command);
 
-            command.OnExecute(async () =>
-            {
-                command.ShowHelp();
-            });
+            AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.ReleaseName, command.Option("-r|--releasename", OptionsStrings.ReleaseVersion, CommandOptionType.SingleValue));
         }
 
-        private void ConfigureInteractiveMode(CommandLineApplication command)
-        {
-            base.Configure(command);
-
-            command.OnExecute(async () =>
-            {
-                await RunInteractively(command);
-            });
-        }
-
-        private async Task RunInteractively(CommandLineApplication command)
+        protected override async Task<int> Run(CommandLineApplication command)
         {
             WriteStatusLine(UiStrings.FetchingProjectList);
             var projectStubs = await octoHelper.GetProjectStubs();
@@ -87,24 +81,26 @@ namespace OctoPlus.Console.Commands {
             if (found == null)
             {
                 System.Console.WriteLine(UiStrings.ProjectNotFound);
-                return;
+                return -1;
             }
 
-            var channelName = PromptForStringWithoutQuitting(UiStrings.WhichChannelPrompt);
-            var environmentName = PromptForStringWithoutQuitting(UiStrings.WhichEnvironmentPrompt);
-            var groupRestriction = Prompt.GetString(UiStrings.RestrictToGroupsPrompt);
+            var channelName = GetStringFromUser(DeployOptionNames.ChannelName, UiStrings.WhichChannelPrompt);
+            var environmentName = GetStringFromUser(DeployOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
+            var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt);
+            var releaseName = GetStringFromUser(DeployOptionNames.ReleaseName, UiStrings.ReleaseNamePrompt);
+
             WriteStatusLine(UiStrings.CheckingOptions);
             var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
 
             if (matchingEnvironments.Count() > 1)
             {
                 System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
-                return;
+                return -1;
             }
             else if (matchingEnvironments.Count() == 0)
             {
                 System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
-                return;
+                return -1;
             }
 
             var groupIds = new List<string>();
@@ -139,6 +135,10 @@ namespace OctoPlus.Console.Commands {
                 {
                     project.Checked = false;
                 }
+                else
+                {
+                    project.Checked = true;
+                }
                 projects.Add(project);
             }
 
@@ -147,48 +147,42 @@ namespace OctoPlus.Console.Commands {
             var deploymentOk = false;
             EnvironmentDeployment deployment;
 
-            do
+            if (this.InInteractiveMode)
             {
-                deployment = await InteractivePrompt(channel, environment, projects);
-                if(deployment == null)
+                do
                 {
-                    return;
-                }
-                var result = await this.deployer.CheckDeployment(deployment);
-                if (result.Success)
-                {
-                    deploymentOk = true;
-                }
-                else
-                {
-                    System.Console.WriteLine(UiStrings.Error + result.ErrorMessage);
-                }
-            } while (!deploymentOk);
+                    deployment = await InteractivePrompt(channel, environment, projects);
+                    if (await ValidateDeployment(deployment, deployer)) return -1;
+                } while (!deploymentOk);
+            }
+            else
+            {
+                deployment = await PrepareEnvironmentDeployment(channel, environment, projects, all: true);
+                if (await ValidateDeployment(deployment, deployer)) return -2;
+            }
 
             await this.deployer.StartJob(deployment, this.uilogger);
+            return 0;
         }
 
         private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
-            var runner = new InteractiveRunner(String.Empty, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
-            foreach (var project in projects)
-            {
-                runner.AddRow(new[] {
-                        project.ProjectName,
-                        project.CurrentRelease.Version,
-                        project.CurrentRelease.DisplayPackageVersion,
-                        project.AvailablePackages.Count() > 0 ? project.AvailablePackages.First().Version : String.Empty
-                    });
-            }
-            runner.Run();
+            InteractiveRunner runner = PopulateRunner(String.Format(UiStrings.DeployingTo, channel.Name, environment.Name), projects);
             var indexes = runner.GetSelectedIndexes();
 
-            if(!indexes.Any())
+            if (!indexes.Any())
             {
                 System.Console.WriteLine(UiStrings.NothingSelected);
                 return null;
             }
 
+            var deployment = await PrepareEnvironmentDeployment(channel, environment, projects, indexes);
+
+            return deployment;
+        }
+
+        private async Task<EnvironmentDeployment> PrepareEnvironmentDeployment(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects, IEnumerable<int> indexes = null, bool all = false)
+        {
             var deployment = new EnvironmentDeployment
             {
                 ChannelName = channel.Name,
@@ -197,62 +191,95 @@ namespace OctoPlus.Console.Commands {
                 EnvironmentName = environment.Name
             };
 
-            var depProjects = new List<ProjectDeployment>();
-
-            foreach (var index in indexes)
+            if (all)
             {
-                var current = projects[index];
-
-                if (current.AvailablePackages.Any())
+                foreach (var project in projects)
                 {
-                    var projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, channel.Name);
-                    deployment.ProjectDeployments.Add(new ProjectDeployment
+                    if (project.AvailablePackages.Any())
                     {
-                        ProjectId = current.ProjectId,
-                        ProjectName = current.ProjectName,
-                        PackageId = current.AvailablePackages.First().Id,
-                        PackageName = current.AvailablePackages.First().Version,
-                        StepName = current.AvailablePackages.First().StepName,
-                        ChannelId = projectChannel.Id,
-                        ChannelVersionRange = channel.VersionRange,
-                        LifeCycleId = current.LifeCycleId
-                    });
+                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, project));
+                    }
+                }
+            }
+            else
+            {
+                foreach (var index in indexes)
+                {
+                    var current = projects[index];
+
+                    if (current.AvailablePackages.Any())
+                    {
+                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, current));
+                    }
                 }
             }
 
             return deployment;
         }
 
-        private string PromptForStringWithoutQuitting(string prompt)
+        private async Task<ProjectDeployment> GenerateProjectDeployment(Channel channel, Project current)
         {
-            var channel = Prompt.GetString(prompt);
-            if (string.IsNullOrEmpty(channel))
+            var projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, channel.Name);
+            return new ProjectDeployment
             {
-                return PromptForStringWithoutQuitting(prompt);
+                ProjectId = current.ProjectId,
+                ProjectName = current.ProjectName,
+                PackageId = current.AvailablePackages.First().Id,
+                PackageName = current.AvailablePackages.First().Version,
+                StepName = current.AvailablePackages.First().StepName,
+                ChannelId = projectChannel.Id,
+                ChannelVersionRange = channel.VersionRange,
+                LifeCycleId = current.LifeCycleId
+            };
+        }
+
+        private InteractiveRunner PopulateRunner(string prompt, IList<Project> projects)
+        {
+            var runner = new InteractiveRunner(prompt, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
+            foreach (var project in projects)
+            {
+                runner.AddRow(project.Checked, new[] {
+                        project.ProjectName,
+                        project.CurrentRelease.Version,
+                        project.CurrentRelease.DisplayPackageVersion,
+                        project.AvailablePackages.Count() > 0 ? project.AvailablePackages.First().Version : String.Empty
+                    });
             }
-            return channel;
+            runner.Run();
+            return runner;
         }
 
         private void ConfigureProfileBasedDeployment(CommandLineApplication command) 
         {
             base.Configure(command);
 
-            AddToRegister("file", command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
-            AddToRegister("apikey", command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
-            AddToRegister("url", command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.File, command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
+            AddToRegister(DeployOptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
 
             command.OnExecute(async () =>
             {
-                await DeployWithProfile(command);
+                await DeployWithProfile();
             });
         }
 
-        private async Task<int> DeployWithProfile(CommandLineApplication command)
+        private async Task<int> DeployWithProfile()
         {
-            var profilePath = GetOption("file").Value();
+            var profilePath = GetOption(DeployOptionNames.File).Value();
             System.Console.WriteLine(UiStrings.UsingProfileAtPath + profilePath);
             await this.consoleDoJob.StartJob(profilePath, null, null, true);
             return 0;
+        }
+
+        struct DeployOptionNames
+        {
+            public const string File = "file";
+            public const string ApiKey = "apikey";
+            public const string Url = "url";
+            public const string ChannelName = "channel";
+            public const string Environment = "environment";
+            public const string GroupFilter = "groupfilter";
+            public const string ReleaseName = "ReleaseName";
         }
     }
 }

@@ -72,6 +72,38 @@ namespace OctoPlusCore.Deployment {
                     }
                     if (!safe)
                     {
+                        var phaseCheck = true;
+                        var deployments = await this.helper.GetDeployments(project.ReleaseId);
+                        var previousEnvs = deployments.Select(d => d.EnvironmentId);
+                        foreach(var phase in lifeCyle.Phases)
+                        {
+                            if (!phase.Optional)
+                            {
+                                if(phase.MinimumEnvironmentsBeforePromotion == 0)
+                                {
+                                    if(!previousEnvs.All(e => phase.OptionalDeploymentTargetEnvironmentIds.Contains(e)))
+                                    {
+                                        phaseCheck = false;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    if(phase.MinimumEnvironmentsBeforePromotion > previousEnvs.Intersect(phase.OptionalDeploymentTargetEnvironmentIds).Count()){
+                                        phaseCheck = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        safe = phaseCheck;
+                    }
+                    if (!safe)
+                    {
 
                         return new DeploymentCheckResult {
                             Success = false,
@@ -100,8 +132,17 @@ namespace OctoPlusCore.Deployment {
             var taskRegister = new Dictionary<string, TaskDetails>();
 
             foreach (var project in deployment.ProjectDeployments) {
-                uiLogger.WriteLine("Creating a release for project " + project.ProjectName + "... ");
-                var result = await helper.CreateRelease(project);
+                Release result;
+                if (string.IsNullOrEmpty(project.ReleaseId))
+                {
+                    uiLogger.WriteLine("Creating a release for project " + project.ProjectName + "... ");
+                    result = await helper.CreateRelease(project);
+                }
+                else
+                {
+                    uiLogger.WriteLine("Fetching existing release for project " + project.ProjectName + "... ");
+                    result = await helper.GetRelease(project.ReleaseId);
+                }
                 uiLogger.WriteLine("Complete: " + StandardSerialiser.SerializeToJsonNet(result, true));
 
                 uiLogger.WriteLine("Deploying " + result.Version + " to " + deployment.EnvironmentName);

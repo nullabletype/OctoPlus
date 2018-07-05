@@ -141,17 +141,26 @@
   <data name="GroupFilter" xml:space="preserve">
     <value>Group filter keyword</value>
   </data>
+  <data name="InteractiveDeploy" xml:space="preserve">
+    <value>Enter interactive mode to deploy projects</value>
+  </data>
   <data name="ProfileFile" xml:space="preserve">
     <value>The path to the json profile file you wish to deploy</value>
   </data>
   <data name="ProjectFilter" xml:space="preserve">
     <value>Project filter keyword</value>
   </data>
+  <data name="PromoteProjects" xml:space="preserve">
+    <value>Promote project releases between environments</value>
+  </data>
   <data name="ReleaseMessage" xml:space="preserve">
     <value>Release message to set</value>
   </data>
   <data name="ReleaseVersion" xml:space="preserve">
     <value>Release version number (must follow semantic versioning)</value>
+  </data>
+  <data name="SourceEnvironment" xml:space="preserve">
+    <value>Environment you wish to promote from</value>
   </data>
   <data name="Url" xml:space="preserve">
     <value>Url for your octopus install</value>

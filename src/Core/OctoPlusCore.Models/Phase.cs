@@ -37,6 +37,8 @@ namespace OctoPlusCore.Models
         public string Name { get; set; }
         public List<string> AutomaticDeploymentTargetEnvironmentIds { get; set; }
         public List<string> OptionalDeploymentTargetEnvironmentIds { get; set; }
+        public int MinimumEnvironmentsBeforePromotion { get; set; }
+        public bool Optional { get; set; }
 
     }
 }

@@ -88,6 +88,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deploying channel {0} to {1}. Please select the projects you wish to deploy..
+        /// </summary>
+        internal static string DeployingTo {
+            get {
+                return ResourceManager.GetString("DeployingTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: .
         /// </summary>
         internal static string Error {
@@ -102,6 +111,24 @@ namespace OctoPlus.Console.Resources {
         internal static string ErrorColumnHeadingMismatch {
             get {
                 return ResourceManager.GetString("ErrorColumnHeadingMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Existing Package.
+        /// </summary>
+        internal static string ExistingPackage {
+            get {
+                return ResourceManager.GetString("ExistingPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Existing Release.
+        /// </summary>
+        internal static string ExistingRelease {
+            get {
+                return ResourceManager.GetString("ExistingRelease", resourceCulture);
             }
         }
         
@@ -205,6 +232,24 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to On source.
+        /// </summary>
+        internal static string OnSource {
+            get {
+                return ResourceManager.GetString("OnSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On Target.
+        /// </summary>
+        internal static string OnTarget {
+            get {
+                return ResourceManager.GetString("OnTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Project Name.
         /// </summary>
         internal static string ProjectName {
@@ -223,11 +268,38 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Promoting from {0} to {1}. Please select the projects you wish to promote..
+        /// </summary>
+        internal static string PromotingTo {
+            get {
+                return ResourceManager.GetString("PromotingTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you wish to name your release? (Must follow semver, leave blank for sequentially generated).
+        /// </summary>
+        internal static string ReleaseNamePrompt {
+            get {
+                return ResourceManager.GetString("ReleaseNamePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to restrict to certain product groups?.
         /// </summary>
         internal static string RestrictToGroupsPrompt {
             get {
                 return ResourceManager.GetString("RestrictToGroupsPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which environment do you wish to promote from?.
+        /// </summary>
+        internal static string SourceEnvironment {
+            get {
+                return ResourceManager.GetString("SourceEnvironment", resourceCulture);
             }
         }
         

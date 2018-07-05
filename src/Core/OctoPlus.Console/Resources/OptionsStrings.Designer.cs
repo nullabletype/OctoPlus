@@ -133,6 +133,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter interactive mode to deploy projects.
+        /// </summary>
+        internal static string InteractiveDeploy {
+            get {
+                return ResourceManager.GetString("InteractiveDeploy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path to the json profile file you wish to deploy.
         /// </summary>
         internal static string ProfileFile {
@@ -151,6 +160,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Promote project releases between environments.
+        /// </summary>
+        internal static string PromoteProjects {
+            get {
+                return ResourceManager.GetString("PromoteProjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Release message to set.
         /// </summary>
         internal static string ReleaseMessage {
@@ -165,6 +183,15 @@ namespace OctoPlus.Console.Resources {
         internal static string ReleaseVersion {
             get {
                 return ResourceManager.GetString("ReleaseVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Environment you wish to promote from.
+        /// </summary>
+        internal static string SourceEnvironment {
+            get {
+                return ResourceManager.GetString("SourceEnvironment", resourceCulture);
             }
         }
         

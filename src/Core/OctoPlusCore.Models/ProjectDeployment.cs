@@ -40,5 +40,6 @@ namespace OctoPlusCore.Models
         public string ReleaseMessage { get; set; }
         public string ReleaseVersion { get; set; }
         public string LifeCycleId { get; set; }
+        public string ReleaseId { get; set; }
     }
 }
