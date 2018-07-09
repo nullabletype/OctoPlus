@@ -27,9 +27,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NuGet.Versioning;
 using OctoPlus.Console.Resources;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Models;
+using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands {
     abstract class BaseCommand 
@@ -42,24 +44,29 @@ namespace OctoPlus.Console.Commands {
         private readonly Dictionary<string, CommandOption> _optionRegister;
         private readonly List<BaseCommand> _subCommands;
         protected bool InInteractiveMode { get; private set; }
+        protected IOctopusHelper octoHelper;
 
-        protected BaseCommand()
+
+        protected BaseCommand(IOctopusHelper octoHelper)
         {
             _optionRegister = new Dictionary<string, CommandOption>();
             _subCommands = new List<BaseCommand>();
+            this.octoHelper = octoHelper;
         }
 
         public virtual void Configure(CommandLineApplication command) 
         {
             command.HelpOption(HelpOption);
             command.ThrowOnUnexpectedArgument = true;
+            AddToRegister(OptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
+            AddToRegister(OptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
             if (this.SupportsInteractiveMode)
             {
                 AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", OptionsStrings.InteractiveDeploy, CommandOptionType.NoValue));
             }
             command.OnExecute(async () =>
             {
-                if (GetOption(OptionNames.Interactive).HasValue())
+                if (this.SupportsInteractiveMode && GetOption(OptionNames.Interactive).HasValue())
                 {
                     SetInteractiveMode((true));
                 }
@@ -186,6 +193,18 @@ namespace OctoPlus.Console.Commands {
             return channel;
         }
 
+        protected string PromptForReleaseName()
+        {
+            string releaseName;
+
+            do
+            {
+                releaseName = GetStringFromUser(OptionNames.ReleaseName, UiStrings.ReleaseNamePrompt, allowEmpty: true);
+            } while (InInteractiveMode && !string.IsNullOrEmpty(releaseName) && !SemanticVersion.TryParse(releaseName, out _));
+
+            return releaseName;
+        }
+
         protected async Task<bool> ValidateDeployment(EnvironmentDeployment deployment, IDeployer deployer)
         {
             if (deployment == null)
@@ -206,9 +225,30 @@ namespace OctoPlus.Console.Commands {
             return false;
         }
 
+        protected async Task<OctoPlusCore.Models.Environment> FetchEnvironmentFromUserInput(string environmentName)
+        {
+            var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
+
+            if (matchingEnvironments.Count() > 1)
+            {
+                System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
+                return null;
+            }
+            else if (!matchingEnvironments.Any())
+            {
+                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
+                return null;
+            }
+
+            return matchingEnvironments.First();
+        }
+
         public struct OptionNames
         {
             public const string Interactive = "interactive";
+            public const string ApiKey = "apikey";
+            public const string Url = "url";
+            public const string ReleaseName = "ReleaseName";
         }
 
     }

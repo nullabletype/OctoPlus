@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
 using OctoPlus.Console.Resources;
+using OctoPlusCore.Octopus.Interfaces;
 
-namespace OctoPlus.Console.Commands
+namespace OctoPlus.Console.Commands.SubCommands
 {
     class DeployWithProfile : BaseCommand
     {
@@ -15,7 +16,7 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profile";
 
-        public DeployWithProfile(IConsoleDoJob consoleDoJob)
+        public DeployWithProfile(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper) : base(octopusHelper)
         {
             this._consoleDoJob = consoleDoJob;
         }
@@ -26,8 +27,6 @@ namespace OctoPlus.Console.Commands
             base.Configure(command);
 
             AddToRegister(DeployWithProfileOptionNames.File, command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
-            AddToRegister(DeployWithProfileOptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
-            AddToRegister(DeployWithProfileOptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -41,8 +40,6 @@ namespace OctoPlus.Console.Commands
         struct DeployWithProfileOptionNames
         {
             public const string File = "file";
-            public const string ApiKey = "apikey";
-            public const string Url = "url";
         }
     }
 }

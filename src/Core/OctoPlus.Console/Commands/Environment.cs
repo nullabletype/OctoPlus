@@ -28,10 +28,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands {
-    class Environment : BaseCommand
+    internal class Environment : BaseCommand
     {
+
+        public Environment(IOctopusHelper octoHelper) : base(octoHelper) { }
 
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "env";
@@ -40,13 +43,6 @@ namespace OctoPlus.Console.Commands {
         {
             base.Configure(command);
             command.Description = OptionsStrings.EnvironmentCommands;
-
-            command.Command("list", ConfigureListCommand);
-        }
-
-        private void ConfigureListCommand(CommandLineApplication command) 
-        {
-            base.Configure(command);
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -55,10 +51,10 @@ namespace OctoPlus.Console.Commands {
             var table = new ConsoleTable(UiStrings.Name, UiStrings.Id);
             foreach (var env in envs)
             {
-                table.AddRow(new [] { env.Name, env.Id });
+                table.AddRow(env.Name, env.Id);
             }
 
-            table.Write();
+            table.Write(Format.Minimal);
             return 0;
         }
 

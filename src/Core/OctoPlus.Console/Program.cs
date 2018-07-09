@@ -39,6 +39,7 @@ using OctoPlusCore.VersionChecking;
 using OctoPlusCore.VersionChecking.GitHub;
 using System;
 using System.Threading.Tasks;
+using OctoPlus.Console.Commands.SubCommands;
 
 namespace OctoPlus.Console
 {

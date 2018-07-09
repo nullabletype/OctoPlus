@@ -38,11 +38,8 @@ using System.Threading.Tasks;
 
 namespace OctoPlus.Console.Commands
 {
-    class Promote : BaseCommand
+    internal class Promote : BaseCommand
     {
-
-        private IConsoleDoJob consoleDoJob;
-        private IOctopusHelper octoHelper;
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
@@ -50,11 +47,9 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "promote";
 
-        public Promote(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger)
+        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger) : base(octoHelper)
         {
-            this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
-            this.octoHelper = octoHelper;
             this.deployer = deployer;
             this.uilogger = uilogger;
         }
@@ -86,30 +81,12 @@ namespace OctoPlus.Console.Commands
             var groupRestriction = GetStringFromUser(PromoteOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt);
 
             WriteStatusLine(UiStrings.CheckingOptions);
-            var matchingEnvironments = await octoHelper.GetMatchingEnvironments(environmentName);
+            var environment = await FetchEnvironmentFromUserInput(environmentName);
+            var targetEnvironment = await FetchEnvironmentFromUserInput(targetEnvironmentName);
 
-            if (matchingEnvironments.Count() > 1)
+            if (environment == null || targetEnvironment == null)
             {
-                System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
-                return -1;
-            }
-            else if (matchingEnvironments.Count() == 0)
-            {
-                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
-                return -1;
-            }
-
-            var matchingTargetEnvironments = await octoHelper.GetMatchingEnvironments(targetEnvironmentName);
-
-            if (matchingTargetEnvironments.Count() > 1)
-            {
-                System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
-                return -1;
-            }
-            else if (matchingEnvironments.Count() == 0)
-            {
-                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
-                return -1;
+                return -2;
             }
 
             var groupIds = new List<string>();
@@ -121,45 +98,27 @@ namespace OctoPlus.Console.Commands
                     .Select(g => g.Id).ToList();
             }
 
-            var environment = await octoHelper.GetEnvironment(matchingEnvironments.First().Id);
-            var targetEnvironment = await octoHelper.GetEnvironment(matchingTargetEnvironments.First().Id);
-            var projects = new List<Project>();
-            var targetProjects = new List<Project>();
             CleanCurrentLine();
 
-            foreach (var projectStub in projectStubs)
-            {
-                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(), String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
-                if (!string.IsNullOrEmpty(groupRestriction))
-                {
-                    if (!groupIds.Contains(projectStub.ProjectGroupId))
-                    {
-                        continue;
-                    }
-                }
-                var project = await octoHelper.ConvertProject(projectStub, environment.Id, null);
-                var targetProject = await octoHelper.ConvertProject(projectStub, targetEnvironment.Id, null);
+            var (projects, targetProjects) = await GenerateProjectList(projectStubs, groupRestriction, groupIds, environment, targetEnvironment);
 
-                var currentRelease = project.CurrentRelease;
-                var currentTargetRelease = targetProject.CurrentRelease;
-                if (currentRelease == null)
-                {
-                    continue;
-                }
-                if (currentTargetRelease != null && currentTargetRelease.Id == currentRelease.Id)
-                {
-                    project.Checked = false;
-                }
-                else
-                {
-                    project.Checked = true;
-                }
-                projects.Add(project);
-                targetProjects.Add(targetProject);
+            CleanCurrentLine();
+
+            var deployment = await GenerateDeployment(environment, targetEnvironment, projects, targetProjects);
+
+            if (deployment == null)
+            {
+                return -2;
             }
 
-            CleanCurrentLine();
+            await this.deployer.StartJob(deployment, this.uilogger);
 
+            return 0;
+        }
+
+        private async Task<EnvironmentDeployment> GenerateDeployment(OctoPlusCore.Models.Environment environment, OctoPlusCore.Models.Environment targetEnvironment, List<Project> projects,
+            List<Project> targetProjects)
+        {
             var deploymentOk = false;
             EnvironmentDeployment deployment;
 
@@ -168,8 +127,9 @@ namespace OctoPlus.Console.Commands
                 deployment = InteractivePrompt(environment, targetEnvironment, projects, targetProjects);
                 if (deployment == null)
                 {
-                    return -1;
+                    return deployment;
                 }
+
                 var result = await this.deployer.CheckDeployment(deployment);
                 if (result.Success)
                 {
@@ -181,9 +141,51 @@ namespace OctoPlus.Console.Commands
                 }
             } while (!deploymentOk);
 
-            await this.deployer.StartJob(deployment, this.uilogger);
+            return deployment;
+        }
 
-            return 0;
+        private async Task<(List<Project> projects, List<Project> targetProjects)> GenerateProjectList(List<ProjectStub> projectStubs, string groupRestriction, List<string> groupIds, OctoPlusCore.Models.Environment environment,
+            OctoPlusCore.Models.Environment targetEnvironment)
+        {
+            var projects = new List<Project>();
+            var targetProjects = new List<Project>();
+
+            foreach (var projectStub in projectStubs)
+            {
+                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
+                    String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
+                if (!string.IsNullOrEmpty(groupRestriction))
+                {
+                    if (!groupIds.Contains(projectStub.ProjectGroupId))
+                    {
+                        continue;
+                    }
+                }
+
+                var project = await octoHelper.ConvertProject(projectStub, environment.Id, null);
+                var targetProject = await octoHelper.ConvertProject(projectStub, targetEnvironment.Id, null);
+
+                var currentRelease = project.CurrentRelease;
+                var currentTargetRelease = targetProject.CurrentRelease;
+                if (currentRelease == null)
+                {
+                    continue;
+                }
+
+                if (currentTargetRelease != null && currentTargetRelease.Id == currentRelease.Id)
+                {
+                    project.Checked = false;
+                }
+                else
+                {
+                    project.Checked = true;
+                }
+
+                projects.Add(project);
+                targetProjects.Add(targetProject);
+            }
+
+            return (projects, targetProjects);
         }
 
         private EnvironmentDeployment InteractivePrompt(OctoPlusCore.Models.Environment environment, OctoPlusCore.Models.Environment targetEnvironment, IList<Project> projects, IList<Project> targetProjects)
@@ -201,8 +203,8 @@ namespace OctoPlus.Console.Commands
             {
                 ChannelName = string.Empty,
                 DeployAsync = true,
-                EnvironmentId = environment.Id,
-                EnvironmentName = environment.Name
+                EnvironmentId = targetEnvironment.Id,
+                EnvironmentName = targetEnvironment.Name
             };
 
             foreach (var index in indexes)
@@ -210,7 +212,7 @@ namespace OctoPlus.Console.Commands
                 var current = projects[index];
                 var currentTarget = targetProjects[index];
 
-                if (current.AvailablePackages.Any())
+                if (current.CurrentRelease != null)
                 {
                     deployment.ProjectDeployments.Add(new ProjectDeployment
                     {
@@ -242,12 +244,9 @@ namespace OctoPlus.Console.Commands
 
         struct PromoteOptionNames
         {
-            public const string ApiKey = "apikey";
-            public const string Url = "url";
             public const string SourceEnvironment = "sourceenvironment";
             public const string Environment = "environment";
             public const string GroupFilter = "groupfilter";
-            public const string Interactive = "interactive";
         }
     }
 
