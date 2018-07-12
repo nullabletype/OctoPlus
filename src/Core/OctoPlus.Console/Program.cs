@@ -68,6 +68,8 @@ namespace OctoPlus.Console
             app.Command(promoter.CommandName, promote => promoter.Configure(promote));
             var environment = container.GetService<Commands.Environment>();
             app.Command(environment.CommandName, env => environment.Configure(env));
+            var release = container.GetService<Release>();
+            app.Command(release.CommandName, env => release.Configure(env));
 
             app.OnExecute(() =>
             {
@@ -126,6 +128,8 @@ namespace OctoPlus.Console
             .AddTransient<IConsoleDoJob, ConsoleDoJob>()
             .AddTransient<Deploy, Deploy>()
             .AddTransient<Promote, Promote>()
+            .AddTransient<Release, Release>()
+            .AddTransient<RenameRelease, RenameRelease>()
             .AddTransient<DeployWithProfile, DeployWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>();

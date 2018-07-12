@@ -97,6 +97,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Done {0}.
+        /// </summary>
+        internal static string Done {
+            get {
+                return ResourceManager.GetString("Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: .
         /// </summary>
         internal static string Error {
@@ -142,6 +151,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed {0} : {1}.
+        /// </summary>
+        internal static string Failed {
+            get {
+                return ResourceManager.GetString("Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fetching project list.
         /// </summary>
         internal static string FetchingProjectList {
@@ -156,6 +174,15 @@ namespace OctoPlus.Console.Resources {
         internal static string GettingGroupInfo {
             get {
                 return ResourceManager.GetString("GettingGroupInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Going to rename the following to {0}.
+        /// </summary>
+        internal static string GoingToRename {
+            get {
+                return ResourceManager.GetString("GoingToRename", resourceCulture);
             }
         }
         
@@ -183,6 +210,15 @@ namespace OctoPlus.Console.Resources {
         internal static string InteractiveRunnerSelectionInstructions {
             get {
                 return ResourceManager.GetString("InteractiveRunnerSelectionInstructions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release versions much follow the semantic versioning 2.0 spec!.
+        /// </summary>
+        internal static string InvalidReleaseVersion {
+            get {
+                return ResourceManager.GetString("InvalidReleaseVersion", resourceCulture);
             }
         }
         
@@ -255,6 +291,15 @@ namespace OctoPlus.Console.Resources {
         internal static string OnTarget {
             get {
                 return ResourceManager.GetString("OnTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing {0}.
+        /// </summary>
+        internal static string Processing {
+            get {
+                return ResourceManager.GetString("Processing", resourceCulture);
             }
         }
         

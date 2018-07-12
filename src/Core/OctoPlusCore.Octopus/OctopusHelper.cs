@@ -92,7 +92,6 @@ namespace OctoPlusCore.Octopus
 
         private async Task<List<PackageStub>> GetPackages(ProjectResource project, string versionRange, int take = 5) 
         {
-
             var packageIdResult = await this.GetPackageId(project);
             if (packageIdResult != null && !string.IsNullOrEmpty(packageIdResult.PackageId)) {
                 var template =
@@ -347,6 +346,22 @@ namespace OctoPlusCore.Octopus
         public bool Search(DeploymentResource deploymentResource, string projectId, string envId)
         {
             return deploymentResource.ProjectId == projectId && deploymentResource.EnvironmentId == envId;
+        }
+
+        public async Task<(string error, bool success)> RenameRelease(string releaseId, string newReleaseVersion)
+        {
+            try
+            {
+                var release = await client.Repository.Releases.Get(releaseId);
+                release.Version = newReleaseVersion;
+                await client.Repository.Releases.Modify(release);
+            }
+            catch (Exception e)
+            {
+                return (e.Message, false);
+            }
+
+            return (string.Empty, true);
         }
 
         private Environment ConvertEnvironment(EnvironmentResource env)

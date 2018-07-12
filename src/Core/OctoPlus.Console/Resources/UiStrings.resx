@@ -129,6 +129,9 @@
   <data name="DeployingTo" xml:space="preserve">
     <value>Deploying channel {0} to {1}. Please select the projects you wish to deploy.</value>
   </data>
+  <data name="Done" xml:space="preserve">
+    <value>Done {0}</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>Error: </value>
   </data>
@@ -144,11 +147,17 @@
   <data name="Exiting" xml:space="preserve">
     <value>Exiting...</value>
   </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed {0} : {1}</value>
+  </data>
   <data name="FetchingProjectList" xml:space="preserve">
     <value>Fetching project list</value>
   </data>
   <data name="GettingGroupInfo" xml:space="preserve">
     <value>Getting group info</value>
+  </data>
+  <data name="GoingToRename" xml:space="preserve">
+    <value>Going to rename the following to {0}</value>
   </data>
   <data name="Id" xml:space="preserve">
     <value>Id</value>
@@ -158,6 +167,9 @@
   </data>
   <data name="InteractiveRunnerSelectionInstructions" xml:space="preserve">
     <value>Please make a selection using ranges 1-2 or comma separated 1,2,3 etc.</value>
+  </data>
+  <data name="InvalidReleaseVersion" xml:space="preserve">
+    <value>Release versions much follow the semantic versioning 2.0 spec!</value>
   </data>
   <data name="LoadingInfoFor" xml:space="preserve">
     <value>Loading Info for {0}</value>
@@ -182,6 +194,9 @@
   </data>
   <data name="OnTarget" xml:space="preserve">
     <value>On Target</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Processing {0}</value>
   </data>
   <data name="ProjectName" xml:space="preserve">
     <value>Project Name</value>

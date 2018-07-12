@@ -153,11 +153,17 @@
   <data name="PromoteProjects" xml:space="preserve">
     <value>Promote project releases between environments</value>
   </data>
+  <data name="Release" xml:space="preserve">
+    <value>Options pertaining to releases</value>
+  </data>
   <data name="ReleaseMessage" xml:space="preserve">
     <value>Release message to set</value>
   </data>
   <data name="ReleaseVersion" xml:space="preserve">
     <value>Release version number (must follow semantic versioning)</value>
+  </data>
+  <data name="SkipConfirmation" xml:space="preserve">
+    <value>Skip any confirmation messages</value>
   </data>
   <data name="SourceEnvironment" xml:space="preserve">
     <value>Environment you wish to promote from</value>

@@ -169,6 +169,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Options pertaining to releases.
+        /// </summary>
+        internal static string Release {
+            get {
+                return ResourceManager.GetString("Release", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Release message to set.
         /// </summary>
         internal static string ReleaseMessage {
@@ -183,6 +192,15 @@ namespace OctoPlus.Console.Resources {
         internal static string ReleaseVersion {
             get {
                 return ResourceManager.GetString("ReleaseVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip any confirmation messages.
+        /// </summary>
+        internal static string SkipConfirmation {
+            get {
+                return ResourceManager.GetString("SkipConfirmation", resourceCulture);
             }
         }
         
