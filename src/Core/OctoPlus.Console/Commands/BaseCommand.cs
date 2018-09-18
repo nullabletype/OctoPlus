@@ -243,6 +243,29 @@ namespace OctoPlus.Console.Commands {
             return matchingEnvironments.First();
         }
 
+        protected void FillRequiredVariables(List<ProjectDeployment> projects)
+        {
+            foreach (var project in projects)
+            {
+                if (project.RequiredVariables != null)
+                {
+                    foreach (var requirement in project.RequiredVariables)
+                    {
+                        do
+                        {
+                            var prompt = String.Format(UiStrings.VariablePrompt, requirement.Name, project.ProjectName);
+                            if (!string.IsNullOrEmpty(requirement.ExtraOptions))
+                            {
+                                prompt = prompt + String.Format(UiStrings.VariablePromptAllowedValues, requirement.ExtraOptions);
+                            }
+                            requirement.Value = PromptForStringWithoutQuitting(prompt);
+                        } while (InInteractiveMode && string.IsNullOrEmpty(requirement.Value));
+                    }
+
+                }
+            }
+        }
+
         public struct OptionNames
         {
             public const string Interactive = "interactive";

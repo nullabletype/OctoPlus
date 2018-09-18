@@ -22,6 +22,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,9 +33,8 @@ namespace OctoPlusCore.Models
     {
         public string ProjectId { get; set; }
         public string ProjectName { get; set; }
-        public string PackageName { get; set; }
-        public string PackageId { get; set; }
-        public string StepName { get; set; }
+        public IList<PackageDeployment> Packages { get; set; }
+        public IList<RequiredVariableDeployment> RequiredVariables { get; set; }
         public string ChannelId { get; set; }
         public string ChannelVersionRange { get; set; }
         public string ReleaseMessage { get; set; }

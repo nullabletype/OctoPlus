@@ -30,7 +30,7 @@ namespace OctoPlusCore.Octopus.Interfaces
 {
     public interface IOctopusHelper
     {
-        Task<List<PackageStub>> GetPackages(string projectIdOrHref, string versionRange);
+        Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange);
         Task<Release> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);
         Task<List<Environment>> GetEnvironments();

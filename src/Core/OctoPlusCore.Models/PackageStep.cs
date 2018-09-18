@@ -21,23 +21,20 @@
 #endregion
 
 
-using OctoPlusCore.Models;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace OctoPlusCore
+namespace OctoPlusCore.Models
 {
-    public class PackageStub
+    public class PackageStep
     {
-        public string Id { get; set; }
-        public string Version { get; set; }
         public string StepName { get; set; }
         public string StepId { get; set; }
-    }
-
-    public class PackageFull 
-    {
-        public string Id { get; set; }
-        public string Version { get; set; }
-        public string StepName { get; set; }
-        public string Message { get; set; }
+        public List<PackageStub> AvailablePackages { get; set; }
+        public PackageStub SelectedPackage { get
+            {
+                return AvailablePackages == null || !AvailablePackages.Any() ? null : AvailablePackages.First();
+            }
+            set { } }
     }
 }

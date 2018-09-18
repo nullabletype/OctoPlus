@@ -2,7 +2,7 @@
   "profiles": {
     "OctoPlus.Console": {
       "commandName": "Project",
-      "commandLineArgs": "release rename -e canada -g pebble -r 1804"
+      "commandLineArgs": "deploy -i -s=\"d:\\newprofile.profile\""
     }
   }
 }

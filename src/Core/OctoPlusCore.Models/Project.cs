@@ -23,6 +23,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace OctoPlusCore.Models
@@ -30,7 +31,6 @@ namespace OctoPlusCore.Models
     public class Project : INotifyPropertyChanged {
 
         private bool _checked { get; set; }
-        private PackageStub _selectedPackageStub { get; set; }
 
         public bool Checked
         {
@@ -42,27 +42,29 @@ namespace OctoPlusCore.Models
             }
         }
 
-        public PackageStub SelectedPackageStub
+        public IList<PackageStub> SelectedPackageStubs
         {
             get
             {
-                return _selectedPackageStub;
-            }
-            set
-            {
-                this._selectedPackageStub = value;
-                this.OnPropertyChanged();
+                return AvailablePackages.Select(p => p.SelectedPackage).ToList();
             }
         }
 
         public string ProjectName { get; set; }
         public string ProjectId { get; set; }
         public Release CurrentRelease { get; set; }
-        public List<PackageStub> AvailablePackages { get; set; }
+        public IList<PackageStep> AvailablePackages { get; set; }
         public string ProjectGroupId { get; set; }
         public string LifeCycleId { get; set; }
+        public IList<RequiredVariable> RequiredVariables { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public Project()
+        {
+            AvailablePackages = new List<PackageStep>();
+            RequiredVariables = new List<RequiredVariable>();
+        }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

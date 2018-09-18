@@ -21,23 +21,15 @@
 #endregion
 
 
-using OctoPlusCore.Models;
 
-namespace OctoPlusCore
+namespace OctoPlusCore.Models
 {
-    public class PackageStub
+    public class RequiredVariableDeployment
     {
         public string Id { get; set; }
-        public string Version { get; set; }
-        public string StepName { get; set; }
-        public string StepId { get; set; }
-    }
-
-    public class PackageFull 
-    {
-        public string Id { get; set; }
-        public string Version { get; set; }
-        public string StepName { get; set; }
-        public string Message { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string ExtraOptions { get; set; }
+        public string Value { get; set; }
     }
 }

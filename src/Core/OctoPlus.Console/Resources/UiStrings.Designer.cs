@@ -187,6 +187,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No deployment will take place, saving a profile to {0}.
+        /// </summary>
+        internal static string GoingToSaveProfile {
+            get {
+                return ResourceManager.GetString("GoingToSaveProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id.
         /// </summary>
         internal static string Id {
@@ -228,6 +237,15 @@ namespace OctoPlus.Console.Resources {
         internal static string LoadingInfoFor {
             get {
                 return ResourceManager.GetString("LoadingInfoFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to multi.
+        /// </summary>
+        internal static string Multi {
+            get {
+                return ResourceManager.GetString("Multi", resourceCulture);
             }
         }
         
@@ -304,6 +322,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Profile saved to {0}.
+        /// </summary>
+        internal static string ProfileSaved {
+            get {
+                return ResourceManager.GetString("ProfileSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Project Name.
         /// </summary>
         internal static string ProjectName {
@@ -372,6 +399,24 @@ namespace OctoPlus.Console.Resources {
         internal static string UsingProfileAtPath {
             get {
                 return ResourceManager.GetString("UsingProfileAtPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide a value for the variable {0} for project {1}. .
+        /// </summary>
+        internal static string VariablePrompt {
+            get {
+                return ResourceManager.GetString("VariablePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Available values: {0}.
+        /// </summary>
+        internal static string VariablePromptAllowedValues {
+            get {
+                return ResourceManager.GetString("VariablePromptAllowedValues", resourceCulture);
             }
         }
         

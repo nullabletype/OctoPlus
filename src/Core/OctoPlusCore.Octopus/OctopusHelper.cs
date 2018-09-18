@@ -59,7 +59,7 @@ namespace OctoPlusCore.Octopus
             return client;
         }
 
-        public async Task<List<PackageStub>> GetPackages(string projectIdOrHref, string versionRange) 
+        public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange) 
         {
             return await GetPackages(await client.Repository.Projects.Get(projectIdOrHref), versionRange);
         }
@@ -78,7 +78,8 @@ namespace OctoPlusCore.Octopus
                                 if (!string.IsNullOrEmpty(packageId)) {
                                     return new PackageIdResult {
                                         PackageId = packageId,
-                                        StepName = step.Name
+                                        StepName = step.Name,
+                                        StepId = step.Id
                                     };
                                 }
                             }
@@ -90,33 +91,75 @@ namespace OctoPlusCore.Octopus
             return null;
         }
 
-        private async Task<List<PackageStub>> GetPackages(ProjectResource project, string versionRange, int take = 5) 
+        private async Task<IList<PackageIdResult>> GetPackages(ProjectResource project)
         {
-            var packageIdResult = await this.GetPackageId(project);
-            if (packageIdResult != null && !string.IsNullOrEmpty(packageIdResult.PackageId)) {
-                var template =
-                    (await client.Repository.Feeds.Get("feeds-builtin")).Links["SearchTemplate"];
+            var results = new List<PackageIdResult>();
+            var process = await client.Repository.DeploymentProcesses.Get(project.DeploymentProcessId);
+            if (process != null)
+            {
+                foreach (var step in process.Steps)
+                {
+                    foreach (var action in step.Actions)
+                    {
+                        if (action.Properties.ContainsKey("Octopus.Action.Package.FeedId") &&
+                            action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin")
+                        {
+                            if (action.Properties.ContainsKey("Octopus.Action.Package.PackageId") &&
+                                !string.IsNullOrEmpty(action.Properties["Octopus.Action.Package.PackageId"].Value))
+                            {
+                                var packageId = action.Properties["Octopus.Action.Package.PackageId"].Value;
+                                if (!string.IsNullOrEmpty(packageId))
+                                {
+                                    results.Add(new PackageIdResult
+                                    {
+                                        PackageId = packageId,
+                                        StepName = step.Name,
+                                        StepId = step.Id
+                                    });
+                                }
+                            }
+                        }
 
-                var packages =
-                    await
-                        client.Get<List<PackageFromBuiltInFeedResource>>(template,
-                            new {
-                                packageId = packageIdResult.PackageId,
-                                partialMatch = false,
-                                includeMultipleVersions = true,
-                                take,
-                                includePreRelease = true,
-                                versionRange,
-                            });
-
-                var finalPackages = new List<PackageStub>();
-                foreach (var package in packages) {
-                    finalPackages.Add(ConvertPackage(package, packageIdResult.StepName));
+                    }
                 }
-                return finalPackages;
+            }
+            return results;
+        }
+
+        private async Task<IList<PackageStep>> GetPackages(ProjectResource project, string versionRange, int take = 5) 
+        {
+            var packageIdResult = await this.GetPackages(project);
+            var allPackages = new List<PackageStep>();
+            foreach (var package in packageIdResult)
+            {
+                if (package != null && !string.IsNullOrEmpty(package.PackageId))
+                {
+                    var template =
+                        (await client.Repository.Feeds.Get("feeds-builtin")).Links["SearchTemplate"];
+
+                    var packages =
+                        await
+                            client.Get<List<PackageFromBuiltInFeedResource>>(template,
+                                new
+                                {
+                                    packageId = package.PackageId,
+                                    partialMatch = false,
+                                    includeMultipleVersions = true,
+                                    take,
+                                    includePreRelease = true,
+                                    versionRange,
+                                });
+
+                    var finalPackages = new List<PackageStub>();
+                    foreach (var currentPackage in packages)
+                    {
+                        finalPackages.Add(ConvertPackage(currentPackage, package.StepName));
+                    }
+                    allPackages.Add(new PackageStep { AvailablePackages = finalPackages, StepName = package.StepName, StepId = package.StepId });
+                }
             }
 
-            return new List<PackageStub>();
+            return allPackages;
         }
 
         public async Task<Release> GetReleasedVersion(string projectId, string envId) 
@@ -269,22 +312,23 @@ namespace OctoPlusCore.Octopus
         public async Task<Release> CreateRelease(ProjectDeployment project) 
         {
             var user = await client.Repository.Users.GetCurrent();
+            var release = new ReleaseResource
+            {
+                Assembled = DateTimeOffset.UtcNow,
+                ChannelId = project.ChannelId,
+                LastModifiedBy = user.Username,
+                LastModifiedOn = DateTimeOffset.UtcNow,
+                ProjectId = project.ProjectId,
+                ReleaseNotes = project.ReleaseMessage ?? string.Empty,
+                Version = project.ReleaseVersion ?? project.Packages.First().PackageName.Split('.')[0] + ".i"
+            };
+            foreach (var package in project.Packages)
+            {
+                release.SelectedPackages.Add(new SelectedPackage { Version = package.PackageName, ActionName = package.StepName });
+            }
             var result =
                     await
-                        client.Repository.Releases.Create(new ReleaseResource {
-                            Assembled = DateTimeOffset.UtcNow,
-                            ChannelId = project.ChannelId,
-                            LastModifiedBy = user.Username,
-                            LastModifiedOn = DateTimeOffset.UtcNow,
-                            ProjectId = project.ProjectId,
-                            ReleaseNotes = project.ReleaseMessage ?? string.Empty,
-                            Version = project.ReleaseVersion ?? project.PackageName.Split('.')[0] + ".i",
-                            SelectedPackages =
-                                new List<SelectedPackage>
-                                {
-                                    new SelectedPackage {Version = project.PackageName, ActionName = project.StepName}
-                                },
-                        });
+                        client.Repository.Releases.Create(release);
             return new Release {
                 Version = result.Version,
                 Id = result.Id,
@@ -295,17 +339,26 @@ namespace OctoPlusCore.Octopus
         public async Task<Deployment> CreateDeploymentTask(ProjectDeployment project, string environmentId, string releaseId) 
         {
             var user = await client.Repository.Users.GetCurrent();
-            var deployResult = await client.Repository.Deployments.Create(new DeploymentResource {
+            var deployment = new DeploymentResource
+            {
                 ChannelId = project.ChannelId,
                 Comments = "Initiated by OctoPlus",
                 Created = DateTimeOffset.UtcNow,
                 EnvironmentId = environmentId,
                 LastModifiedBy = user.Username,
                 LastModifiedOn = DateTimeOffset.UtcNow,
-                Name = project.ProjectName + ":" + project.PackageName,
+                Name = project.ProjectName + ":" + project.Packages.First().PackageName,
                 ProjectId = project.ProjectId,
-                ReleaseId = releaseId
-            });
+                ReleaseId = releaseId,
+            };
+            if (project.RequiredVariables != null)
+            {
+                foreach (var variable in project.RequiredVariables)
+                {
+                    deployment.FormValues.Add(variable.Id, variable.Value);
+                }
+            }
+            var deployResult = await client.Repository.Deployments.Create(deployment);
             return new Deployment {
                 TaskId = deployResult.TaskId
             };
@@ -383,6 +436,7 @@ namespace OctoPlusCore.Octopus
         {
             var projectRes = await this.client.Repository.Projects.Get(project.ProjectId);
             var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange);
+            List<RequiredVariable> requiredVariables = await GetVariables(projectRes.VariableSetId);
             return new Project {
                 CurrentRelease = await this.GetReleasedVersion(project.ProjectId, env),
                 ProjectName = project.ProjectName,
@@ -390,14 +444,15 @@ namespace OctoPlusCore.Octopus
                 Checked = true,
                 ProjectGroupId = project.ProjectGroupId,
                 AvailablePackages = packages,
-                SelectedPackageStub = packages != null && packages.Any() ? packages.First() : null,
-                LifeCycleId = project.LifeCycleId
+                LifeCycleId = project.LifeCycleId,
+                RequiredVariables = requiredVariables
             };
         }
 
-        private async Task<Project> ConvertProject(ProjectResource project, string env, string channelRange) 
+        private async Task<Project> ConvertProject(ProjectResource project, string env, string channelRange)
         {
             var packages = await this.GetPackages(project, channelRange);
+            List<RequiredVariable> requiredVariables = await GetVariables(project.VariableSetId);
             return new Project
             {
                 CurrentRelease = await this.GetReleasedVersion(project.Id, env),
@@ -406,9 +461,29 @@ namespace OctoPlusCore.Octopus
                 Checked = true,
                 ProjectGroupId = project.ProjectGroupId,
                 AvailablePackages = packages,
-                SelectedPackageStub = packages != null && packages.Any() ? packages.First() : null,
-                LifeCycleId = project.LifecycleId
+                LifeCycleId = project.LifecycleId,
+                RequiredVariables = requiredVariables
             };
+        }
+
+        private async Task<List<RequiredVariable>> GetVariables(string variableSetId)
+        {
+            var variables = await this.client.Repository.VariableSets.Get(variableSetId);
+            var requiredVariables = new List<RequiredVariable>();
+            foreach (var variable in variables.Variables)
+            {
+                if (variable.Prompt != null && variable.Prompt.Required)
+                {
+                    var requiredVariable = new RequiredVariable { Name = variable.Name, Type = variable.Type.ToString(), Id = variable.Id };
+                    if (variable.Prompt.DisplaySettings.ContainsKey("Octopus.SelectOptions"))
+                    {
+                        requiredVariable.ExtraOptions = string.Join(", ", variable.Prompt.DisplaySettings["Octopus.SelectOptions"].Split('\n').Select(s => s.Split('|')[0]));
+                    }
+                    requiredVariables.Add(requiredVariable);
+                }
+            }
+
+            return requiredVariables;
         }
 
         private ProjectStub ConvertProject(ProjectResource project) 
@@ -508,6 +583,7 @@ namespace OctoPlusCore.Octopus
         {
             public string PackageId { get; set; }
             public string StepName { get; set; }
+            public string StepId { get; set; }
         }
     }
 }

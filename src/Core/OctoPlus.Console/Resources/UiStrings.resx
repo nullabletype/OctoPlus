@@ -159,6 +159,9 @@
   <data name="GoingToRename" xml:space="preserve">
     <value>Going to rename the following to {0}</value>
   </data>
+  <data name="GoingToSaveProfile" xml:space="preserve">
+    <value>No deployment will take place, saving a profile to {0}</value>
+  </data>
   <data name="Id" xml:space="preserve">
     <value>Id</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="LoadingInfoFor" xml:space="preserve">
     <value>Loading Info for {0}</value>
+  </data>
+  <data name="Multi" xml:space="preserve">
+    <value>multi</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
@@ -198,6 +204,9 @@
   <data name="Processing" xml:space="preserve">
     <value>Processing {0}</value>
   </data>
+  <data name="ProfileSaved" xml:space="preserve">
+    <value>Profile saved to {0}</value>
+  </data>
   <data name="ProjectName" xml:space="preserve">
     <value>Project Name</value>
   </data>
@@ -221,6 +230,12 @@
   </data>
   <data name="UsingProfileAtPath" xml:space="preserve">
     <value>Using profile at path </value>
+  </data>
+  <data name="VariablePrompt" xml:space="preserve">
+    <value>Please provide a value for the variable {0} for project {1}. </value>
+  </data>
+  <data name="VariablePromptAllowedValues" xml:space="preserve">
+    <value>Available values: {0}</value>
   </data>
   <data name="WhichChannelPrompt" xml:space="preserve">
     <value>Which channel do you wish to deploy?</value>

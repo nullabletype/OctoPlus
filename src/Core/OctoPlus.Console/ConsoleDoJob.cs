@@ -66,13 +66,16 @@ namespace OctoPlus.Console {
                         await
                             this._helper.GetProject(project.ProjectId, job.EnvironmentId,
                                 project.ChannelVersionRange);
-                    if (project.PackageId == "latest")
+                    foreach (var package in project.Packages)
                     {
-                        var packages =
-                            await this._helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange);
-                        project.PackageId = packages.First().Id;
-                        project.PackageName = packages.First().Version;
-                        project.StepName = packages.First().StepName;
+                        if (package.PackageId == "latest")
+                        {
+                            var packages =
+                                await this._helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange);
+                            package.PackageId = packages.First().SelectedPackage.Id;
+                            package.PackageName = packages.First().SelectedPackage.Version;
+                            package.StepName = packages.First().SelectedPackage.StepName;
+                        }
                     }
                     if (!forceDeploymentIfSamePackage)
                     {
@@ -81,7 +84,7 @@ namespace OctoPlus.Console {
                         {
                             var release = await this._helper.GetRelease(currentRelease.Id);
                             var currentPackage = release.SelectedPackages[0];
-                            if (currentPackage.Version == project.PackageName) 
+                            if (project.Packages.All(p => release.SelectedPackages.Any(s => p.StepName == p.StepName && s.Version == p.PackageName)))
                             {
                                 continue;
                             }

@@ -37,6 +37,8 @@ using System.Text;
 using System.Threading.Tasks;
 using NuGet.Versioning;
 using OctoPlus.Console.Commands.SubCommands;
+using OctoPlusCore.Utilities;
+using System.IO;
 
 namespace OctoPlus.Console.Commands {
     class Deploy : BaseCommand {
@@ -69,11 +71,17 @@ namespace OctoPlus.Console.Commands {
             AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.SaveProfile, command.Option("-s|--saveprofile", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
             AddToRegister(OptionNames.ReleaseName, command.Option("-r|--releasename", OptionsStrings.ReleaseVersion, CommandOptionType.SingleValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
+            var profilePath = GetStringValueFromOption(DeployOptionNames.SaveProfile);
+            if (!string.IsNullOrEmpty(profilePath))
+            {
+                System.Console.WriteLine(string.Format(UiStrings.GoingToSaveProfile, profilePath));
+            }
             WriteStatusLine(UiStrings.FetchingProjectList);
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
@@ -125,8 +133,30 @@ namespace OctoPlus.Console.Commands {
                 return -2;
             }
 
-            await this.deployer.StartJob(deployment, this.uilogger);
+            if (!string.IsNullOrEmpty(profilePath))
+            {
+                SaveProfile(deployment, profilePath);
+            }
+            else
+            {
+                await this.deployer.StartJob(deployment, this.uilogger);
+            }
             return 0;
+        }
+
+        private void SaveProfile(EnvironmentDeployment deployment, string profilePath)
+        {
+            foreach(var project in deployment.ProjectDeployments)
+            {
+                foreach(var package in project.Packages)
+                {
+                    package.PackageId = "latest";
+                    package.PackageName = "latest";
+                }
+            }
+            var content = StandardSerialiser.SerializeToJsonNet(deployment, true);
+            File.WriteAllText(profilePath, content);
+            System.Console.WriteLine(string.Format(UiStrings.ProfileSaved, profilePath));
         }
 
         private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, OctoPlusCore.Models.Environment environment, List<Project> projects)
@@ -158,6 +188,8 @@ namespace OctoPlus.Console.Commands {
                 }
             }
 
+            FillRequiredVariables(deployment.ProjectDeployments);
+
             return deployment;
         }
 
@@ -179,16 +211,25 @@ namespace OctoPlus.Console.Commands {
                 }
 
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
-                var currentPackage = project.CurrentRelease.SelectedPackages.FirstOrDefault();
-                if (project.SelectedPackageStub == null ||
-                    (currentPackage == null ? "" : currentPackage.Version) == project.SelectedPackageStub.Version ||
-                    !project.AvailablePackages.Any())
-                {
-                    project.Checked = false;
-                }
-                else
-                {
-                    project.Checked = true;
+                var currentPackages = project.CurrentRelease.SelectedPackages;
+                project.Checked = false;
+                if (project.SelectedPackageStubs == null) {
+                    foreach(var stub in project.SelectedPackageStubs)
+                    {
+                        var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == stub.StepId);
+                        if (matchingCurrent != null) {
+                            if (matchingCurrent.Version != stub.Version)
+                            {
+                                project.Checked = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            project.Checked = true;
+                            break;
+                        }
+                    }
                 }
 
                 projects.Add(project);
@@ -256,12 +297,16 @@ namespace OctoPlus.Console.Commands {
             {
                 ProjectId = current.ProjectId,
                 ProjectName = current.ProjectName,
-                PackageId = current.AvailablePackages.First().Id,
-                PackageName = current.AvailablePackages.First().Version,
-                StepName = current.AvailablePackages.First().StepName,
+                Packages = current.AvailablePackages.Select(x => new PackageDeployment {
+                    PackageId = x.SelectedPackage.Id,
+                    PackageName = x.SelectedPackage.Version,
+                    StepId = x.StepId,
+                    StepName = x.StepName
+                }).ToList(),
                 ChannelId = projectChannel.Id,
                 ChannelVersionRange = channel.VersionRange,
-                LifeCycleId = current.LifeCycleId
+                LifeCycleId = current.LifeCycleId,
+                RequiredVariables = current?.RequiredVariables?.Select(r => new RequiredVariableDeployment { Id = r.Id, ExtraOptions = r.ExtraOptions, Name = r.Name, Type = r.Type, Value = r.Value }).ToList()
             };
         }
 
@@ -270,12 +315,15 @@ namespace OctoPlus.Console.Commands {
             var runner = new InteractiveRunner(prompt, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
             foreach (var project in projects)
             {
+                var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
+                
                 runner.AddRow(project.Checked, new[] {
-                        project.ProjectName,
-                        project.CurrentRelease.Version,
-                        project.CurrentRelease.DisplayPackageVersion,
-                        project.AvailablePackages.Count > 0 ? project.AvailablePackages.First().Version : string.Empty
-                    });
+                    project.ProjectName,
+                    project.CurrentRelease.Version,
+                    project.AvailablePackages.Count > 1 ? UiStrings.Multi : project.CurrentRelease.DisplayPackageVersion,
+                    project.AvailablePackages.Count > 1 ? UiStrings.Multi : (packagesAvailable ? project.AvailablePackages.First().SelectedPackage.Version : string.Empty)
+                });
+                
             }
             runner.Run();
             return runner;
@@ -286,6 +334,7 @@ namespace OctoPlus.Console.Commands {
             public const string ChannelName = "channel";
             public const string Environment = "environment";
             public const string GroupFilter = "groupfilter";
+            public const string SaveProfile = "saveprofile";
         }
     }
 }

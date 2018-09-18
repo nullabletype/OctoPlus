@@ -141,6 +141,8 @@ namespace OctoPlus.Console.Commands
                 }
             } while (!deploymentOk);
 
+            FillRequiredVariables(deployment.ProjectDeployments);
+
             return deployment;
         }
 
