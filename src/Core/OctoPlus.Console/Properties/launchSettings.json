@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "OctoPlus.Console": {
-      "commandName": "Project",
-      "commandLineArgs": "deploy -i -s=\"d:\\newprofile.profile\""
-    }
-  }
-}
