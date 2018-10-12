@@ -168,7 +168,10 @@ namespace OctoPlus.Console.Commands {
             {
                 if (allowEmpty)
                 {
-                    option = Prompt.GetString(prompt);
+                    if (string.IsNullOrEmpty(option))
+                    {
+                        option = Prompt.GetString(prompt);
+                    }
                 }
                 else
                 {
