@@ -353,7 +353,7 @@ namespace OctoPlusCore.Octopus
                 EnvironmentId = environmentId,
                 LastModifiedBy = user.Username,
                 LastModifiedOn = DateTimeOffset.UtcNow,
-                Name = project.ProjectName + ":" + project.Packages.First().PackageName,
+                Name = project.ProjectName + ":" + project.Packages?.First().PackageName,
                 ProjectId = project.ProjectId,
                 ReleaseId = releaseId,
             };
