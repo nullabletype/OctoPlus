@@ -26,5 +26,8 @@ namespace OctoPlusCore.Logging.Interfaces
     public interface IUiLogger
     {
         void WriteLine(string toWrite);
+        void WriteStatusLine(string status);
+        void CleanCurrentLine();
+        void WriteProgress(int current, int total, string message);
     }
 }

@@ -47,18 +47,20 @@ namespace OctoPlus.Console.Commands {
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
+        private IProgressBar progressBar;
         private readonly DeployWithProfile profile;
 
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "deploy";
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile) : base(octoHelper)
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, IProgressBar progressBar) : base(octoHelper)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
             this.deployer = deployer;
             this.uilogger = uilogger;
             this.profile = profile;
+            this.progressBar = progressBar;
         }
 
         public override void Configure(CommandLineApplication command) 
@@ -82,7 +84,7 @@ namespace OctoPlus.Console.Commands {
             {
                 System.Console.WriteLine(string.Format(UiStrings.GoingToSaveProfile, profilePath));
             }
-            WriteStatusLine(UiStrings.FetchingProjectList);
+            progressBar.WriteStatusLine(UiStrings.FetchingProjectList);
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
@@ -96,7 +98,7 @@ namespace OctoPlus.Console.Commands {
             var environmentName = GetStringFromUser(DeployOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
             var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt, allowEmpty: true);
 
-            WriteStatusLine(UiStrings.CheckingOptions);
+            progressBar.WriteStatusLine(UiStrings.CheckingOptions);
 
             var environment = await FetchEnvironmentFromUserInput(environmentName);
 
@@ -108,7 +110,7 @@ namespace OctoPlus.Console.Commands {
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -122,9 +124,9 @@ namespace OctoPlus.Console.Commands {
                 return -1;
             }
 
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
             var projects = await ConvertProjectStubsToProjects(projectStubs, groupRestriction, groupIds, environment, channel);
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
 
             var deployment = await GenerateDeployment(channel, environment, projects);
 
@@ -200,7 +202,7 @@ namespace OctoPlus.Console.Commands {
 
             foreach (var projectStub in projectStubs)
             {
-                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
+                progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
                     String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
@@ -213,7 +215,8 @@ namespace OctoPlus.Console.Commands {
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
                 var currentPackages = project.CurrentRelease.SelectedPackages;
                 project.Checked = false;
-                if (project.SelectedPackageStubs == null) {
+                if (project.SelectedPackageStubs == null) 
+                {
                     foreach(var stub in project.SelectedPackageStubs)
                     {
                         var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == stub.StepId);

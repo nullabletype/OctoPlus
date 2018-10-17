@@ -40,6 +40,7 @@ using OctoPlusCore.VersionChecking.GitHub;
 using System;
 using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
+using OctoPlus.Console.ConsoleTools;
 
 namespace OctoPlus.Console
 {
@@ -132,7 +133,8 @@ namespace OctoPlus.Console
             .AddTransient<RenameRelease, RenameRelease>()
             .AddTransient<DeployWithProfile, DeployWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
-            .AddTransient<IUiLogger, ConsoleDoJob>();
+            .AddTransient<IUiLogger, ConsoleDoJob>()
+            .AddTransient<IProgressBar, ProgressBar>();
         }
     }
 }

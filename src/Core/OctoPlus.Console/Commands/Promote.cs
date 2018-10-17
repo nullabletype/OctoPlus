@@ -43,15 +43,17 @@ namespace OctoPlus.Console.Commands
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
+        private IProgressBar progressBar;
 
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "promote";
 
-        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger) : base(octoHelper)
+        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, IProgressBar progressBar) : base(octoHelper)
         {
             this.configuration = configuration;
             this.deployer = deployer;
             this.uilogger = uilogger;
+            this.progressBar = progressBar;
         }
         
         public override void Configure(CommandLineApplication command)
@@ -66,7 +68,7 @@ namespace OctoPlus.Console.Commands
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
-            WriteStatusLine(UiStrings.FetchingProjectList);
+            progressBar.WriteStatusLine(UiStrings.FetchingProjectList);
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
@@ -80,7 +82,7 @@ namespace OctoPlus.Console.Commands
             var targetEnvironmentName = GetStringFromUser(PromoteOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
             var groupRestriction = GetStringFromUser(PromoteOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt);
 
-            WriteStatusLine(UiStrings.CheckingOptions);
+            progressBar.WriteStatusLine(UiStrings.CheckingOptions);
             var environment = await FetchEnvironmentFromUserInput(environmentName);
             var targetEnvironment = await FetchEnvironmentFromUserInput(targetEnvironmentName);
 
@@ -92,17 +94,17 @@ namespace OctoPlus.Console.Commands
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
             }
 
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
 
             var (projects, targetProjects) = await GenerateProjectList(projectStubs, groupRestriction, groupIds, environment, targetEnvironment);
 
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
 
             var deployment = await GenerateDeployment(environment, targetEnvironment, projects, targetProjects);
 
@@ -154,7 +156,7 @@ namespace OctoPlus.Console.Commands
 
             foreach (var projectStub in projectStubs)
             {
-                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
+                progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
                     String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {

@@ -18,8 +18,12 @@ namespace OctoPlus.Console.Commands.SubCommands
 
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "rename";
+        private IProgressBar progressBar;
 
-        public RenameRelease(IOctopusHelper octopusHelper) : base(octopusHelper) { }
+        public RenameRelease(IOctopusHelper octopusHelper, IProgressBar progressBar) : base(octopusHelper) 
+        {
+            this.progressBar = progressBar;
+        }
 
 
         public override void Configure(CommandLineApplication command)
@@ -54,7 +58,7 @@ namespace OctoPlus.Console.Commands.SubCommands
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -64,11 +68,11 @@ namespace OctoPlus.Console.Commands.SubCommands
 
             var toRename = new List<ProjectRelease>();
 
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
 
             foreach (var projectStub in projectStubs)
             {
-                WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
+                progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
                     String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
@@ -85,7 +89,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                 }
             }
 
-            CleanCurrentLine();
+            progressBar.CleanCurrentLine();
 
             System.Console.WriteLine();
 

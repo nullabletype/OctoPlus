@@ -32,17 +32,21 @@ using OctoPlusCore.Models;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
+using OctoPlus.Console.ConsoleTools;
+using System.Text;
 
 namespace OctoPlus.Console {
     public class ConsoleDoJob : IUiLogger, IConsoleDoJob
     {
-        private IDeployer _deployer;
-        private readonly IOctopusHelper _helper;
+        private IDeployer deployer;
+        private readonly IOctopusHelper helper;
+        private IProgressBar progressBar;
 
-        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer)
+        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar)
         {
-            this._helper = helper;
-            this._deployer = deployer;
+            this.helper = helper;
+            this.deployer = deployer;
+            this.progressBar = progressBar;
         }
 
         public async Task StartJob(string pathToProfile, string message, string releaseVersion,
@@ -64,14 +68,14 @@ namespace OctoPlus.Console {
                 {
                     var octoProject =
                         await
-                            this._helper.GetProject(project.ProjectId, job.EnvironmentId,
+                            this.helper.GetProject(project.ProjectId, job.EnvironmentId,
                                 project.ChannelVersionRange);
                     foreach (var package in project.Packages)
                     {
                         if (package.PackageId == "latest")
                         {
                             var packages =
-                                await this._helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange);
+                                await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange);
                             package.PackageId = packages.First().SelectedPackage.Id;
                             package.PackageName = packages.First().SelectedPackage.Version;
                             package.StepName = packages.First().SelectedPackage.StepName;
@@ -79,10 +83,10 @@ namespace OctoPlus.Console {
                     }
                     if (!forceDeploymentIfSamePackage)
                     {
-                        var currentRelease = await this._helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
+                        var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
                         if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id)) 
                         {
-                            var release = await this._helper.GetRelease(currentRelease.Id);
+                            var release = await this.helper.GetRelease(currentRelease.Id);
                             var currentPackage = release.SelectedPackages[0];
                             if (project.Packages.All(p => release.SelectedPackages.Any(s => p.StepName == p.StepName && s.Version == p.PackageName)))
                             {
@@ -103,7 +107,7 @@ namespace OctoPlus.Console {
 
                 job.ProjectDeployments = projects;
 
-                await this._deployer.StartJob(job, this, true);
+                await this.deployer.StartJob(job, this, true);
             }
             catch (Exception e)
             {
@@ -114,6 +118,21 @@ namespace OctoPlus.Console {
         public void WriteLine(string toWrite)
         {
             System.Console.WriteLine(toWrite);
+        }
+
+        public void WriteStatusLine(string status) 
+        {
+            this.progressBar.WriteStatusLine(status);
+        }
+
+        public void CleanCurrentLine() 
+        {
+            this.progressBar.CleanCurrentLine();
+        }
+
+        public void WriteProgress(int current, int total, string message) 
+        {
+            this.progressBar.WriteProgress(current, total, message);
         }
     }
 }

@@ -48,6 +48,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<Project> GetProject(string idOrHref, string environment, string channelRange);
         Task<Release> GetRelease(string releaseIdOrHref);
         Task<TaskDetails> GetTaskDetails(string taskId);
+        Task<IEnumerable<TaskStub>> GetDeploymentTasks(int skip, int take);
         Task<string> GetTaskRawLog(string taskId);
         Task<Release> CreateRelease(ProjectDeployment project);
         Task<Deployment> CreateDeploymentTask(ProjectDeployment project, string environmentId, string releaseId);

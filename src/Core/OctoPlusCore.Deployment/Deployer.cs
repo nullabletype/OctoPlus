@@ -130,8 +130,10 @@ namespace OctoPlusCore.Deployment {
             var failedProjects = new Dictionary<ProjectDeployment, TaskDetails>();
 
             var taskRegister = new Dictionary<string, TaskDetails>();
+            var projectRegister = new Dictionary<string, ProjectDeployment>();
 
-            foreach (var project in deployment.ProjectDeployments) {
+            foreach (var project in deployment.ProjectDeployments) 
+            {
                 Release result;
                 if (string.IsNullOrEmpty(project.ReleaseId))
                 {
@@ -143,18 +145,21 @@ namespace OctoPlusCore.Deployment {
                     uiLogger.WriteLine("Fetching existing release for project " + project.ProjectName + "... ");
                     result = await helper.GetRelease(project.ReleaseId);
                 }
-                uiLogger.WriteLine("Complete: " + StandardSerialiser.SerializeToJsonNet(result, true));
 
-                uiLogger.WriteLine("Deploying " + result.Version + " to " + deployment.EnvironmentName);
+                uiLogger.WriteLine("Creating deployment task for " + result.Version + " to " + deployment.EnvironmentName);
                 var deployResult = await helper.CreateDeploymentTask(project, deployment.EnvironmentId, result.Id);
-                uiLogger.WriteLine("Complete: " + StandardSerialiser.SerializeToJsonNet(deployResult, true));
+                uiLogger.WriteLine("Created");
 
                 var taskDeets = await helper.GetTaskDetails(deployResult.TaskId);
-                taskDeets = await StartDeployment(uiLogger, taskDeets, !deployment.DeployAsync);
-                if (deployment.DeployAsync) {
+                //taskDeets = await StartDeployment(uiLogger, taskDeets, !deployment.DeployAsync);
+                if (deployment.DeployAsync) 
+                {
                     taskRegister.Add(taskDeets.TaskId, taskDeets);
-                } else {
-                    if (taskDeets.State == TaskDetails.TaskState.Failed) {
+                    projectRegister.Add(taskDeets.TaskId, project);
+                } 
+                else 
+                {
+                    if (taskDeets.State == Models.TaskStatus.Failed) {
                         uiLogger.WriteLine("Failed deploying " + project.ProjectName);
                         failedProjects.Add(project, taskDeets);
                     }
@@ -165,11 +170,10 @@ namespace OctoPlusCore.Deployment {
                 }
             }
 
+
             // This needs serious improvement.
             if (deployment.DeployAsync) {
-                foreach(var tasks in taskRegister) {
-                    await StartDeployment(uiLogger, tasks.Value, true);
-                }
+                await DeployAsync(uiLogger, failedProjects, taskRegister, projectRegister);
             }
 
             uiLogger.WriteLine("Done deploying!");
@@ -196,26 +200,84 @@ namespace OctoPlusCore.Deployment {
             }
         }
 
-        private async Task<TaskDetails> StartDeployment(IUiLogger uiLogger, TaskDetails taskDeets, bool doWait) {
-            do {
+        private async Task DeployAsync(IUiLogger uiLogger, Dictionary<ProjectDeployment, TaskDetails> failedProjects, Dictionary<string, TaskDetails> taskRegister, Dictionary<string, ProjectDeployment> projectRegister) 
+        {
+            var done = false;
+            int totalCount = taskRegister.Count();
+
+            while (!done) 
+            {
+                var tasks = await this.helper.GetDeploymentTasks(0, 200);
+                foreach (var currentTask in taskRegister.ToList()) 
+                {
+                    var found = tasks.FirstOrDefault(t => t.TaskId == currentTask.Key);
+                    if (found == null) 
+                    {
+                        uiLogger.CleanCurrentLine();
+                        uiLogger.WriteLine($"Couldn't find {currentTask.Key} in the tasks list?");
+                        taskRegister.Remove(currentTask.Key);
+                    } 
+                    else 
+                    {
+                        if (found.State == Models.TaskStatus.Done) 
+                        {
+                            var finishedTask = await this.helper.GetTaskDetails(found.TaskId);
+                            var project = projectRegister[currentTask.Key];
+                            uiLogger.CleanCurrentLine();
+                            uiLogger.WriteLine($"{project.ProjectName} deployed successfully");
+                            taskRegister.Remove(currentTask.Key);
+                        }
+                        else if (found.State == Models.TaskStatus.Failed) 
+                        {
+                            var finishedTask = await this.helper.GetTaskDetails(found.TaskId);
+                            var project = projectRegister[currentTask.Key];
+                            uiLogger.CleanCurrentLine();
+                            uiLogger.WriteLine($"{currentTask.Key} failed to deploy with error: {found.ErrorMessage}");
+                            failedProjects.Add(project, finishedTask);
+                            taskRegister.Remove(currentTask.Key);
+                        }
+                    }
+                }
+
+                if (taskRegister.Count == 0) 
+                {
+                    done = true;
+                }
+
+                uiLogger.WriteProgress(totalCount - taskRegister.Count, totalCount, $"Deploying the requested projects ({totalCount - taskRegister.Count} of {totalCount} done)...");
+
+                await Task.Delay(1000);
+            }
+            uiLogger.CleanCurrentLine();
+        }
+
+        private async Task<TaskDetails> StartDeployment(IUiLogger uiLogger, TaskDetails taskDeets, bool doWait) 
+        {
+            do 
+            {
                 WriteStatus(uiLogger, taskDeets);
-                if (doWait) {
+                if (doWait) 
+                {
                     await Task.Delay(1000);
                 }
                 taskDeets = await this.helper.GetTaskDetails(taskDeets.TaskId);
             }
-            while (doWait && (taskDeets.State == TaskDetails.TaskState.InProgress || taskDeets.State == TaskDetails.TaskState.Queued));
+            while (doWait && (taskDeets.State == Models.TaskStatus.InProgress || taskDeets.State == Models.TaskStatus.Queued));
             return taskDeets;
         }
 
-        private static void WriteStatus(IUiLogger uiLogger, TaskDetails taskDeets) {
-            if (taskDeets.State != TaskDetails.TaskState.Queued) {
-                if (taskDeets.PercentageComplete < 100) {
+        private static void WriteStatus(IUiLogger uiLogger, TaskDetails taskDeets) 
+        {
+            if (taskDeets.State != Models.TaskStatus.Queued) 
+            {
+                if (taskDeets.PercentageComplete < 100) 
+                {
                     uiLogger.WriteLine("Current status: " + taskDeets.State + " Percentage: " +
                                      taskDeets.PercentageComplete+ " estimated time remaining: " +
                                      taskDeets.TimeLeft);
                 }
-            } else {
+            } else 
+            {
                 uiLogger.WriteLine("Currently queued... waiting");
             }
         }

@@ -68,15 +68,21 @@ namespace OctoPlusCore.Octopus
         {
             var process = await client.Repository.DeploymentProcesses.Get(project.DeploymentProcessId);
             if (process != null) {
-                foreach (var step in process.Steps) {
-                    foreach (var action in step.Actions) {
+                foreach (var step in process.Steps) 
+                {
+                    foreach (var action in step.Actions) 
+                    {
                         if (action.Properties.ContainsKey("Octopus.Action.Package.FeedId") &&
-                            action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin") {
+                            action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin") 
+                        {
                             if (action.Properties.ContainsKey("Octopus.Action.Package.PackageId") &&
-                                !string.IsNullOrEmpty(action.Properties["Octopus.Action.Package.PackageId"].Value)) {
+                                !string.IsNullOrEmpty(action.Properties["Octopus.Action.Package.PackageId"].Value)) 
+                            {
                                 var packageId = action.Properties["Octopus.Action.Package.PackageId"].Value;
-                                if (!string.IsNullOrEmpty(packageId)) {
-                                    return new PackageIdResult {
+                                if (!string.IsNullOrEmpty(packageId)) 
+                                {
+                                    return new PackageIdResult 
+                                    {
                                         PackageId = packageId,
                                         StepName = step.Name,
                                         StepId = step.Id
@@ -369,15 +375,43 @@ namespace OctoPlusCore.Octopus
             var task = await client.Repository.Tasks.Get(taskId);
             var taskDeets = await client.Repository.Tasks.GetDetails(task);
 
-            return new TaskDetails {
+            return new TaskDetails 
+            {
                 PercentageComplete = taskDeets.Progress.ProgressPercentage,
                 TimeLeft = taskDeets.Progress.EstimatedTimeRemaining,
-                State = taskDeets.Task.State == TaskState.Success ? TaskDetails.TaskState.Done :
-                    taskDeets.Task.State == TaskState.Executing ? TaskDetails.TaskState.InProgress :
-                    taskDeets.Task.State == TaskState.Queued ? TaskDetails.TaskState.Queued : TaskDetails.TaskState.Failed,
+                State = taskDeets.Task.State == TaskState.Success ? Models.TaskStatus.Done :
+                    taskDeets.Task.State == TaskState.Executing ? Models.TaskStatus.InProgress :
+                    taskDeets.Task.State == TaskState.Queued ? Models.TaskStatus.Queued : Models.TaskStatus.Failed,
                 TaskId = taskId,
                 Links = taskDeets.Links.ToDictionary(l => l.Key, l => l.Value.ToString())
             };
+        }
+
+        public async Task<IEnumerable<TaskStub>> GetDeploymentTasks(int skip, int take) 
+        {
+            //var taskDeets = await client.Repository.Tasks.FindAll(pathParameters: new { skip, take, name = "Deploy" });
+
+            var taskDeets = await client.Get<ResourceCollection<TaskResource>>(client.RootDocument.Links["Tasks"], new { skip, take, name = "Deploy" });
+
+            var tasks = new List<TaskStub>();
+
+            foreach (var currentTask in taskDeets.Items) 
+            {
+                tasks.Add(new TaskStub 
+                {
+                    State = currentTask.State == TaskState.Success ? Models.TaskStatus.Done :
+                        currentTask.State == TaskState.Executing ? Models.TaskStatus.InProgress :
+                        currentTask.State == TaskState.Queued ? Models.TaskStatus.Queued : Models.TaskStatus.Failed,
+                    ErrorMessage = currentTask.ErrorMessage,
+                    FinishedSuccessfully = currentTask.FinishedSuccessfully,
+                    HasWarningsOrErrors = currentTask.HasWarningsOrErrors,
+                    IsComplete = currentTask.IsCompleted,
+                    TaskId = currentTask.Id,
+                    Links = currentTask.Links.ToDictionary(l => l.Key, l => l.Value.ToString())
+                });
+            }
+
+            return tasks;
         }
 
         public async Task<string> GetTaskRawLog(string taskId) 
