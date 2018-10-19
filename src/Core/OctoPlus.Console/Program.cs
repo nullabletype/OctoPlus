@@ -41,6 +41,7 @@ using System;
 using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
 using OctoPlus.Console.ConsoleTools;
+using OctoPlus.Console.Resources;
 
 namespace OctoPlus.Console
 {
@@ -112,7 +113,30 @@ namespace OctoPlus.Console
             container.AddSingleton<IOctopusHelper>(OctopusHelper.Default);
             container.AddSingleton<IConfiguration>(configurationLoadResult.Configuration);
             log.Info("Set configuration in IoC");
-            return new Tuple<ConfigurationLoadResult, IServiceProvider>(configurationLoadResult, container.BuildServiceProvider());
+
+            var serviceProvider = container.BuildServiceProvider();
+
+            var versionChecker = serviceProvider.GetService<IVersionChecker>();
+            var checkResult = await versionChecker.GetLatestVersion();
+
+            if (checkResult.NewVersion) {
+                ShowNewVersionMessage(checkResult);
+            }
+
+            return new Tuple<ConfigurationLoadResult, IServiceProvider>(configurationLoadResult, serviceProvider);
+        }
+
+        private static void ShowNewVersionMessage(VersionCheckResult checkResult) {
+            System.Console.WriteLine("-------------------------------------");
+            System.Console.WriteLine(UiStrings.NewVersionAvailable);
+            System.Console.WriteLine(string.Format(UiStrings.CurrentVersion, checkResult.Release.CurrentVersion));
+            System.Console.WriteLine(string.Format(UiStrings.NewVersion, checkResult.Release.TagName));
+            System.Console.WriteLine(string.Format(UiStrings.UpdateAvailableHere, checkResult.Release.Url));
+            if (!string.IsNullOrEmpty(checkResult.Release.ChangeLog)) {
+                System.Console.WriteLine(UiStrings.ChangeLog);
+                System.Console.WriteLine(checkResult.Release.ChangeLog);
+            }
+            System.Console.WriteLine("-------------------------------------");
         }
 
         private static IServiceCollection IoC() 

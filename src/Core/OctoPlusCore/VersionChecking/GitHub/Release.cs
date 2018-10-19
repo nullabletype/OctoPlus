@@ -33,6 +33,8 @@ namespace OctoPlusCore.VersionChecking.GitHub
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        public string CurrentVersion { get; set; }
+
         [JsonProperty("tag_name")]
         public string TagName { get; set; }
 

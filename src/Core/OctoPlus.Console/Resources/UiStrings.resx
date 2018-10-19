@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ChangeLog" xml:space="preserve">
+    <value>ChangeLog:</value>
+  </data>
   <data name="CheckingOptions" xml:space="preserve">
     <value>Checking your options...</value>
   </data>
@@ -125,6 +128,9 @@
   </data>
   <data name="CurrentRelease" xml:space="preserve">
     <value>Current Release</value>
+  </data>
+  <data name="CurrentVersion" xml:space="preserve">
+    <value>Current version: {0}</value>
   </data>
   <data name="DeployingTo" xml:space="preserve">
     <value>Deploying channel {0} to {1}. Please select the projects you wish to deploy.</value>
@@ -186,6 +192,12 @@
   <data name="NewPackage" xml:space="preserve">
     <value>New Package</value>
   </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>New version: {0}</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>There is a new version of OctoPlus available</value>
+  </data>
   <data name="NoMatchingChannel" xml:space="preserve">
     <value>No channel found with the specified name! </value>
   </data>
@@ -227,6 +239,9 @@
   </data>
   <data name="TooManyMatchingEnvironments" xml:space="preserve">
     <value>Too many enviroments match your criteria: </value>
+  </data>
+  <data name="UpdateAvailableHere" xml:space="preserve">
+    <value>Update here: {0}</value>
   </data>
   <data name="UsingProfileAtPath" xml:space="preserve">
     <value>Using profile at path </value>

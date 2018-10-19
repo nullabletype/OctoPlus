@@ -27,6 +27,7 @@ namespace OctoPlusCore.VersionChecking
     {
         string Url { get; set; }
         string Name { get; set; }
+        string CurrentVersion { get; set; }
         string TagName { get; set; }
         bool PreRelease { get; set; }
         string ChangeLog { get; set; }

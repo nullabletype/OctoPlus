@@ -61,6 +61,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ChangeLog:.
+        /// </summary>
+        internal static string ChangeLog {
+            get {
+                return ResourceManager.GetString("ChangeLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Checking your options....
         /// </summary>
         internal static string CheckingOptions {
@@ -84,6 +93,15 @@ namespace OctoPlus.Console.Resources {
         internal static string CurrentRelease {
             get {
                 return ResourceManager.GetString("CurrentRelease", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current version: {0}.
+        /// </summary>
+        internal static string CurrentVersion {
+            get {
+                return ResourceManager.GetString("CurrentVersion", resourceCulture);
             }
         }
         
@@ -268,6 +286,24 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New version: {0}.
+        /// </summary>
+        internal static string NewVersion {
+            get {
+                return ResourceManager.GetString("NewVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is a new version of OctoPlus available.
+        /// </summary>
+        internal static string NewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No channel found with the specified name! .
         /// </summary>
         internal static string NoMatchingChannel {
@@ -390,6 +426,15 @@ namespace OctoPlus.Console.Resources {
         internal static string TooManyMatchingEnvironments {
             get {
                 return ResourceManager.GetString("TooManyMatchingEnvironments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update here: {0}.
+        /// </summary>
+        internal static string UpdateAvailableHere {
+            get {
+                return ResourceManager.GetString("UpdateAvailableHere", resourceCulture);
             }
         }
         
