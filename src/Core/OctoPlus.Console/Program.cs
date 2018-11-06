@@ -42,6 +42,7 @@ using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
 using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Resources;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OctoPlus.Console
 {
@@ -115,6 +116,8 @@ namespace OctoPlus.Console
             log.Info("Set configuration in IoC");
 
             var serviceProvider = container.BuildServiceProvider();
+            //Temporary filth
+            serviceProvider.GetService<IOctopusHelper>().SetCacheImplementation(serviceProvider.GetService<IMemoryCache>());
 
             var versionChecker = serviceProvider.GetService<IVersionChecker>();
             var checkResult = await versionChecker.GetLatestVersion();
@@ -158,7 +161,7 @@ namespace OctoPlus.Console
             .AddTransient<DeployWithProfile, DeployWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>()
-            .AddTransient<IProgressBar, ProgressBar>();
+            .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache();
         }
     }
 }

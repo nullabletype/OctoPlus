@@ -97,7 +97,7 @@ namespace OctoPlusCore.Configuration
             {
                 try
                 {
-                    var octoHelper = new OctopusHelper(config.OctopusUrl, config.ApiKey);
+                    var octoHelper = new OctopusHelper(config.OctopusUrl, config.ApiKey, null);
                     await octoHelper.GetEnvironments();
                     try 
                     {

@@ -81,7 +81,7 @@ namespace OctoPlusCore.Deployment {
                             {
                                 if(phase.MinimumEnvironmentsBeforePromotion == 0)
                                 {
-                                    if(!previousEnvs.All(e => phase.OptionalDeploymentTargetEnvironmentIds.Contains(e)))
+                                    if(!previousEnvs.All(e => phase.OptionalDeploymentTargetEnvironmentIds.Contains(e)) && !phase.OptionalDeploymentTargetEnvironmentIds.Contains(deployment.EnvironmentId))
                                     {
                                         phaseCheck = false;
                                         break;

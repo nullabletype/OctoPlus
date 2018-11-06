@@ -28,19 +28,17 @@ using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Models;
-using OctoPlusCore.Octopus;
 using OctoPlusCore.Octopus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using NuGet.Versioning;
 using OctoPlus.Console.Commands.SubCommands;
 using OctoPlusCore.Utilities;
 using System.IO;
 
-namespace OctoPlus.Console.Commands {
+namespace OctoPlus.Console.Commands
+{
     class Deploy : BaseCommand {
 
         private IConsoleDoJob consoleDoJob;
@@ -215,10 +213,14 @@ namespace OctoPlus.Console.Commands {
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
                 var currentPackages = project.CurrentRelease.SelectedPackages;
                 project.Checked = false;
-                if (project.SelectedPackageStubs == null) 
+                if (project.SelectedPackageStubs != null) 
                 {
                     foreach(var stub in project.SelectedPackageStubs)
                     {
+                        if(stub == null)
+                        {
+                            continue;
+                        }
                         var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == stub.StepId);
                         if (matchingCurrent != null) {
                             if (matchingCurrent.Version != stub.Version)

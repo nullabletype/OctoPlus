@@ -31,24 +31,33 @@ using Octopus.Client.Model;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
 using Environment = OctoPlusCore.Models.Environment;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OctoPlusCore.Octopus
 {
     public class OctopusHelper : IOctopusHelper 
     {
         private IOctopusAsyncClient client;
+        private IMemoryCache cache;
         public static IOctopusHelper Default;
 
         public OctopusHelper() { }
 
-        public OctopusHelper(string url, string apiKey) 
+        public OctopusHelper(string url, string apiKey, IMemoryCache memoryCache) 
         { 
             this.client = InitClient(url, apiKey);
+            cache = memoryCache;
         }
 
-        public static IOctopusHelper Init(string url, string apikey) {
+        public OctopusHelper(IOctopusAsyncClient client, IMemoryCache memoryCache = null)
+        {
+            this.client = client;
+            cache = memoryCache;
+        }
+
+        public static IOctopusHelper Init(string url, string apikey, IMemoryCache memoryCache = null) {
             var client = InitClient(url, apikey);
-            Default = new OctopusHelper { client = client };
+            Default = new OctopusHelper(client, memoryCache);
             return Default;
         }
 
@@ -59,14 +68,19 @@ namespace OctoPlusCore.Octopus
             return client;
         }
 
+        public void SetCacheImplementation(IMemoryCache cache)
+        {
+            this.cache = cache;
+        }
+
         public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange) 
         {
-            return await GetPackages(await client.Repository.Projects.Get(projectIdOrHref), versionRange);
+            return await GetPackages(await GetProject(projectIdOrHref), versionRange);
         }
 
         private async Task<PackageIdResult> GetPackageId(ProjectResource project) 
         {
-            var process = await client.Repository.DeploymentProcesses.Get(project.DeploymentProcessId);
+            var process = await GetDeploymentProcess(project.DeploymentProcessId);
             if (process != null) {
                 foreach (var step in process.Steps) 
                 {
@@ -100,7 +114,7 @@ namespace OctoPlusCore.Octopus
         private async Task<IList<PackageIdResult>> GetPackages(ProjectResource project)
         {
             var results = new List<PackageIdResult>();
-            var process = await client.Repository.DeploymentProcesses.Get(project.DeploymentProcessId);
+            var process = await GetDeploymentProcess(project.DeploymentProcessId);
             if (process != null)
             {
                 foreach (var step in process.Steps)
@@ -171,11 +185,11 @@ namespace OctoPlusCore.Octopus
         public async Task<Release> GetReleasedVersion(string projectId, string envId) 
         {
             var deployment =
-                (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId)));
+                (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId), pathParameters: new { take = 1, projects = projectId, environments = envId }));
             if (deployment != null) {
                 var release = await client.Repository.Releases.Get(deployment.ReleaseId);
                 if (release != null) {
-                    var project = await client.Repository.Projects.Get(projectId);
+                    var project = await GetProject(projectId);
                     var package = await GetPackageId(project);
                     if (package != null) {
                         return await this.ConvertRelease(release);
@@ -233,6 +247,7 @@ namespace OctoPlusCore.Octopus
             var projects = await client.Repository.Projects.GetAll();
             var converted = new List<ProjectStub>();
             foreach (var project in projects) {
+                CacheObject(project.Id, project);
                 converted.Add(ConvertProject(project));
             }
             return converted;
@@ -240,7 +255,7 @@ namespace OctoPlusCore.Octopus
 
         public async Task<Project> GetProject(string idOrHref, string environment, string channelRange) 
         {
-            return await ConvertProject(await client.Repository.Projects.Get(idOrHref), environment, channelRange);
+            return await ConvertProject(await GetProject(idOrHref), environment, channelRange);
         }
 
         public async Task<bool> ValidateProjectName(string name) 
@@ -271,7 +286,7 @@ namespace OctoPlusCore.Octopus
 
         public async Task<Channel> GetChannelByName(string projectIdOrName, string channelName) 
         {
-            var project = await client.Repository.Projects.Get(projectIdOrName);
+            var project = await GetProject(projectIdOrName);
             return ConvertChannel(await client.Repository.Channels.FindByName(project, channelName));
         }
 
@@ -282,7 +297,7 @@ namespace OctoPlusCore.Octopus
 
         public async Task<List<Channel>> GetChannelsForProject(string projectIdOrHref) 
         {
-            var project = await client.Repository.Projects.Get(projectIdOrHref);
+            var project = await GetProject(projectIdOrHref);
             var channels = await client.Repository.Projects.GetChannels(project);
             return channels.Items.Select(ConvertChannel).ToList();
         }
@@ -468,7 +483,7 @@ namespace OctoPlusCore.Octopus
 
         public async Task<Project> ConvertProject(ProjectStub project, string env, string channelRange)
         {
-            var projectRes = await this.client.Repository.Projects.Get(project.ProjectId);
+            var projectRes = await this.GetProject(project.ProjectId);
             var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange);
             List<RequiredVariable> requiredVariables = await GetVariables(projectRes.VariableSetId);
             return new Project {
@@ -589,7 +604,7 @@ namespace OctoPlusCore.Octopus
 
         private async Task<Release> ConvertRelease(ReleaseResource release)
         {
-            var project = await client.Repository.Projects.Get(release.ProjectId);
+            var project = await GetProject(release.ProjectId);
             var packageId = await this.GetPackageId(project);
             var packages =
                 release.SelectedPackages.Select(
@@ -611,6 +626,49 @@ namespace OctoPlusCore.Octopus
         private PackageStub ConvertPackage(PackageResource package, string stepName)
         {
             return new PackageStub {Id = package.PackageId, Version = package.Version, StepName = stepName};
+        }
+
+        private async Task<DeploymentProcessResource> GetDeploymentProcess(string deploymentProcessId)
+        {
+            var cached = GetCachedObject<DeploymentProcessResource>(deploymentProcessId);
+            if (cached == default(DeploymentProcessResource))
+            {
+                var project = await client.Repository.DeploymentProcesses.Get(deploymentProcessId);
+                CacheObject(project.Id, project);
+                return project;
+            }
+            return cached;
+        }
+
+        private async Task<ProjectResource> GetProject(string projectId)
+        {
+            var cached = GetCachedObject<ProjectResource>(projectId);
+            if (cached == default(ProjectResource))
+            {
+                var project = await client.Repository.Projects.Get(projectId);
+                CacheObject(project.Id, project);
+                return project;
+            }
+            return cached;
+        }
+
+        private T GetCachedObject<T>(string key)
+        {
+            if (cache != null && this.cache.TryGetValue(key + typeof(T).Name, out T cachedValue))
+            {
+                return cachedValue;
+            }
+            return default(T);
+        }
+
+        private void CacheObject<T>(string key, T value)
+        {
+            if(cache == null)
+            {
+                return;
+            }
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(20));
+            cache.Set(key + typeof(T).Name, value, cacheEntryOptions);
         }
 
         private class PackageIdResult

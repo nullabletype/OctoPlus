@@ -25,11 +25,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Octopus.Client.Model;
 using OctoPlusCore.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OctoPlusCore.Octopus.Interfaces
 {
     public interface IOctopusHelper
     {
+        void SetCacheImplementation(IMemoryCache cache);
         Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange);
         Task<Release> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);
