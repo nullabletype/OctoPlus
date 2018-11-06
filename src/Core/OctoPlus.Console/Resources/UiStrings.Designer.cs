@@ -187,6 +187,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forces a redeploy of the same packages.
+        /// </summary>
+        internal static string ForceRedeploy {
+            get {
+                return ResourceManager.GetString("ForceRedeploy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Getting group info.
         /// </summary>
         internal static string GettingGroupInfo {

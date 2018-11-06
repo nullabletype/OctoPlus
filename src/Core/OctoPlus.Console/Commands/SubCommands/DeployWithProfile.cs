@@ -27,19 +27,21 @@ namespace OctoPlus.Console.Commands.SubCommands
             base.Configure(command);
 
             AddToRegister(DeployWithProfileOptionNames.File, command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
+            AddToRegister(DeployWithProfileOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", OptionsStrings.ForceDeployOfSamePackage, CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
             var profilePath = GetOption(DeployWithProfileOptionNames.File).Value();
             System.Console.WriteLine(UiStrings.UsingProfileAtPath + profilePath);
-            await this._consoleDoJob.StartJob(profilePath, null, null, true);
+            await this._consoleDoJob.StartJob(profilePath, null, null, GetOption(DeployWithProfileOptionNames.ForceRedeploy).HasValue());
             return 0;
         }
 
         struct DeployWithProfileOptionNames
         {
             public const string File = "file";
+            public const string ForceRedeploy = "forceredeploy";
         }
     }
 }

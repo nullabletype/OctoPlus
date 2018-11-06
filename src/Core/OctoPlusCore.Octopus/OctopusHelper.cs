@@ -32,6 +32,7 @@ using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
 using Environment = OctoPlusCore.Models.Environment;
 using Microsoft.Extensions.Caching.Memory;
+using Octopus.Client.Extensibility;
 
 namespace OctoPlusCore.Octopus
 {
@@ -154,8 +155,14 @@ namespace OctoPlusCore.Octopus
             {
                 if (package != null && !string.IsNullOrEmpty(package.PackageId))
                 {
-                    var template =
-                        (await client.Repository.Feeds.Get("feeds-builtin")).Links["SearchTemplate"];
+                    var template = GetCachedObject<Href>("feeds-builtin");
+
+                    if (template == null)
+                    {
+                        template =
+                            (await client.Repository.Feeds.Get("feeds-builtin")).Links["SearchTemplate"];
+                        CacheObject("feeds-builtin", template);
+                    }
 
                     var packages =
                         await
@@ -187,7 +194,7 @@ namespace OctoPlusCore.Octopus
             var deployment =
                 (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId), pathParameters: new { take = 1, projects = projectId, environments = envId }));
             if (deployment != null) {
-                var release = await client.Repository.Releases.Get(deployment.ReleaseId);
+                var release = await GetReleaseInternal(deployment.ReleaseId);
                 if (release != null) {
                     var project = await GetProject(projectId);
                     var package = await GetPackageId(project);
@@ -304,7 +311,7 @@ namespace OctoPlusCore.Octopus
 
         public async Task<Release> GetRelease(string releaseIdOrHref) 
         {
-            return await ConvertRelease(await client.Repository.Releases.Get(releaseIdOrHref));
+            return await ConvertRelease(await GetReleaseInternal(releaseIdOrHref));
         }
 
         public async Task<LifeCycle> GetLifeCycle(string idOrHref) 
@@ -441,7 +448,7 @@ namespace OctoPlusCore.Octopus
             {
                 return new Deployment[0];
             }
-            var deployments = await client.Repository.Releases.GetDeployments(await client.Repository.Releases.Get(releaseId), 0, 100);
+            var deployments = await client.Repository.Releases.GetDeployments(await GetReleaseInternal(releaseId), 0, 100);
             return deployments.Items.ToList().Select(ConvertDeployment);
         }
 
@@ -454,7 +461,7 @@ namespace OctoPlusCore.Octopus
         {
             try
             {
-                var release = await client.Repository.Releases.Get(releaseId);
+                var release = await GetReleaseInternal(releaseId);
                 release.Version = newReleaseVersion;
                 await client.Repository.Releases.Modify(release);
             }
@@ -633,9 +640,9 @@ namespace OctoPlusCore.Octopus
             var cached = GetCachedObject<DeploymentProcessResource>(deploymentProcessId);
             if (cached == default(DeploymentProcessResource))
             {
-                var project = await client.Repository.DeploymentProcesses.Get(deploymentProcessId);
-                CacheObject(project.Id, project);
-                return project;
+                var deployment = await client.Repository.DeploymentProcesses.Get(deploymentProcessId);
+                CacheObject(deployment.Id, deployment);
+                return deployment;
             }
             return cached;
         }
@@ -648,6 +655,18 @@ namespace OctoPlusCore.Octopus
                 var project = await client.Repository.Projects.Get(projectId);
                 CacheObject(project.Id, project);
                 return project;
+            }
+            return cached;
+        }
+
+        private async Task<ReleaseResource> GetReleaseInternal(string releaseId)
+        {
+            var cached = GetCachedObject<ReleaseResource>(releaseId);
+            if (cached == default(ReleaseResource))
+            {
+                var release = await client.Repository.Releases.Get(releaseId);
+                CacheObject(release.Id, release);
+                return release;
             }
             return cached;
         }

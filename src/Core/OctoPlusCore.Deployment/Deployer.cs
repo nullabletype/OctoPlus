@@ -207,7 +207,7 @@ namespace OctoPlusCore.Deployment {
 
             while (!done) 
             {
-                var tasks = await this.helper.GetDeploymentTasks(0, 200);
+                var tasks = await this.helper.GetDeploymentTasks(0, 100);
                 foreach (var currentTask in taskRegister.ToList()) 
                 {
                     var found = tasks.FirstOrDefault(t => t.TaskId == currentTask.Key);
@@ -246,7 +246,7 @@ namespace OctoPlusCore.Deployment {
 
                 uiLogger.WriteProgress(totalCount - taskRegister.Count, totalCount, $"Deploying the requested projects ({totalCount - taskRegister.Count} of {totalCount} done)...");
 
-                await Task.Delay(1000);
+                await Task.Delay(3000);
             }
             uiLogger.CleanCurrentLine();
         }

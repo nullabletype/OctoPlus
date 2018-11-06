@@ -159,6 +159,9 @@
   <data name="FetchingProjectList" xml:space="preserve">
     <value>Fetching project list</value>
   </data>
+  <data name="ForceRedeploy" xml:space="preserve">
+    <value>Forces a redeploy of the same packages</value>
+  </data>
   <data name="GettingGroupInfo" xml:space="preserve">
     <value>Getting group info</value>
   </data>
