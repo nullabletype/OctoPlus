@@ -40,6 +40,7 @@ namespace OctoPlusCore.Octopus
     {
         private IOctopusAsyncClient client;
         private IMemoryCache cache;
+        private int cacheTimeout = 20;
         public static IOctopusHelper Default;
 
         public OctopusHelper() { }
@@ -69,9 +70,14 @@ namespace OctoPlusCore.Octopus
             return client;
         }
 
-        public void SetCacheImplementation(IMemoryCache cache)
+        public void SetCacheImplementation(IMemoryCache cache, int cacheTimeout)
         {
             this.cache = cache;
+            this.cacheTimeout = cacheTimeout;
+            if (cacheTimeout < 1)
+            {
+                cacheTimeout = 1;
+            }
         }
 
         public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange) 
@@ -686,7 +692,7 @@ namespace OctoPlusCore.Octopus
             {
                 return;
             }
-            var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(20));
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(cacheTimeout));
             cache.Set(key + typeof(T).Name, value, cacheEntryOptions);
         }
 

@@ -142,6 +142,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stay running monitoring for package updates, pausing for the specified time in seconds.
+        /// </summary>
+        internal static string MonitorForPackages {
+            get {
+                return ResourceManager.GetString("MonitorForPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path to the json profile file you wish to deploy.
         /// </summary>
         internal static string ProfileFile {

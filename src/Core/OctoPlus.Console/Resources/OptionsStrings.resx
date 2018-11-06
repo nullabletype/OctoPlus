@@ -144,6 +144,9 @@
   <data name="InteractiveDeploy" xml:space="preserve">
     <value>Enter interactive mode to deploy projects</value>
   </data>
+  <data name="MonitorForPackages" xml:space="preserve">
+    <value>Stay running monitoring for package updates, pausing for the specified time in seconds</value>
+  </data>
   <data name="ProfileFile" xml:space="preserve">
     <value>The path to the json profile file you wish to deploy</value>
   </data>

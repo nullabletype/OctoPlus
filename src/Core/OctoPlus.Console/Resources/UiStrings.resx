@@ -219,6 +219,9 @@
   <data name="OnTarget" xml:space="preserve">
     <value>On Target</value>
   </data>
+  <data name="ParameterNotANumber" xml:space="preserve">
+    <value>Parameter must be a number</value>
+  </data>
   <data name="PathDoesntExist" xml:space="preserve">
     <value>The path doesn't exist!?</value>
   </data>
@@ -242,6 +245,9 @@
   </data>
   <data name="RestrictToGroupsPrompt" xml:space="preserve">
     <value>Do you want to restrict to certain product groups?</value>
+  </data>
+  <data name="SleepingForSeconds" xml:space="preserve">
+    <value>Sleeping for {0} seconds...</value>
   </data>
   <data name="SourceEnvironment" xml:space="preserve">
     <value>Which environment do you wish to promote from?</value>

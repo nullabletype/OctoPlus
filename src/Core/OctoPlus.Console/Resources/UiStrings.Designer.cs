@@ -367,6 +367,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter must be a number.
+        /// </summary>
+        internal static string ParameterNotANumber {
+            get {
+                return ResourceManager.GetString("ParameterNotANumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path doesn&apos;t exist!?.
         /// </summary>
         internal static string PathDoesntExist {
@@ -435,6 +444,15 @@ namespace OctoPlus.Console.Resources {
         internal static string RestrictToGroupsPrompt {
             get {
                 return ResourceManager.GetString("RestrictToGroupsPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sleeping for {0} seconds....
+        /// </summary>
+        internal static string SleepingForSeconds {
+            get {
+                return ResourceManager.GetString("SleepingForSeconds", resourceCulture);
             }
         }
         

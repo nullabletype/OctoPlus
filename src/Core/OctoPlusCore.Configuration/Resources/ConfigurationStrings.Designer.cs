@@ -61,6 +61,15 @@ namespace OctoPlusCore.Configuration.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cache timeout in seconds.
+        /// </summary>
+        internal static string CacheTimeoutInSeconds {
+            get {
+                return ResourceManager.GetString("CacheTimeoutInSeconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Configuration file was found, but couldn&apos;t be deserialised. Please check the syntax in the file.
         /// </summary>
         internal static string LoadCouldntParseFile {

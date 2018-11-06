@@ -31,7 +31,7 @@ namespace OctoPlusCore.Octopus.Interfaces
 {
     public interface IOctopusHelper
     {
-        void SetCacheImplementation(IMemoryCache cache);
+        void SetCacheImplementation(IMemoryCache cache, int cacheTimeout);
         Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange);
         Task<Release> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);

@@ -117,7 +117,7 @@ namespace OctoPlus.Console
 
             var serviceProvider = container.BuildServiceProvider();
             //Temporary filth
-            serviceProvider.GetService<IOctopusHelper>().SetCacheImplementation(serviceProvider.GetService<IMemoryCache>());
+            serviceProvider.GetService<IOctopusHelper>().SetCacheImplementation(serviceProvider.GetService<IMemoryCache>(), configurationLoadResult.Configuration.CacheTimeoutInSeconds);
 
             var versionChecker = serviceProvider.GetService<IVersionChecker>();
             var checkResult = await versionChecker.GetLatestVersion();
