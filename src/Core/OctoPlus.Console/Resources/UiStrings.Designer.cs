@@ -115,6 +115,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deploying using config {0}.
+        /// </summary>
+        internal static string DeployingUsingConfig {
+            get {
+                return ResourceManager.GetString("DeployingUsingConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Done {0}.
         /// </summary>
         internal static string Done {
@@ -358,6 +367,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path doesn&apos;t exist!?.
+        /// </summary>
+        internal static string PathDoesntExist {
+            get {
+                return ResourceManager.GetString("PathDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Processing {0}.
         /// </summary>
         internal static string Processing {
@@ -439,6 +457,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected error: {0}.
+        /// </summary>
+        internal static string UnexpectedError {
+            get {
+                return ResourceManager.GetString("UnexpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Update here: {0}.
         /// </summary>
         internal static string UpdateAvailableHere {
@@ -453,6 +480,15 @@ namespace OctoPlus.Console.Resources {
         internal static string UsingProfileAtPath {
             get {
                 return ResourceManager.GetString("UsingProfileAtPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using profile directory at path.
+        /// </summary>
+        internal static string UsingProfileDirAtPath {
+            get {
+                return ResourceManager.GetString("UsingProfileDirAtPath", resourceCulture);
             }
         }
         

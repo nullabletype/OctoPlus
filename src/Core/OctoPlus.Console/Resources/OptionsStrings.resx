@@ -147,6 +147,9 @@
   <data name="ProfileFile" xml:space="preserve">
     <value>The path to the json profile file you wish to deploy</value>
   </data>
+  <data name="ProfileFileDirectory" xml:space="preserve">
+    <value>The path to the directory containing the profile files you wish to deploy. Profile files must contain auto.profile</value>
+  </data>
   <data name="ProjectFilter" xml:space="preserve">
     <value>Project filter keyword</value>
   </data>

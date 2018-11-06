@@ -151,6 +151,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path to the directory containing the profile files you wish to deploy. Profile files must contain auto.profile.
+        /// </summary>
+        internal static string ProfileFileDirectory {
+            get {
+                return ResourceManager.GetString("ProfileFileDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Project filter keyword.
         /// </summary>
         internal static string ProjectFilter {

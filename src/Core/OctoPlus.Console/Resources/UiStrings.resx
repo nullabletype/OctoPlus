@@ -135,6 +135,9 @@
   <data name="DeployingTo" xml:space="preserve">
     <value>Deploying channel {0} to {1}. Please select the projects you wish to deploy.</value>
   </data>
+  <data name="DeployingUsingConfig" xml:space="preserve">
+    <value>Deploying using config {0}</value>
+  </data>
   <data name="Done" xml:space="preserve">
     <value>Done {0}</value>
   </data>
@@ -216,6 +219,9 @@
   <data name="OnTarget" xml:space="preserve">
     <value>On Target</value>
   </data>
+  <data name="PathDoesntExist" xml:space="preserve">
+    <value>The path doesn't exist!?</value>
+  </data>
   <data name="Processing" xml:space="preserve">
     <value>Processing {0}</value>
   </data>
@@ -243,11 +249,17 @@
   <data name="TooManyMatchingEnvironments" xml:space="preserve">
     <value>Too many enviroments match your criteria: </value>
   </data>
+  <data name="UnexpectedError" xml:space="preserve">
+    <value>Unexpected error: {0}</value>
+  </data>
   <data name="UpdateAvailableHere" xml:space="preserve">
     <value>Update here: {0}</value>
   </data>
   <data name="UsingProfileAtPath" xml:space="preserve">
     <value>Using profile at path </value>
+  </data>
+  <data name="UsingProfileDirAtPath" xml:space="preserve">
+    <value>Using profile directory at path</value>
   </data>
   <data name="VariablePrompt" xml:space="preserve">
     <value>Please provide a value for the variable {0} for project {1}. </value>

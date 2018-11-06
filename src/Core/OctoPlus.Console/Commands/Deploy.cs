@@ -47,17 +47,19 @@ namespace OctoPlus.Console.Commands
         private IUiLogger uilogger;
         private IProgressBar progressBar;
         private readonly DeployWithProfile profile;
+        private readonly DeployWithProfileDirectory profileDir;
 
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "deploy";
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, IProgressBar progressBar) : base(octoHelper)
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar) : base(octoHelper)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
             this.deployer = deployer;
             this.uilogger = uilogger;
             this.profile = profile;
+            this.profileDir = profileDir;
             this.progressBar = progressBar;
         }
 
@@ -67,7 +69,8 @@ namespace OctoPlus.Console.Commands
             command.Description = OptionsStrings.DeployProjects;
 
             ConfigureSubCommand(profile, command);
-
+            ConfigureSubCommand(profileDir, command);
+            
             AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
