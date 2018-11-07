@@ -76,7 +76,7 @@ namespace OctoPlusCore.Octopus
             this.cacheTimeout = cacheTimeout;
             if (cacheTimeout < 1)
             {
-                cacheTimeout = 1;
+                this.cacheTimeout = 1;
             }
         }
 

@@ -43,6 +43,7 @@ using OctoPlus.Console.Commands.SubCommands;
 using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Resources;
 using Microsoft.Extensions.Caching.Memory;
+using System.Linq;
 
 namespace OctoPlus.Console
 {
@@ -50,6 +51,7 @@ namespace OctoPlus.Console
     {
         static int Main(string[] args)
         {
+            args = args.Select(a => a.Replace("action:", "--action")).ToArray();
             AppDomain.CurrentDomain.UnhandledException += HandleException;
             var initResult = CheckConfigurationAndInit().GetAwaiter().GetResult();
             if (!initResult.Item1.Success) 
