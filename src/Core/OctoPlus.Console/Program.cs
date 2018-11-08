@@ -44,6 +44,7 @@ using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Resources;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
+using System.IO;
 
 namespace OctoPlus.Console
 {
@@ -51,6 +52,8 @@ namespace OctoPlus.Console
     {
         static int Main(string[] args)
         {
+            string cwd = Path.GetDirectoryName(System.Environment.GetCommandLineArgs()[0]);
+            Directory.SetCurrentDirectory(cwd ?? ".");
             args = args.Select(a => a.Replace("action:", "--action")).ToArray();
             AppDomain.CurrentDomain.UnhandledException += HandleException;
             var initResult = CheckConfigurationAndInit().GetAwaiter().GetResult();

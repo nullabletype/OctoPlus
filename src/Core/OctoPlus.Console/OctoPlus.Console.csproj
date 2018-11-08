@@ -21,7 +21,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="NuGet.Versioning" Version="4.8.0" />
-    <PackageReference Include="PeterKottas.DotNetCore.WindowsService" Version="2.0.9" />
     <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
   </ItemGroup>
 
@@ -33,6 +32,12 @@
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Utilities\OctoPlusCore.Utilities.csproj" />
     <ProjectReference Include="..\OctoPlusCore\OctoPlusCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PeterKottas.DotNetCore.WindowsService">
+      <HintPath>..\externallib\PeterKottas.DotNetCore.WindowsService.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
