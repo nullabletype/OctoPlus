@@ -28,12 +28,8 @@ namespace OctoPlusCore.Configuration.Interfaces
         string ApiKey { get; set; }
         string OctopusUrl { get; set; }
         string ChannelSeedProjectName { get; set; }
-        string ProjectGroupFilterString { get; set; }
-        string DefaultEnvironmentName { get; set; }
-        string DefaultChannelName { get; set; }
         ChangeLogProviderConfiguration ChangeProviderConfiguration { get; set; }
         bool EnableTrace { get; set; }
-        bool DisableAutoLoad { get; set; }
         int CacheTimeoutInSeconds { get; set; }
     }
 }

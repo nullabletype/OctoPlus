@@ -31,11 +31,8 @@ namespace OctoPlusCore.Configuration
         public string OctopusUrl { get; set; }
         public string ChannelSeedProjectName { get; set; }
         public string ProjectGroupFilterString { get; set; }
-        public string DefaultEnvironmentName { get; set; }
-        public string DefaultChannelName { get; set; }
         public ChangeLogProviderConfiguration ChangeProviderConfiguration { get; set; }
         public bool EnableTrace { get; set; }
-        public bool DisableAutoLoad { get; set; }
         public int CacheTimeoutInSeconds { get; set; }
     }
 }

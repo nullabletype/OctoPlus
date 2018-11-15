@@ -214,6 +214,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t deploy, but save a profile instead to use later with the profile command.
+        /// </summary>
+        internal static string SaveProfile {
+            get {
+                return ResourceManager.GetString("SaveProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Skip any confirmation messages.
         /// </summary>
         internal static string SkipConfirmation {

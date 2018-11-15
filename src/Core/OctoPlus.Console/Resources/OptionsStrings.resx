@@ -168,6 +168,9 @@
   <data name="ReleaseVersion" xml:space="preserve">
     <value>Release version number (must follow semantic versioning)</value>
   </data>
+  <data name="SaveProfile" xml:space="preserve">
+    <value>Don't deploy, but save a profile instead to use later with the profile command</value>
+  </data>
   <data name="SkipConfirmation" xml:space="preserve">
     <value>Skip any confirmation messages</value>
   </data>
