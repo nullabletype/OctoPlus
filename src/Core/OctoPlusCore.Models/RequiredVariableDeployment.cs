@@ -21,7 +21,6 @@
 #endregion
 
 
-
 namespace OctoPlusCore.Models
 {
     public class RequiredVariableDeployment
