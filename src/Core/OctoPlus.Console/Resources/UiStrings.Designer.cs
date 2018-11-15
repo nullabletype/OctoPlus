@@ -367,6 +367,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no package available to deploy for one of the projects you&apos;re trying to select!.
+        /// </summary>
+        internal static string PackageNotSelectable {
+            get {
+                return ResourceManager.GetString("PackageNotSelectable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parameter must be a number.
         /// </summary>
         internal static string ParameterNotANumber {

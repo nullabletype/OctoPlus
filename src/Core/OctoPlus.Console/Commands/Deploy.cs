@@ -249,7 +249,7 @@ namespace OctoPlus.Console.Commands
 
         private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
-            InteractiveRunner runner = PopulateRunner(String.Format(UiStrings.DeployingTo, channel.Name, environment.Name), projects);
+            InteractiveRunner runner = PopulateRunner(String.Format(UiStrings.DeployingTo, channel.Name, environment.Name), UiStrings.PackageNotSelectable, projects);
             var indexes = runner.GetSelectedIndexes();
 
             if (!indexes.Any())
@@ -319,14 +319,14 @@ namespace OctoPlus.Console.Commands
             };
         }
 
-        private InteractiveRunner PopulateRunner(string prompt, IEnumerable<Project> projects)
+        private InteractiveRunner PopulateRunner(string prompt, string unselectableText, IEnumerable<Project> projects)
         {
-            var runner = new InteractiveRunner(prompt, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
+            var runner = new InteractiveRunner(prompt, unselectableText, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
             foreach (var project in projects)
             {
                 var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
                 
-                runner.AddRow(project.Checked, new[] {
+                runner.AddRow(project.Checked, packagesAvailable, new[] {
                     project.ProjectName,
                     project.CurrentRelease.Version,
                     project.AvailablePackages.Count > 1 ? UiStrings.Multi : project.CurrentRelease.DisplayPackageVersion,

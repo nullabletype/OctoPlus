@@ -219,6 +219,9 @@
   <data name="OnTarget" xml:space="preserve">
     <value>On Target</value>
   </data>
+  <data name="PackageNotSelectable" xml:space="preserve">
+    <value>There is no package available to deploy for one of the projects you're trying to select!</value>
+  </data>
   <data name="ParameterNotANumber" xml:space="preserve">
     <value>Parameter must be a number</value>
   </data>

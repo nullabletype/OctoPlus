@@ -234,10 +234,12 @@ namespace OctoPlus.Console.Commands
 
         private static InteractiveRunner PopulateRunner(string prompt, IList<Project> projects, IList<Project> targetProjects)
         {
-            var runner = new InteractiveRunner(prompt, UiStrings.ProjectName, UiStrings.OnSource, UiStrings.OnTarget);
+            var runner = new InteractiveRunner(prompt, UiStrings.PackageNotSelectable, UiStrings.ProjectName, UiStrings.OnSource, UiStrings.OnTarget);
             foreach (var project in projects)
             {
-                runner.AddRow(project.Checked, new[] {
+                var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
+
+                runner.AddRow(project.Checked, packagesAvailable, new[] {
                         project.ProjectName,
                         project.CurrentRelease.Version,
                         targetProjects.FirstOrDefault(p => p.ProjectId == project.ProjectId)?.CurrentRelease?.Version

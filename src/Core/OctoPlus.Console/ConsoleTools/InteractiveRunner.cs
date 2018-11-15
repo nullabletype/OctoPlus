@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace OctoPlus.Console.ConsoleTools
 {
@@ -35,26 +36,34 @@ namespace OctoPlus.Console.ConsoleTools
         private readonly List<string> _columns;
         private readonly List<string[]> _rows;
         private readonly List<int> _selected;
+        private readonly List<int> _unselectable;
         private readonly string _promptText;
+        private readonly string _unselectableText;
 
-        internal InteractiveRunner(string promptText, params string[] columns)
+        internal InteractiveRunner(string promptText, string unselectableText, params string[] columns)
         {
             _columns = new List<string>(columns);
             _rows = new List<string[]>();
             _selected = new List<int>();
-            this._promptText = promptText;
+            _unselectable = new List<int>();
+            _promptText = promptText;
+            _unselectableText = unselectableText;
         }
 
-        public void AddRow(bool selected, params string[] values)
+        public void AddRow(bool selected, bool selectable = true, params string[] values)
         {
             if (values.Count() != _columns.Count())
             {
                 throw new Exception(String.Format(UiStrings.ErrorColumnHeadingMismatch, values.Count(), _columns.Count()));
             }
             _rows.Add(values);
-            if (selected)
+            if (selected && selectable)
             {
                 _selected.Add(_rows.Count() - 1);
+            }
+            if (!selectable)
+            {
+                _unselectable.Add(_rows.Count() - 1);
             }
         }
 
@@ -115,6 +124,17 @@ namespace OctoPlus.Console.ConsoleTools
         private void SelectProjectsForDeployment(bool select)
         {
             var range = GetRangeFromPrompt(_rows.Count());
+
+            if (_unselectable.Any(u => range.Contains(u + 1)))
+            {
+                System.Console.WriteLine(_unselectable);
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine(_unselectableText);
+                System.Console.ResetColor();
+                Thread.Sleep(3000);
+                return;
+            }
+
             foreach (var index in range)
             {
                 if (select)
