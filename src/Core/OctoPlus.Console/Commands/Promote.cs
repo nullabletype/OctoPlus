@@ -237,7 +237,7 @@ namespace OctoPlus.Console.Commands
             var runner = new InteractiveRunner(prompt, UiStrings.PackageNotSelectable, UiStrings.ProjectName, UiStrings.OnSource, UiStrings.OnTarget);
             foreach (var project in projects)
             {
-                var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
+                var packagesAvailable = project.CurrentRelease != null;
 
                 runner.AddRow(project.Checked, packagesAvailable, new[] {
                         project.ProjectName,

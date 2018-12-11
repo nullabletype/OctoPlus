@@ -301,6 +301,12 @@ namespace OctoPlus.Console.Commands
 
         private async Task<ProjectDeployment> GenerateProjectDeployment(Channel channel, Project current)
         {
+
+            if(current.AvailablePackages == null)
+            {
+                System.Console.WriteLine($"No packages found for {current.ProjectName}");
+            }
+
             var projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, channel.Name);
             return new ProjectDeployment
             {
