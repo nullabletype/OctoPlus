@@ -72,7 +72,7 @@ namespace OctoPlus.Console.Commands
             ConfigureSubCommand(profile, command);
             ConfigureSubCommand(profileDir, command);
             
-            AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.InteractiveDeploy, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.DeployChannel, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.GroupFilter, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.SaveProfile, command.Option("-s|--saveprofile", OptionsStrings.SaveProfile, CommandOptionType.SingleValue));

@@ -70,6 +70,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The channel to deploy.
+        /// </summary>
+        internal static string DeployChannel {
+            get {
+                return ResourceManager.GetString("DeployChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deploy using a stored profile.
         /// </summary>
         internal static string DeployFromProfile {

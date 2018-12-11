@@ -212,6 +212,17 @@ namespace OctoPlusCore.Octopus
             return new Release { Id = "", Version = "None" };
         }
 
+        public async Task<bool> UpdateReleaseVariables(string releaseId)
+        {
+            var release = await this.client.Repository.Releases.Get(releaseId);
+            if(release == null)
+            {
+                return false;
+            }
+            await this.client.Repository.Releases.SnapshotVariables(release);
+            return true;
+        }
+
         public async Task<List<Environment>> GetEnvironments() 
         {
             var envs = await client.Repository.Environments.GetAll();

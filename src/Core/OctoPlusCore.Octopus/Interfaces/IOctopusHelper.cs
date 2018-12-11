@@ -61,5 +61,6 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<LifeCycle> GetLifeCycle(string idOrHref);
         Task<IEnumerable<Deployment>> GetDeployments(string releaseId);
         Task<(string error, bool success)> RenameRelease(string releaseId, string newReleaseVersion);
+        Task<bool> UpdateReleaseVariables(string releaseId);
     }
 }

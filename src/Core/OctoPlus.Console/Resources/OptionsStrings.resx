@@ -120,6 +120,9 @@
   <data name="ApiKey" xml:space="preserve">
     <value>The API key to use for deployment</value>
   </data>
+  <data name="DeployChannel" xml:space="preserve">
+    <value>The channel to deploy</value>
+  </data>
   <data name="DeployFromProfile" xml:space="preserve">
     <value>Deploy using a stored profile</value>
   </data>

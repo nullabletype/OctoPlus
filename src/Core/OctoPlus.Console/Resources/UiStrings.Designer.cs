@@ -61,6 +61,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you wish to update the variables for the above releases?.
+        /// </summary>
+        internal static string AreYouSureUpdateVariables {
+            get {
+                return ResourceManager.GetString("AreYouSureUpdateVariables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ChangeLog:.
         /// </summary>
         internal static string ChangeLog {

@@ -164,6 +164,7 @@ namespace OctoPlus.Console
             .AddTransient<Promote, Promote>()
             .AddTransient<Release, Release>()
             .AddTransient<RenameRelease, RenameRelease>()
+            .AddTransient<UpdateReleaseVariables, UpdateReleaseVariables>()
             .AddTransient<DeployWithProfile, DeployWithProfile>()
             .AddTransient<DeployWithProfileDirectory, DeployWithProfileDirectory>()
             .AddTransient<Commands.Environment, Commands.Environment>()

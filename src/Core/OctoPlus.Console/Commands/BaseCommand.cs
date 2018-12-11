@@ -59,7 +59,7 @@ namespace OctoPlus.Console.Commands {
         {
             command.HelpOption(HelpOption);
             command.ThrowOnUnexpectedArgument = true;
-            AddToRegister(OptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ProfileFile, CommandOptionType.SingleValue));
+            AddToRegister(OptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ApiKey, CommandOptionType.SingleValue));
             AddToRegister(OptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
             if (this.SupportsInteractiveMode)
             {

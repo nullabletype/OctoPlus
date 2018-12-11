@@ -32,14 +32,16 @@ namespace OctoPlus.Console.Commands {
 
 
         private readonly RenameRelease _renameRelease;
+        private readonly UpdateReleaseVariables _updateVars;
 
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "release";
 
-        public Release(IOctopusHelper octoHelper, RenameRelease renameRelease) : base(octoHelper)
+        public Release(IOctopusHelper octoHelper, RenameRelease renameRelease, UpdateReleaseVariables updateVars) : base(octoHelper)
         {
 
             this._renameRelease = renameRelease;
+            this._updateVars = updateVars;
         }
 
         public override void Configure(CommandLineApplication command) 
@@ -48,6 +50,7 @@ namespace OctoPlus.Console.Commands {
             command.Description = OptionsStrings.Release;
 
             ConfigureSubCommand(_renameRelease, command);
+            ConfigureSubCommand(_updateVars, command);
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
