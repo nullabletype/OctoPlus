@@ -312,14 +312,14 @@ namespace OctoPlus.Console.Commands
             {
                 ProjectId = current.ProjectId,
                 ProjectName = current.ProjectName,
-                Packages = current.AvailablePackages.Select(x => new PackageDeployment {
+                Packages = current.AvailablePackages.Where(x => x.SelectedPackage != null).Select(x => new PackageDeployment {
                     PackageId = x.SelectedPackage.Id,
                     PackageName = x.SelectedPackage.Version,
                     StepId = x.StepId,
                     StepName = x.StepName
                 }).ToList(),
-                ChannelId = projectChannel.Id,
-                ChannelVersionRange = channel.VersionRange,
+                ChannelId = projectChannel?.Id,
+                ChannelVersionRange = channel?.VersionRange,
                 LifeCycleId = current.LifeCycleId,
                 RequiredVariables = current?.RequiredVariables?.Select(r => new RequiredVariableDeployment { Id = r.Id, ExtraOptions = r.ExtraOptions, Name = r.Name, Type = r.Type, Value = r.Value }).ToList()
             };

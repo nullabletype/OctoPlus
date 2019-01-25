@@ -88,6 +88,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you absolutely 100% sure you wish to delete {0}? There is no going back....
+        /// </summary>
+        internal static string ConfirmationCheck {
+            get {
+                return ResourceManager.GetString("ConfirmationCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current Package.
         /// </summary>
         internal static string CurrentPackage {
@@ -138,6 +147,33 @@ namespace OctoPlus.Console.Resources {
         internal static string Done {
             get {
                 return ResourceManager.GetString("Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EnvironmentId: {0}.
+        /// </summary>
+        internal static string EnvionmentId {
+            get {
+                return ResourceManager.GetString("EnvionmentId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Environment found with name {0}.
+        /// </summary>
+        internal static string EnvironmentFound {
+            get {
+                return ResourceManager.GetString("EnvironmentFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Environment not found with name {0}.
+        /// </summary>
+        internal static string EnvironmentNotFound {
+            get {
+                return ResourceManager.GetString("EnvironmentNotFound", resourceCulture);
             }
         }
         

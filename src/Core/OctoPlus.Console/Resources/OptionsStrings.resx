@@ -132,6 +132,9 @@
   <data name="DeployProjects" xml:space="preserve">
     <value>Deploy projects to environments</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>A short description</value>
+  </data>
   <data name="EnvironmentCommands" xml:space="preserve">
     <value>Commands for dealing with environments</value>
   </data>

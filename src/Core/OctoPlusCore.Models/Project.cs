@@ -66,9 +66,12 @@ namespace OctoPlusCore.Models
             RequiredVariables = new List<RequiredVariable>();
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        protected virtual bool IsDeployable { get { return AvailablePackages != null && AvailablePackages.Any(x => x.SelectedPackage != null); } }
 
     }
 }

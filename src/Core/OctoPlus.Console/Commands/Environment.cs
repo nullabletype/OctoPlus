@@ -30,12 +30,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using OctoPlusCore.Octopus.Interfaces;
+using OctoPlus.Console.Commands.SubCommands;
 
 namespace OctoPlus.Console.Commands {
     internal class Environment : BaseCommand
     {
+        private EnsureEnvironment ensureEnv;
+        private DeleteEnvironment delEnv;
 
-        public Environment(IOctopusHelper octoHelper) : base(octoHelper) { }
+        public Environment(IOctopusHelper octoHelper, EnsureEnvironment ensureEnv, DeleteEnvironment delEnv) : base(octoHelper) 
+        {
+            this.ensureEnv = ensureEnv;
+            this.delEnv = delEnv;
+        }
 
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "env";
@@ -43,6 +50,9 @@ namespace OctoPlus.Console.Commands {
         public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
+            ConfigureSubCommand(ensureEnv, command);
+            ConfigureSubCommand(delEnv, command);
+
             command.Description = OptionsStrings.EnvironmentCommands;
         }
 

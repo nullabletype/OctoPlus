@@ -126,6 +126,9 @@
   <data name="CheckingOptions" xml:space="preserve">
     <value>Checking your options...</value>
   </data>
+  <data name="ConfirmationCheck" xml:space="preserve">
+    <value>Are you absolutely 100% sure you wish to delete {0}? There is no going back...</value>
+  </data>
   <data name="CurrentPackage" xml:space="preserve">
     <value>Current Package</value>
   </data>
@@ -143,6 +146,15 @@
   </data>
   <data name="Done" xml:space="preserve">
     <value>Done {0}</value>
+  </data>
+  <data name="EnvionmentId" xml:space="preserve">
+    <value>EnvironmentId: {0}</value>
+  </data>
+  <data name="EnvironmentFound" xml:space="preserve">
+    <value>Environment found with name {0}</value>
+  </data>
+  <data name="EnvironmentNotFound" xml:space="preserve">
+    <value>Environment not found with name {0}</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error: </value>

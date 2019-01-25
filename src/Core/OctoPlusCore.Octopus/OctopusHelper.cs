@@ -229,20 +229,37 @@ namespace OctoPlusCore.Octopus
             return envs.Select(ConvertEnvironment).ToList();
         }
 
-        public async Task<List<Environment>> GetMatchingEnvironments(string keyword)
+        public async Task<List<Environment>> GetMatchingEnvironments(string keyword, bool extactMatch = false)
         {
             var environments = await GetEnvironments();
             var matchingEnvironments = environments.Where(env => env.Name.Equals(keyword, StringComparison.CurrentCultureIgnoreCase));
-            if (matchingEnvironments.Count() == 0)
+            if (matchingEnvironments.Count() == 0 && !extactMatch)
             {
                 matchingEnvironments = environments.Where(env => env.Name.ToLower().Contains(keyword.ToLower()));
             }
             return matchingEnvironments.ToList();
         }
 
+        public async Task<Environment> CreateEnvironment(string name, string description) 
+        {
+            var env = new EnvironmentResource {
+                Name = name,
+                Description = description
+            };
+            env = await client.Repository.Environments.Create(env);
+            
+            return ConvertEnvironment(env);
+        }
+
         public async Task<Environment> GetEnvironment(string idOrName) 
         {
             return ConvertEnvironment(await client.Repository.Environments.Get(idOrName));
+        }
+
+        public async Task DeleteEnvironment(string idOrhref) 
+        {
+            var env = await client.Repository.Environments.Get(idOrhref);
+            await client.Repository.Environments.Delete(env);
         }
 
         public async Task<List<ProjectGroup>> GetFilteredProjectGroups(string filter) 
