@@ -64,5 +64,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<IEnumerable<Deployment>> GetDeployments(string releaseId);
         Task<(string error, bool success)> RenameRelease(string releaseId, string newReleaseVersion);
         Task<bool> UpdateReleaseVariables(string releaseId);
+        Task RemoveEnvironmentsFromTeams(string envId);
+        Task AddEnvironmentToTeam(string envId, string teamId);
     }
 }

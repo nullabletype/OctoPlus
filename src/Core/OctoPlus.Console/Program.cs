@@ -169,6 +169,7 @@ namespace OctoPlus.Console
             .AddTransient<DeployWithProfileDirectory, DeployWithProfileDirectory>()
             .AddTransient<EnsureEnvironment, EnsureEnvironment>()
             .AddTransient<DeleteEnvironment, DeleteEnvironment>()
+            .AddTransient<EnvironmentToTeam, EnvironmentToTeam>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>()
             .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache();

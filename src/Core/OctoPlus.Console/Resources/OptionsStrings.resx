@@ -138,6 +138,9 @@
   <data name="EnvironmentCommands" xml:space="preserve">
     <value>Commands for dealing with environments</value>
   </data>
+  <data name="EnvironmentId" xml:space="preserve">
+    <value>Environment Id</value>
+  </data>
   <data name="EnvironmentName" xml:space="preserve">
     <value>Name the of the environment to deploy to</value>
   </data>
@@ -182,6 +185,9 @@
   </data>
   <data name="SourceEnvironment" xml:space="preserve">
     <value>Environment you wish to promote from</value>
+  </data>
+  <data name="TeamId" xml:space="preserve">
+    <value>Team Id</value>
   </data>
   <data name="Url" xml:space="preserve">
     <value>Url for your octopus install</value>

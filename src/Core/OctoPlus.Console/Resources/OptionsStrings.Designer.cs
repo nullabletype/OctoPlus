@@ -124,6 +124,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Environment Id.
+        /// </summary>
+        internal static string EnvironmentId {
+            get {
+                return ResourceManager.GetString("EnvironmentId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name the of the environment to deploy to.
         /// </summary>
         internal static string EnvironmentName {
@@ -255,6 +264,15 @@ namespace OctoPlus.Console.Resources {
         internal static string SourceEnvironment {
             get {
                 return ResourceManager.GetString("SourceEnvironment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Team Id.
+        /// </summary>
+        internal static string TeamId {
+            get {
+                return ResourceManager.GetString("TeamId", resourceCulture);
             }
         }
         

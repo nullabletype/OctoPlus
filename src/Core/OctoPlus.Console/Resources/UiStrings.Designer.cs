@@ -97,6 +97,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t add the environment to that team: {0}.
+        /// </summary>
+        internal static string CouldntAddEnvToTeam {
+            get {
+                return ResourceManager.GetString("CouldntAddEnvToTeam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current Package.
         /// </summary>
         internal static string CurrentPackage {
@@ -516,6 +525,15 @@ namespace OctoPlus.Console.Resources {
         internal static string SourceEnvironment {
             get {
                 return ResourceManager.GetString("SourceEnvironment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The team you specified doesn&apos;t exist?.
+        /// </summary>
+        internal static string TeamDoesntExist {
+            get {
+                return ResourceManager.GetString("TeamDoesntExist", resourceCulture);
             }
         }
         

@@ -129,6 +129,9 @@
   <data name="ConfirmationCheck" xml:space="preserve">
     <value>Are you absolutely 100% sure you wish to delete {0}? There is no going back...</value>
   </data>
+  <data name="CouldntAddEnvToTeam" xml:space="preserve">
+    <value>I couldn't add the environment to that team: {0}</value>
+  </data>
   <data name="CurrentPackage" xml:space="preserve">
     <value>Current Package</value>
   </data>
@@ -269,6 +272,9 @@
   </data>
   <data name="SourceEnvironment" xml:space="preserve">
     <value>Which environment do you wish to promote from?</value>
+  </data>
+  <data name="TeamDoesntExist" xml:space="preserve">
+    <value>The team you specified doesn't exist?</value>
   </data>
   <data name="TooManyMatchingEnvironments" xml:space="preserve">
     <value>Too many enviroments match your criteria: </value>

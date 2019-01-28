@@ -45,7 +45,7 @@ namespace OctoPlus.Console.Commands.SubCommands
         {
             base.Configure(command);
 
-            AddToRegister(EnsureEnvironmentOptionNames.Id, command.Option("-i|--id", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnsureEnvironmentOptionNames.Id, command.Option("-e|--e", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue).IsRequired());
             AddToRegister(EnsureEnvironmentOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", OptionsStrings.SkipConfirmation, CommandOptionType.NoValue));
         }
 
@@ -66,6 +66,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                 }
                 try 
                 {
+                    await octoHelper.RemoveEnvironmentsFromTeams(found.Id);
                     await octoHelper.DeleteEnvironment(found.Id);
                 } 
                 catch (Exception e) 
