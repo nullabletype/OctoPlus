@@ -241,6 +241,24 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed parsing the json file, please check your syntax!.
+        /// </summary>
+        internal static string FailedParsingVariableFile {
+            get {
+                return ResourceManager.GetString("FailedParsingVariableFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Received an error from Octopus when updating variables: {0}.
+        /// </summary>
+        internal static string FailedUpdatingVariableSet {
+            get {
+                return ResourceManager.GetString("FailedUpdatingVaraibleSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fetching project list.
         /// </summary>
         internal static string FetchingProjectList {
@@ -561,6 +579,15 @@ namespace OctoPlus.Console.Resources {
         internal static string UpdateAvailableHere {
             get {
                 return ResourceManager.GetString("UpdateAvailableHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating VariableSet {0} with {1} variables.
+        /// </summary>
+        internal static string UpdatingVariableSet {
+            get {
+                return ResourceManager.GetString("UpdatingVariableSet", resourceCulture);
             }
         }
         

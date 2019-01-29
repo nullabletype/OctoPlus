@@ -33,6 +33,7 @@ using OctoPlusCore.Octopus.Interfaces;
 using Environment = OctoPlusCore.Models.Environment;
 using Microsoft.Extensions.Caching.Memory;
 using Octopus.Client.Extensibility;
+using OctoPlusCore.Models.Variables;
 
 namespace OctoPlusCore.Octopus
 {
@@ -530,6 +531,37 @@ namespace OctoPlusCore.Octopus
             }
 
             return (string.Empty, true);
+        }
+
+        public async Task UpdateVariableSet(VariableSet varSet) 
+        {
+            var id = varSet.Id;
+            if (varSet.IdType == VariableSet.VariableIdTypes.Library) 
+            {
+                id = (await client.Repository.LibraryVariableSets.Get(id)).VariableSetId;
+            }
+            var set = await client.Repository.VariableSets.Get(id);
+            foreach(var variable in varSet.Variables) 
+            {
+                var scope = new ScopeSpecification();
+
+                if (variable.EnvironmentIds.Any()) 
+                {
+                    scope.Add(ScopeField.Environment, new ScopeValue(variable.EnvironmentIds));
+                }
+                if (variable.TargetIds.Any()) 
+                {
+                    scope.Add(ScopeField.Machine, new ScopeValue(variable.TargetIds));
+                }
+                if (variable.RoleIds.Any()) 
+                {
+                    scope.Add(ScopeField.Role, new ScopeValue(variable.RoleIds));
+                }
+
+                set.AddOrUpdateVariableValue(variable.Key, variable.Value, scope);
+            }
+
+            await client.Repository.VariableSets.Modify(set);
         }
 
         private Environment ConvertEnvironment(EnvironmentResource env)

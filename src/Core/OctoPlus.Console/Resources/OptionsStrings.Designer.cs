@@ -284,5 +284,14 @@ namespace OctoPlus.Console.Resources {
                 return ResourceManager.GetString("Url", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add or update variables.
+        /// </summary>
+        internal static string Variables {
+            get {
+                return ResourceManager.GetString("Variables", resourceCulture);
+            }
+        }
     }
 }

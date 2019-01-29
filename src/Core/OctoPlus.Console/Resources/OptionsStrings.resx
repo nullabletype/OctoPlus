@@ -192,4 +192,7 @@
   <data name="Url" xml:space="preserve">
     <value>Url for your octopus install</value>
   </data>
+  <data name="Variables" xml:space="preserve">
+    <value>Add or update variables</value>
+  </data>
 </root>

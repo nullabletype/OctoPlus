@@ -177,6 +177,12 @@
   <data name="Failed" xml:space="preserve">
     <value>Failed {0} : {1}</value>
   </data>
+  <data name="FailedParsingVariableFile" xml:space="preserve">
+    <value>Failed parsing the json file, please check your syntax!</value>
+  </data>
+  <data name="FailedUpdatingVaraibleSet" xml:space="preserve">
+    <value>Received an error from Octopus when updating variables: {0}</value>
+  </data>
   <data name="FetchingProjectList" xml:space="preserve">
     <value>Fetching project list</value>
   </data>
@@ -284,6 +290,9 @@
   </data>
   <data name="UpdateAvailableHere" xml:space="preserve">
     <value>Update here: {0}</value>
+  </data>
+  <data name="UpdatingVariableSet" xml:space="preserve">
+    <value>Updating VariableSet {0} with {1} variables</value>
   </data>
   <data name="UsingProfileAtPath" xml:space="preserve">
     <value>Using profile at path </value>

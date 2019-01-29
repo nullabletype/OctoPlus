@@ -22,16 +22,12 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Interfaces;
 using OctoPlus.Console.Resources;
 using OctoPlusCore.Octopus.Interfaces;
 
-namespace OctoPlus.Console.Commands.SubCommands
+namespace OctoPlus.Console.Commands.SubCommands 
 {
     class EnvironmentToTeam : BaseCommand
     {

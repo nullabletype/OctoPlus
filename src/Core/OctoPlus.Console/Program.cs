@@ -79,6 +79,8 @@ namespace OctoPlus.Console
             app.Command(environment.CommandName, env => environment.Configure(env));
             var release = container.GetService<Release>();
             app.Command(release.CommandName, env => release.Configure(env));
+            var variable = container.GetService<Variable>();
+            app.Command(variable.CommandName, vari => variable.Configure(vari));
 
             app.OnExecute(() =>
             {
@@ -170,6 +172,8 @@ namespace OctoPlus.Console
             .AddTransient<EnsureEnvironment, EnsureEnvironment>()
             .AddTransient<DeleteEnvironment, DeleteEnvironment>()
             .AddTransient<EnvironmentToTeam, EnvironmentToTeam>()
+            .AddTransient<Variable, Variable>()
+            .AddTransient<VariablesWithProfile, VariablesWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>()
             .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache();
