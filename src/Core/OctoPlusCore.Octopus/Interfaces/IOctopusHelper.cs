@@ -27,6 +27,7 @@ using Octopus.Client.Model;
 using OctoPlusCore.Models;
 using Microsoft.Extensions.Caching.Memory;
 using OctoPlusCore.Models.Variables;
+using static OctoPlusCore.Octopus.OctopusHelper;
 
 namespace OctoPlusCore.Octopus.Interfaces
 {
@@ -68,5 +69,6 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task RemoveEnvironmentsFromTeams(string envId);
         Task AddEnvironmentToTeam(string envId, string teamId);
         Task UpdateVariableSet(VariableSet varSet);
+        Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic);
     }
 }

@@ -70,6 +70,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatic deploy.
+        /// </summary>
+        internal static string AutomaticDeploy {
+            get {
+                return ResourceManager.GetString("AutomaticDeploy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The channel to deploy.
         /// </summary>
         internal static string DeployChannel {
@@ -169,11 +178,29 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Lifecycle Id.
+        /// </summary>
+        internal static string LifecycleId {
+            get {
+                return ResourceManager.GetString("LifecycleId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stay running monitoring for package updates, pausing for the specified time in seconds.
         /// </summary>
         internal static string MonitorForPackages {
             get {
                 return ResourceManager.GetString("MonitorForPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase number.
+        /// </summary>
+        internal static string PhaseNumber {
+            get {
+                return ResourceManager.GetString("PhaseNumber", resourceCulture);
             }
         }
         

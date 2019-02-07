@@ -38,12 +38,14 @@ namespace OctoPlus.Console.Commands {
         private EnsureEnvironment ensureEnv;
         private DeleteEnvironment delEnv;
         private EnvironmentToTeam envToTeam;
+        private EnvironmentToLifecycle envToLifecycle;
 
-        public Environment(IOctopusHelper octoHelper, EnsureEnvironment ensureEnv, DeleteEnvironment delEnv, EnvironmentToTeam envToTeam) : base(octoHelper) 
+        public Environment(IOctopusHelper octoHelper, EnsureEnvironment ensureEnv, DeleteEnvironment delEnv, EnvironmentToTeam envToTeam, EnvironmentToLifecycle envToLifecycle) : base(octoHelper) 
         {
             this.ensureEnv = ensureEnv;
             this.delEnv = delEnv;
             this.envToTeam = envToTeam;
+            this.envToLifecycle = envToLifecycle;
         }
 
         protected override bool SupportsInteractiveMode => false;
@@ -55,6 +57,7 @@ namespace OctoPlus.Console.Commands {
             ConfigureSubCommand(ensureEnv, command);
             ConfigureSubCommand(delEnv, command);
             ConfigureSubCommand(envToTeam, command);
+            ConfigureSubCommand(envToLifecycle, command);
 
             command.Description = OptionsStrings.EnvironmentCommands;
         }

@@ -180,7 +180,7 @@
   <data name="FailedParsingVariableFile" xml:space="preserve">
     <value>Failed parsing the json file, please check your syntax!</value>
   </data>
-  <data name="FailedUpdatingVaraibleSet" xml:space="preserve">
+  <data name="FailedUpdatingVariableSet" xml:space="preserve">
     <value>Received an error from Octopus when updating variables: {0}</value>
   </data>
   <data name="FetchingProjectList" xml:space="preserve">
@@ -209,6 +209,12 @@
   </data>
   <data name="InvalidReleaseVersion" xml:space="preserve">
     <value>Release versions much follow the semantic versioning 2.0 spec!</value>
+  </data>
+  <data name="LifecycleDoesntExist" xml:space="preserve">
+    <value>The lifecycle you specified doesn't exist?</value>
+  </data>
+  <data name="LifecyclePhaseIsInvalid" xml:space="preserve">
+    <value>The phase number you provided is invalid. Please use a number, like 1 or 2</value>
   </data>
   <data name="LoadingInfoFor" xml:space="preserve">
     <value>Loading Info for {0}</value>

@@ -496,6 +496,49 @@ namespace OctoPlusCore.Octopus
             }
         }
 
+        public async Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic) {
+            LifecycleResource lifecycle;
+            EnvironmentResource environment;
+            try 
+            {
+                lifecycle = await client.Repository.Lifecycles.Get(lcId);
+                environment = await client.Repository.Environments.Get(envId);
+            } 
+            catch (Exception e) 
+            {
+                return (false,LifecycleErrorType.UnexpectedError, e.Message);
+            }
+            if (lifecycle.Phases.Count < phaseId) 
+            {
+                return (false, LifecycleErrorType.PhaseInLifeCycleNotFound, string.Empty);
+            }
+            if (automatic) 
+            {
+                if (!lifecycle.Phases[phaseId].AutomaticDeploymentTargets.Contains(envId)) 
+                {
+                    lifecycle.Phases[phaseId].AutomaticDeploymentTargets.Add(envId);
+                }
+            } 
+            else 
+            {
+                if (!lifecycle.Phases[phaseId].OptionalDeploymentTargets.Contains(envId)) 
+                {
+                    lifecycle.Phases[phaseId].OptionalDeploymentTargets.Add(envId);
+                }
+            }
+            try 
+            {
+                await client.Repository.Lifecycles.Modify(lifecycle);
+            } 
+            catch (Exception e) 
+            {
+                return (false, LifecycleErrorType.UnexpectedError, e.Message);
+            }
+            return (false, LifecycleErrorType.None, string.Empty); ;
+
+
+        }
+
         public async Task<string> GetTaskRawLog(string taskId) 
         {
             var task = await client.Repository.Tasks.Get(taskId);
@@ -786,6 +829,15 @@ namespace OctoPlusCore.Octopus
             public string PackageId { get; set; }
             public string StepName { get; set; }
             public string StepId { get; set; }
+        }
+
+        public enum LifecycleErrorType 
+        {
+            LifeCycleNotFound,
+            EnvironmentNotFound,
+            PhaseInLifeCycleNotFound,
+            UnexpectedError,
+            None
         }
     }
 }

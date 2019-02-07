@@ -120,6 +120,9 @@
   <data name="ApiKey" xml:space="preserve">
     <value>The API key to use for deployment</value>
   </data>
+  <data name="AutomaticDeploy" xml:space="preserve">
+    <value>Automatic deploy</value>
+  </data>
   <data name="DeployChannel" xml:space="preserve">
     <value>The channel to deploy</value>
   </data>
@@ -153,8 +156,14 @@
   <data name="InteractiveDeploy" xml:space="preserve">
     <value>Enter interactive mode to deploy projects</value>
   </data>
+  <data name="LifecycleId" xml:space="preserve">
+    <value>Lifecycle Id</value>
+  </data>
   <data name="MonitorForPackages" xml:space="preserve">
     <value>Stay running monitoring for package updates, pausing for the specified time in seconds</value>
+  </data>
+  <data name="PhaseNumber" xml:space="preserve">
+    <value>Phase number</value>
   </data>
   <data name="ProfileFile" xml:space="preserve">
     <value>The path to the json profile file you wish to deploy</value>

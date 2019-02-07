@@ -254,7 +254,7 @@ namespace OctoPlus.Console.Resources {
         /// </summary>
         internal static string FailedUpdatingVariableSet {
             get {
-                return ResourceManager.GetString("FailedUpdatingVaraibleSet", resourceCulture);
+                return ResourceManager.GetString("FailedUpdatingVariableSet", resourceCulture);
             }
         }
         
@@ -336,6 +336,24 @@ namespace OctoPlus.Console.Resources {
         internal static string InvalidReleaseVersion {
             get {
                 return ResourceManager.GetString("InvalidReleaseVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The lifecycle you specified doesn&apos;t exist?.
+        /// </summary>
+        internal static string LifecycleDoesntExist {
+            get {
+                return ResourceManager.GetString("LifecycleDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The phase number you provided is invalid. Please use a number, like 1 or 2.
+        /// </summary>
+        internal static string LifecyclePhaseIsInvalid {
+            get {
+                return ResourceManager.GetString("LifecyclePhaseIsInvalid", resourceCulture);
             }
         }
         

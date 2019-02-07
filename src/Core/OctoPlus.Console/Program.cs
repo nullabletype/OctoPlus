@@ -172,6 +172,7 @@ namespace OctoPlus.Console
             .AddTransient<EnsureEnvironment, EnsureEnvironment>()
             .AddTransient<DeleteEnvironment, DeleteEnvironment>()
             .AddTransient<EnvironmentToTeam, EnvironmentToTeam>()
+            .AddTransient<EnvironmentToLifecycle, EnvironmentToLifecycle>()
             .AddTransient<Variable, Variable>()
             .AddTransient<VariablesWithProfile, VariablesWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
