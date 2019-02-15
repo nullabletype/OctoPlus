@@ -1,0 +1,24 @@
+image: microsoft/dotnet:latest
+
+stages:
+    - build
+    - publish
+
+variables:
+    test: "Example.Test"
+
+before_script:
+    - "cd src\Core"
+    - "dotnet restore"
+
+build:
+    stage: build
+    script:
+        - cd src\Core
+        - "dotnet build -c Release OctoPlus.sln"
+
+publish:
+    stage: publish
+    script: 
+        - cd src\Core\Octoplus.Console
+        - "dotnet publish -c Release OctoPlus.Console.csproj -o publish"
