@@ -7,15 +7,13 @@ variables:
     test: "Example.Test"
 
 before_script:
-    - "cd src/Core"
-    - "dotnet restore"
+    - "dotnet restore src/Core"
 
 build:
     stage: build
     script:
-        - "dotnet build -c Release OctoPlus.sln"
-        - cd OctoPlus.Console
-        - "dotnet publish -c Release OctoPlus.Console.csproj -o publish"
+        - "dotnet build -c Release src/Core/OctoPlus.sln"
+        - "dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o octoplus-release"
     artifacts:
         paths:
-            - src/Core/OctoPlus.Console/publish/
+            - octoplus-release/
