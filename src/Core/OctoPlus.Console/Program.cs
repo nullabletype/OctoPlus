@@ -46,6 +46,7 @@ using OctoPlus.Console.Resources;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 using System.IO;
+using OctoPlusCore.VersionChecking.GitLab;
 
 namespace OctoPlus.Console
 {
@@ -159,7 +160,7 @@ namespace OctoPlus.Console
             .AddSingleton<IDeployer, Deployer>()
             .AddTransient<IChangeLogProvider, TeamCity>()
             .AddTransient<IWebRequestHelper, WebRequestHelper>()
-            .AddTransient<IVersionCheckingProvider, GitHubVersionChecker>()
+            .AddTransient<IVersionCheckingProvider, GitLabVersionChecker>()
             .AddTransient<IVersionChecker, VersionChecker>()
             .AddTransient<IConsoleDoJob, ConsoleDoJob>()
             .AddTransient<Deploy, Deploy>()

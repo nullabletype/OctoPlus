@@ -47,7 +47,7 @@ namespace OctoPlusCore.VersionChecking
                 return new VersionCheckResult();
             }
             var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
-            latestVersion.CurrentVersion = currentVersion.ToString();
+            latestVersion.CurrentVersion = currentVersion.ToString().TrimEnd(".0".ToCharArray());
             var latestTagVersion = new Version(latestVersion.TagName.Split('-')[0]);
             if (currentVersion.CompareTo(latestTagVersion) < 0)
             {
