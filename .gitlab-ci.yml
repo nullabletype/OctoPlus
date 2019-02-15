@@ -2,7 +2,6 @@ image: microsoft/dotnet:latest
 
 stages:
     - build
-    - publish
 
 variables:
     test: "Example.Test"
@@ -15,9 +14,8 @@ build:
     stage: build
     script:
         - "dotnet build -c Release OctoPlus.sln"
-
-publish:
-    stage: publish
-    script: 
-        - cd Octoplus.Console
+        - cd OctoPlus.Console
         - "dotnet publish -c Release OctoPlus.Console.csproj -o publish"
+    artifacts:
+        paths:
+            - publish
