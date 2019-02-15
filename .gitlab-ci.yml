@@ -18,4 +18,4 @@ build:
         - "dotnet publish -c Release OctoPlus.Console.csproj -o publish"
     artifacts:
         paths:
-            - publish
+            - OctoPlus.Console/publish/
