@@ -14,11 +14,10 @@ before_script:
 build:
     stage: build
     script:
-        - cd src/Core
         - "dotnet build -c Release OctoPlus.sln"
 
 publish:
     stage: publish
     script: 
-        - cd src/Core/Octoplus.Console
+        - cd Octoplus.Console
         - "dotnet publish -c Release OctoPlus.Console.csproj -o publish"
