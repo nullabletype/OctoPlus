@@ -13,7 +13,7 @@ build:
     stage: build
     script:
         - "dotnet build -c Release src/Core/OctoPlus.sln"
-        - "dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o octoplus-release"
+        - "dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release"
     artifacts:
         paths:
             - octoplus-release/
