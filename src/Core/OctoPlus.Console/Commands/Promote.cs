@@ -167,8 +167,8 @@ namespace OctoPlus.Console.Commands
                     }
                 }
 
-                var project = await octoHelper.ConvertProject(projectStub, environment.Id, null);
-                var targetProject = await octoHelper.ConvertProject(projectStub, targetEnvironment.Id, null);
+                var project = await octoHelper.ConvertProject(projectStub, environment.Id, null, null);
+                var targetProject = await octoHelper.ConvertProject(projectStub, targetEnvironment.Id, null, null);
 
                 var currentRelease = project.CurrentRelease;
                 var currentTargetRelease = targetProject.CurrentRelease;

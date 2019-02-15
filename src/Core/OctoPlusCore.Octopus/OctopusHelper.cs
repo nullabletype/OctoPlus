@@ -81,9 +81,9 @@ namespace OctoPlusCore.Octopus
             }
         }
 
-        public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange) 
+        public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag) 
         {
-            return await GetPackages(await GetProject(projectIdOrHref), versionRange);
+            return await GetPackages(await GetProject(projectIdOrHref), versionRange, tag);
         }
 
         private async Task<PackageIdResult> GetPackageId(ProjectResource project) 
@@ -154,7 +154,7 @@ namespace OctoPlusCore.Octopus
             return results;
         }
 
-        private async Task<IList<PackageStep>> GetPackages(ProjectResource project, string versionRange, int take = 5) 
+        private async Task<IList<PackageStep>> GetPackages(ProjectResource project, string versionRange, string tag, int take = 5) 
         {
             var packageIdResult = await this.GetPackages(project);
             var allPackages = new List<PackageStep>();
@@ -182,6 +182,7 @@ namespace OctoPlusCore.Octopus
                                     take,
                                     includePreRelease = true,
                                     versionRange,
+                                    preReleaseTag = tag
                                 });
 
                     var finalPackages = new List<PackageStub>();
@@ -274,12 +275,12 @@ namespace OctoPlusCore.Octopus
             return (await client.Repository.ProjectGroups.GetAll()).Select(ConvertProjectGroup).ToList();
         }
 
-        public async Task<List<Project>> GetProjects(string environment, string channelRange) 
+        public async Task<List<Project>> GetProjects(string environment, string channelRange, string tag) 
         {
             var projects = await client.Repository.Projects.GetAll();
             var converted = new List<Project>();
             foreach (var project in projects) {
-                converted.Add(await ConvertProject(project, environment, channelRange));
+                converted.Add(await ConvertProject(project, environment, channelRange, tag));
             }
             return converted;
         }
@@ -295,9 +296,9 @@ namespace OctoPlusCore.Octopus
             return converted;
         }
 
-        public async Task<Project> GetProject(string idOrHref, string environment, string channelRange) 
+        public async Task<Project> GetProject(string idOrHref, string environment, string channelRange, string tag) 
         {
-            return await ConvertProject(await GetProject(idOrHref), environment, channelRange);
+            return await ConvertProject(await GetProject(idOrHref), environment, channelRange, tag);
         }
 
         public async Task<bool> ValidateProjectName(string name) 
@@ -306,11 +307,12 @@ namespace OctoPlusCore.Octopus
             return project != null;
         }
 
-        public async Task<Project> GetProjectByName(string name, string environment, string channelRange) 
+        public async Task<Project> GetProjectByName(string name, string environment, string channelRange, string tag) 
         {
             return await ConvertProject(await client.Repository.Projects.FindOne(resource => resource.Name == name),
                 environment,
-                channelRange);
+                channelRange,
+                tag);
         }
 
         public async Task<Channel> GetChannelByProjectNameAndChannelName(string name, string channelName) 
@@ -622,10 +624,10 @@ namespace OctoPlusCore.Octopus
             };
         }
 
-        public async Task<Project> ConvertProject(ProjectStub project, string env, string channelRange)
+        public async Task<Project> ConvertProject(ProjectStub project, string env, string channelRange, string tag)
         {
             var projectRes = await this.GetProject(project.ProjectId);
-            var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange);
+            var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange, tag);
             List<RequiredVariable> requiredVariables = await GetVariables(projectRes.VariableSetId);
             return new Project {
                 CurrentRelease = await this.GetReleasedVersion(project.ProjectId, env),
@@ -639,9 +641,9 @@ namespace OctoPlusCore.Octopus
             };
         }
 
-        private async Task<Project> ConvertProject(ProjectResource project, string env, string channelRange)
+        private async Task<Project> ConvertProject(ProjectResource project, string env, string channelRange, string tag)
         {
-            var packages = await this.GetPackages(project, channelRange);
+            var packages = await this.GetPackages(project, channelRange, tag);
             List<RequiredVariable> requiredVariables = await GetVariables(project.VariableSetId);
             return new Project
             {
@@ -731,11 +733,13 @@ namespace OctoPlusCore.Octopus
                 return null;
             }
             var versionRange = String.Empty;
+            var versionTag = String.Empty;
             if (channel.Rules.Any())
             {
                 versionRange = channel.Rules[0].VersionRange;
+                versionTag = channel.Rules[0].Tag;
             }
-            return new Channel {Id = channel.Id, Name = channel.Name, VersionRange = versionRange};
+            return new Channel {Id = channel.Id, Name = channel.Name, VersionRange = versionRange, VersionTag = versionTag};
         }
 
         private ProjectGroup ConvertProjectGroup(ProjectGroupResource projectGroup)

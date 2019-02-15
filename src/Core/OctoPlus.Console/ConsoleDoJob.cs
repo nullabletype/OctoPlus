@@ -69,13 +69,13 @@ namespace OctoPlus.Console {
                     var octoProject =
                         await
                             this.helper.GetProject(project.ProjectId, job.EnvironmentId,
-                                project.ChannelVersionRange);
+                                project.ChannelVersionRange, project.ChannelVersionTag);
                     foreach (var package in project.Packages)
                     {
                         if (package.PackageId == "latest")
                         {
                             var packages =
-                                await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange);
+                                await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
                             package.PackageId = packages.First().SelectedPackage.Id;
                             package.PackageName = packages.First().SelectedPackage.Version;
                             package.StepName = packages.First().SelectedPackage.StepName;

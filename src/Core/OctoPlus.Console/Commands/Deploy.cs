@@ -214,7 +214,7 @@ namespace OctoPlus.Console.Commands
                     }
                 }
 
-                var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange);
+                var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange, channel.VersionTag);
                 var currentPackages = project.CurrentRelease.SelectedPackages;
                 project.Checked = false;
                 if (project.SelectedPackageStubs != null) 
@@ -320,6 +320,7 @@ namespace OctoPlus.Console.Commands
                 }).ToList(),
                 ChannelId = projectChannel?.Id,
                 ChannelVersionRange = channel?.VersionRange,
+                ChannelVersionTag = channel?.VersionTag,
                 LifeCycleId = current.LifeCycleId,
                 RequiredVariables = current?.RequiredVariables?.Select(r => new RequiredVariableDeployment { Id = r.Id, ExtraOptions = r.ExtraOptions, Name = r.Name, Type = r.Type, Value = r.Value }).ToList()
             };

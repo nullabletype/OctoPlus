@@ -28,5 +28,6 @@ namespace OctoPlusCore.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string VersionRange { get; set; }
+        public string VersionTag { get; set; }
     }
 }
