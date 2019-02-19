@@ -475,17 +475,11 @@ namespace OctoPlusCore.Octopus
 
         public async Task RemoveEnvironmentsFromTeams(string envId) 
         {
-            var teams = await client.Repository.Teams.FindAll();
+            var teams = await client.Repository.Teams.FindMany(team => { return team.EnvironmentIds.Contains(envId); });
             foreach (var team in teams) 
             {
-                var scopes = await client.Repository.Teams.GetScopedUserRoles(team);
-                
-                foreach (var scope in scopes.Where(s => s.EnvironmentIds.Contains(envId))) 
-                {
-                    scope.EnvironmentIds.Remove(envId);
-                    var saved = await client.Repository.ScopedUserRoles.Modify(scope);
-                }
-                
+                team.EnvironmentIds.Remove(envId);
+                var saved = await client.Repository.Teams.Modify(team);
             }
         }
 
@@ -497,14 +491,10 @@ namespace OctoPlusCore.Octopus
             {
                 return;
             }
-            var scopes = await client.Repository.Teams.GetScopedUserRoles(team);
-            foreach (var scope in scopes) 
+            if (!team.EnvironmentIds.Contains(envId)) 
             {
-                if (!scope.EnvironmentIds.Contains(envId))
-                {
-                    scope.EnvironmentIds.Add(envId);
-                    var saved = await client.Repository.ScopedUserRoles.Modify(scope);
-                }
+                team.EnvironmentIds.Add(envId);
+                await client.Repository.Teams.Modify(team);
             }
         }
 
