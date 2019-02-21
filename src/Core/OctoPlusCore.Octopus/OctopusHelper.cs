@@ -377,6 +377,12 @@ namespace OctoPlusCore.Octopus
         public async Task<Release> CreateRelease(ProjectDeployment project) 
         {
             var user = await client.Repository.Users.GetCurrent();
+            var split = project.Packages.First().PackageName.Split('.');
+            var releaseName = project.ReleaseVersion ?? split[0] + "." + split[1] + ".i";
+            if (project.ReleaseVersion == null && !string.IsNullOrEmpty(project.ChannelVersionTag)) 
+            {
+                releaseName += "-" + project.ChannelVersionTag;
+            }
             var release = new ReleaseResource
             {
                 Assembled = DateTimeOffset.UtcNow,
@@ -385,7 +391,7 @@ namespace OctoPlusCore.Octopus
                 LastModifiedOn = DateTimeOffset.UtcNow,
                 ProjectId = project.ProjectId,
                 ReleaseNotes = project.ReleaseMessage ?? string.Empty,
-                Version = project.ReleaseVersion ?? project.Packages.First().PackageName.Split('.')[0] + ".i"
+                Version = releaseName
             };
             foreach (var package in project.Packages)
             {
