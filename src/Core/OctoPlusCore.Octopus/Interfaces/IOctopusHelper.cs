@@ -67,6 +67,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<(string error, bool success)> RenameRelease(string releaseId, string newReleaseVersion);
         Task<bool> UpdateReleaseVariables(string releaseId);
         Task RemoveEnvironmentsFromTeams(string envId);
+        Task RemoveEnvironmentsFromLifecycles(string envId);
         Task AddEnvironmentToTeam(string envId, string teamId);
         Task UpdateVariableSet(VariableSet varSet);
         Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic);

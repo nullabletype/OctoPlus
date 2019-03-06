@@ -489,6 +489,27 @@ namespace OctoPlusCore.Octopus
             }
         }
 
+        public async Task RemoveEnvironmentsFromLifecycles(string envId) 
+        {
+            var env = await client.Repository.Environments.Get(envId);
+            var lifecycles = await client.Repository.Lifecycles.FindMany(lifecycle => 
+                { 
+                    return lifecycle.Phases.Any(phase => 
+                        phase.AutomaticDeploymentTargets.Contains(envId) || 
+                        phase.OptionalDeploymentTargets.Contains(envId)
+                    ); 
+                });
+            foreach(var lifecycle in lifecycles) 
+            {
+                foreach (var phase in lifecycle.Phases) 
+                {
+                    phase.AutomaticDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                    phase.OptionalDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                }
+                await client.Repository.Lifecycles.Modify(lifecycle);
+            }
+        }
+
         public async Task AddEnvironmentToTeam(string envId, string teamId) 
         {
             var team = await client.Repository.Teams.Get(teamId);

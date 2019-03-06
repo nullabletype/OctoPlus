@@ -51,10 +51,12 @@ namespace OctoPlus.Console.Commands
             ConfigureSubCommand(_variablesWithProfile, command);
         }
 
-        protected override async Task<int> Run(CommandLineApplication command)
+        protected override Task<int> Run(CommandLineApplication command)
         {
             command.ShowHelp();
-            return 0;
+            var ts = new TaskCompletionSource<int>();
+            ts.SetResult(0);
+            return ts.Task;
         }
 
     }

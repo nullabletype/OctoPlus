@@ -96,7 +96,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                             {
                                 System.Console.WriteLine("Service {0} started", name);
                                 service.Start();
-                                RunProfiles(profilePath, run, waitTime);
+                                RunProfiles(profilePath, run, waitTime).Start();
                             });
 
                         });

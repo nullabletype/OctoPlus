@@ -67,6 +67,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                 try 
                 {
                     await octoHelper.RemoveEnvironmentsFromTeams(found.Id);
+                    await octoHelper.RemoveEnvironmentsFromLifecycles(found.Id);
                     await octoHelper.DeleteEnvironment(found.Id);
                 } 
                 catch (Exception e) 
