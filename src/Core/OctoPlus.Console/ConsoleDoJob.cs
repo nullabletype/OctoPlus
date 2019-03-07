@@ -70,28 +70,25 @@ namespace OctoPlus.Console {
                         await
                             this.helper.GetProject(project.ProjectId, job.EnvironmentId,
                                 project.ChannelVersionRange, project.ChannelVersionTag);
+                        var packages =
+                        await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
                     foreach (var package in project.Packages)
                     {
                         if (package.PackageId == "latest")
                         {
-                            var packages =
-                                await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
-                            package.PackageId = packages.First().SelectedPackage.Id;
-                            package.PackageName = packages.First().SelectedPackage.Version;
-                            package.StepName = packages.First().SelectedPackage.StepName;
+                            // Filter to packages specifically for this package step, then update the package versions
+                            var availablePackages = packages.Where(pack => pack.StepId == package.StepId);
+
+                            package.PackageId = availablePackages.First().SelectedPackage.Id;
+                            package.PackageName = availablePackages.First().SelectedPackage.Version;
+                            package.StepName = availablePackages.First().SelectedPackage.StepName;
                         }
                     }
                     if (!forceDeploymentIfSamePackage)
                     {
-                        var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
-                        if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id)) 
+                        if (!await IsDeploymentRequired(job, project)) 
                         {
-                            var release = await this.helper.GetRelease(currentRelease.Id);
-                            var currentPackage = release.SelectedPackages[0];
-                            if (project.Packages.All(p => release.SelectedPackages.Any(s => p.StepName == p.StepName && s.Version == p.PackageName)))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
                     }
                     if (!string.IsNullOrEmpty(message))
@@ -113,6 +110,24 @@ namespace OctoPlus.Console {
             {
                 this.WriteLine("Couldn't deploy! " + e.Message + e.StackTrace);
             }
+        }
+
+        private async Task<bool> IsDeploymentRequired(EnvironmentDeployment job, ProjectDeployment project)
+        {
+            var needsDeploy = false;
+            var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
+            if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id))
+            {
+                // Check if we have any packages that are different versions. If they're the same, we don't need to deploy.
+                foreach (var package in project.Packages)
+                {
+                    if (!currentRelease.SelectedPackages.Any(pack => pack.StepName == package.StepName && package.PackageName == pack.Version))
+                    {
+                        needsDeploy = true;
+                    }
+                }
+            }
+            return needsDeploy;
         }
 
         public void WriteLine(string toWrite)
