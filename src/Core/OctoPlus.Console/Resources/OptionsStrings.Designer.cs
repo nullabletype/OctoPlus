@@ -151,6 +151,15 @@ namespace OctoPlus.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fallback to the default channel if there are no packages available for the selected channel for a project.
+        /// </summary>
+        internal static string FallbackToDefault {
+            get {
+                return ResourceManager.GetString("FallbackToDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Force redeployment of the same package if no new one exists.
         /// </summary>
         internal static string ForceDeployOfSamePackage {

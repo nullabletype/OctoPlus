@@ -31,5 +31,6 @@ namespace OctoPlusCore.Configuration.Interfaces
         ChangeLogProviderConfiguration ChangeProviderConfiguration { get; set; }
         bool EnableTrace { get; set; }
         int CacheTimeoutInSeconds { get; set; }
+        string DefaultChannel { get; set; }
     }
 }

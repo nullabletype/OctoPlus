@@ -37,6 +37,7 @@ using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
 using OctoPlusCore.Utilities;
 using System.IO;
+using OctoPlusCore;
 
 namespace OctoPlus.Console.Commands
 {
@@ -76,6 +77,7 @@ namespace OctoPlus.Console.Commands
             AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.GroupFilter, CommandOptionType.SingleValue));
             AddToRegister(DeployOptionNames.SaveProfile, command.Option("-s|--saveprofile", OptionsStrings.SaveProfile, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.DefaultFallback, command.Option("-d|--fallbacktodefault", OptionsStrings.FallbackToDefault, CommandOptionType.NoValue));
             AddToRegister(OptionNames.ReleaseName, command.Option("-r|--releasename", OptionsStrings.ReleaseVersion, CommandOptionType.SingleValue));
         }
 
@@ -99,6 +101,7 @@ namespace OctoPlus.Console.Commands
             var channelName = GetStringFromUser(DeployOptionNames.ChannelName, UiStrings.WhichChannelPrompt);
             var environmentName = GetStringFromUser(DeployOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
             var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt, allowEmpty: true);
+            var forceDefault = GetOption(DeployOptionNames.DefaultFallback).HasValue();
 
             progressBar.WriteStatusLine(UiStrings.CheckingOptions);
 
@@ -126,11 +129,17 @@ namespace OctoPlus.Console.Commands
                 return -1;
             }
 
+            Channel defaultChannel = null;
+
+            if (forceDefault && !string.IsNullOrEmpty(configuration.DefaultChannel)) {
+                defaultChannel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, configuration.DefaultChannel);
+            }
+
             progressBar.CleanCurrentLine();
-            var projects = await ConvertProjectStubsToProjects(projectStubs, groupRestriction, groupIds, environment, channel);
+            var projects = await ConvertProjectStubsToProjects(projectStubs, groupRestriction, groupIds, environment, channel, defaultChannel);
             progressBar.CleanCurrentLine();
 
-            var deployment = await GenerateDeployment(channel, environment, projects);
+            var deployment = await GenerateDeployment(channel, environment, projects, forceDefault);
 
             if (deployment == null)
             {
@@ -163,7 +172,7 @@ namespace OctoPlus.Console.Commands
             System.Console.WriteLine(string.Format(UiStrings.ProfileSaved, profilePath));
         }
 
-        private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, OctoPlusCore.Models.Environment environment, List<Project> projects)
+        private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, OctoPlusCore.Models.Environment environment, List<Project> projects, bool fallbackToDefaultChannel)
         {
             EnvironmentDeployment deployment;
 
@@ -194,11 +203,13 @@ namespace OctoPlus.Console.Commands
 
             FillRequiredVariables(deployment.ProjectDeployments);
 
+            deployment.FallbackToDefaultChannel = fallbackToDefaultChannel;
+
             return deployment;
         }
 
         private async Task<List<Project>> ConvertProjectStubsToProjects(List<ProjectStub> projectStubs, string groupRestriction, List<string> groupIds,
-            OctoPlusCore.Models.Environment environment, Channel channel)
+            OctoPlusCore.Models.Environment environment, Channel channel, Channel defaultChannel)
         {
             var projects = new List<Project>();
 
@@ -216,16 +227,31 @@ namespace OctoPlus.Console.Commands
 
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange, channel.VersionTag);
                 var currentPackages = project.CurrentRelease.SelectedPackages;
+                List<PackageStub> defaultPackages = null;
                 project.Checked = false;
                 if (project.SelectedPackageStubs != null) 
                 {
                     foreach(var stub in project.SelectedPackageStubs)
                     {
-                        if(stub == null)
+                        if (stub == null)
                         {
+                            if (defaultChannel != null) 
+                            {
+                                if (defaultPackages == null) 
+                                {
+                                    project = await octoHelper.ConvertProject(projectStub, environment.Id, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                    defaultPackages = project.CurrentRelease.SelectedPackages;
+                                }
+
+                            }
+
                             continue;
                         }
                         var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == stub.StepId);
+                        if (matchingCurrent == null && defaultPackages != null) 
+                        {
+                            matchingCurrent = defaultPackages.FirstOrDefault(p => p.StepId == stub.StepId);
+                        }
                         if (matchingCurrent != null) {
                             if (matchingCurrent.Version != stub.Version)
                             {
@@ -351,6 +377,7 @@ namespace OctoPlus.Console.Commands
             public const string Environment = "environment";
             public const string GroupFilter = "groupfilter";
             public const string SaveProfile = "saveprofile";
+            public const string DefaultFallback = "fallbacktodefault";
         }
     }
 }

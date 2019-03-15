@@ -374,7 +374,7 @@ namespace OctoPlusCore.Octopus
             return package;
         }
 
-        public async Task<Release> CreateRelease(ProjectDeployment project) 
+        public async Task<Release> CreateRelease(ProjectDeployment project, bool ignoreChannelRules = false) 
         {
             var user = await client.Repository.Users.GetCurrent();
             var split = project.Packages.First().PackageName.Split('.');
@@ -391,7 +391,7 @@ namespace OctoPlusCore.Octopus
                 LastModifiedOn = DateTimeOffset.UtcNow,
                 ProjectId = project.ProjectId,
                 ReleaseNotes = project.ReleaseMessage ?? string.Empty,
-                Version = releaseName
+                Version = releaseName,
             };
             foreach (var package in project.Packages)
             {
@@ -399,7 +399,7 @@ namespace OctoPlusCore.Octopus
             }
             var result =
                     await
-                        client.Repository.Releases.Create(release);
+                        client.Repository.Releases.Create(release, ignoreChannelRules: ignoreChannelRules);
             return new Release {
                 Version = result.Version,
                 Id = result.Id,

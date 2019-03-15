@@ -34,6 +34,7 @@ using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
 using OctoPlus.Console.ConsoleTools;
 using System.Text;
+using OctoPlusCore.Configuration.Interfaces;
 
 namespace OctoPlus.Console {
     public class ConsoleDoJob : IUiLogger, IConsoleDoJob
@@ -41,12 +42,14 @@ namespace OctoPlus.Console {
         private IDeployer deployer;
         private readonly IOctopusHelper helper;
         private IProgressBar progressBar;
+        private IConfiguration configuration;
 
-        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar)
+        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration)
         {
             this.helper = helper;
             this.deployer = deployer;
             this.progressBar = progressBar;
+            this.configuration = configuration;
         }
 
         public async Task StartJob(string pathToProfile, string message, string releaseVersion,
@@ -72,12 +75,24 @@ namespace OctoPlus.Console {
                                 project.ChannelVersionRange, project.ChannelVersionTag);
                         var packages =
                         await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
+                    IList<PackageStep> defaultPackages = null;
                     foreach (var package in project.Packages)
                     {
                         if (package.PackageId == "latest")
                         {
                             // Filter to packages specifically for this package step, then update the package versions
                             var availablePackages = packages.Where(pack => pack.StepId == package.StepId);
+
+                            // If there are no packages for this step, check if we've been asked to jump back to default channel.
+                            if (!availablePackages.Any() && job.FallbackToDefaultChannel && !string.IsNullOrEmpty(configuration.DefaultChannel)) 
+                            {
+                                if (defaultPackages == null) 
+                                {
+                                    var defaultChannel = await this.helper.GetChannelByName(project.ProjectId, configuration.DefaultChannel);
+                                    defaultPackages = await this.helper.GetPackages(project.ProjectId, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                }
+                                availablePackages = defaultPackages.Where(pack => pack.StepId == package.StepId);
+                            }
 
                             package.PackageId = availablePackages.First().SelectedPackage.Id;
                             package.PackageName = availablePackages.First().SelectedPackage.Version;

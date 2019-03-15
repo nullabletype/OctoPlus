@@ -38,7 +38,8 @@ namespace OctoPlusCore.Configuration
                 ApiKey = ConfigurationStrings.SampleApiKey,
                 ChannelSeedProjectName = ConfigurationStrings.SampleChannelSeedAppName,
                 OctopusUrl = ConfigurationStrings.SampleOctopusUrl,
-                ProjectGroupFilterString = ConfigurationStrings.SampleProjectGroupFilterString
+                ProjectGroupFilterString = ConfigurationStrings.SampleProjectGroupFilterString,
+                DefaultChannel = "master"
             };
         }
     }

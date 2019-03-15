@@ -56,7 +56,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<TaskDetails> GetTaskDetails(string taskId);
         Task<IEnumerable<TaskStub>> GetDeploymentTasks(int skip, int take);
         Task<string> GetTaskRawLog(string taskId);
-        Task<Release> CreateRelease(ProjectDeployment project);
+        Task<Release> CreateRelease(ProjectDeployment project, bool ignoreChannelRules = false);
         Task<Deployment> CreateDeploymentTask(ProjectDeployment project, string environmentId, string releaseId);
         Task<bool> ValidateProjectName(string name);
         Task<PackageFull> GetFullPackage(PackageStub stub);
