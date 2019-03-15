@@ -22,10 +22,10 @@
 
 
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Octopus.Interfaces;
 using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console.Commands 
 {
@@ -38,7 +38,7 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "var";
 
-        public Variable(IOctopusHelper octoHelper, VariablesWithProfile varsWithProfile) : base(octoHelper)
+        public Variable(IOctopusHelper octoHelper, VariablesWithProfile varsWithProfile, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
             this._variablesWithProfile = varsWithProfile;
         }
@@ -46,7 +46,7 @@ namespace OctoPlus.Console.Commands
         public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
-            command.Description = OptionsStrings.Variables;
+            command.Description = languageProvider.GetString(LanguageSection.OptionsStrings, "Variables");
 
             ConfigureSubCommand(_variablesWithProfile, command);
         }

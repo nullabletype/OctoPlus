@@ -23,22 +23,28 @@
 
 using System.Threading.Tasks;
 using OctoPlusCore.Configuration.Interfaces;
-using OctoPlusCore.Configuration.Resources;
+using OctoPlusCore.Language;
 
 namespace OctoPlusCore.Configuration
 {
     public abstract class ConfigurationImplementation
     {
+        protected ILanguageProvider languageProvider;
+
+        public ConfigurationImplementation(ILanguageProvider languageProvider)
+        {
+            this.languageProvider = languageProvider;
+        }
         public abstract Task<ConfigurationLoadResult> LoadConfiguration();
 
         protected virtual IConfiguration GetSampleConfig()
         {
             return new Configuration
             {
-                ApiKey = ConfigurationStrings.SampleApiKey,
-                ChannelSeedProjectName = ConfigurationStrings.SampleChannelSeedAppName,
-                OctopusUrl = ConfigurationStrings.SampleOctopusUrl,
-                ProjectGroupFilterString = ConfigurationStrings.SampleProjectGroupFilterString,
+                ApiKey = languageProvider.GetString(LanguageSection.ConfigurationStrings, "SampleApiKey"),
+                ChannelSeedProjectName = languageProvider.GetString(LanguageSection.ConfigurationStrings, "SampleChannelSeedAppName"),
+                OctopusUrl = languageProvider.GetString(LanguageSection.ConfigurationStrings, "SampleOctopusUrl"),
+                ProjectGroupFilterString = languageProvider.GetString(LanguageSection.ConfigurationStrings, "SampleProjectGroupFilterString"),
                 DefaultChannel = "master"
             };
         }

@@ -29,11 +29,11 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
 using OctoPlusCore.Models;
 using OctoPlusCore.Models.Variables;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console.Commands.SubCommands 
 {
@@ -42,14 +42,14 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profile";
 
-        public VariablesWithProfile(IOctopusHelper octopusHelper) : base(octopusHelper) { }
+        public VariablesWithProfile(IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider) { }
 
 
         public override void Configure(CommandLineApplication command)
         {
             base.Configure(command);
 
-            AddToRegister(VariablesWithProfileOptionNames.File, command.Option("-f|--filepath", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
+            AddToRegister(VariablesWithProfileOptionNames.File, command.Option("-f|--filepath", languageProvider.GetString(LanguageSection.OptionsStrings, "ProfileFile"), CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -62,24 +62,24 @@ namespace OctoPlus.Console.Commands.SubCommands
             {
                 foreach(var varSet in config.VariableSets) 
                 {
-                    System.Console.WriteLine(String.Format(UiStrings.UpdatingVariableSet, varSet.Id, varSet.Variables.Count));
+                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "UpdatingVariableSet"), varSet.Id, varSet.Variables.Count));
                     try 
                     {
                         await octoHelper.UpdateVariableSet(varSet);
                     } 
                     catch (Exception e) 
                     {
-                        System.Console.WriteLine(String.Format(UiStrings.FailedUpdatingVariableSet, e.Message));
+                        System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "FailedUpdatingVariableSet"), e.Message));
                         return -1;
                     }
                 }
             } 
             else 
             {
-                System.Console.WriteLine(UiStrings.FailedParsingVariableFile);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "FailedParsingVariableFile"));
             }
 
-            System.Console.WriteLine(String.Format(UiStrings.Done, string.Empty));
+            System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "Done"), string.Empty));
 
             return 0;
         }

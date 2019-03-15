@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands.SubCommands
@@ -38,15 +38,15 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "delete";
 
-        public DeleteEnvironment(IOctopusHelper octopusHelper) : base(octopusHelper) { }
+        public DeleteEnvironment(IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider) { }
 
 
         public override void Configure(CommandLineApplication command)
         {
             base.Configure(command);
 
-            AddToRegister(EnsureEnvironmentOptionNames.Id, command.Option("-e|--e", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(EnsureEnvironmentOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", OptionsStrings.SkipConfirmation, CommandOptionType.NoValue));
+            AddToRegister(EnsureEnvironmentOptionNames.Id, command.Option("-e|--e", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnsureEnvironmentOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", languageProvider.GetString(LanguageSection.OptionsStrings, "SkipConfirmation"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -56,10 +56,10 @@ namespace OctoPlus.Console.Commands.SubCommands
             var found = await this.octoHelper.GetEnvironment(id);
             if (found != null) 
             {
-                System.Console.WriteLine(String.Format(UiStrings.EnvironmentFound, id));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "EnvironmentFound"), id));
                 if (skipConfirm == null || !skipConfirm.HasValue()) 
                 {
-                    if (!Prompt.GetYesNo(string.Format(UiStrings.ConfirmationCheck, found.Name), false))
+                    if (!Prompt.GetYesNo(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "ConfirmationCheck"), found.Name), false))
                     {
                         return 0;
                     }
@@ -72,13 +72,13 @@ namespace OctoPlus.Console.Commands.SubCommands
                 } 
                 catch (Exception e) 
                 {
-                    System.Console.WriteLine(UiStrings.Error + e.Message);
+                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Error") + e.Message);
                     return -1;
                 }
-                System.Console.WriteLine(String.Format(UiStrings.Done, string.Empty));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "Done"), string.Empty));
                 return 0;
             }
-            System.Console.WriteLine(String.Format(UiStrings.EnvironmentNotFound, id));
+            System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "EnvironmentNotFound"), id));
             return -1;
         }
 

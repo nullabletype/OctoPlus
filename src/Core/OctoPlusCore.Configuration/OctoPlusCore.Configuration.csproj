@@ -12,21 +12,7 @@
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Utilities\OctoPlusCore.Utilities.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Logging\OctoPlusCore.Logging.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Resources\ConfigurationStrings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\ConfigurationStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <ProjectReference Include="..\OctoPlusCore.Language\OctoPlusCore.Language.csproj" />
   </ItemGroup>
 
 </Project>

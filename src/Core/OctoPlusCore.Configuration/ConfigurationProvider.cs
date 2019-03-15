@@ -25,16 +25,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using OctoPlusCore.Language;
 
 namespace OctoPlusCore.Configuration 
 {
     public static class ConfigurationProvider 
     {
-        public async static Task<ConfigurationLoadResult> LoadConfiguration(ConfigurationProviderTypes type) 
+        public async static Task<ConfigurationLoadResult> LoadConfiguration(ConfigurationProviderTypes type, ILanguageProvider languageProvider) 
         {
             if (type == ConfigurationProviderTypes.Json) 
             {
-                return await new JsonConfigurationProvider().LoadConfiguration();
+                return await new JsonConfigurationProvider(languageProvider).LoadConfiguration();
             }
 
             return null;

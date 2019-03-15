@@ -42,11 +42,11 @@ using System;
 using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
 using OctoPlus.Console.ConsoleTools;
-using OctoPlus.Console.Resources;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 using System.IO;
 using OctoPlusCore.VersionChecking.GitLab;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console
 {
@@ -87,7 +87,7 @@ namespace OctoPlus.Console
             {
                 app.ShowHelp();
             });
-
+            
             return app.Execute(args);
         }
 
@@ -112,7 +112,7 @@ namespace OctoPlus.Console
             log.Info("Attempting IoC configuration...");
             var container = IoC();
             log.Info("Attempting configuration load...");
-            var configurationLoadResult = await ConfigurationProvider.LoadConfiguration(ConfigurationProviderTypes.Json);
+            var configurationLoadResult = await ConfigurationProvider.LoadConfiguration(ConfigurationProviderTypes.Json, new LanguageProvider()); //todo: fix this!
             if (!configurationLoadResult.Success) 
             {
                 log.Error("Failed to load config.");
@@ -132,20 +132,20 @@ namespace OctoPlus.Console
             var checkResult = await versionChecker.GetLatestVersion();
 
             if (checkResult.NewVersion) {
-                ShowNewVersionMessage(checkResult);
+                ShowNewVersionMessage(checkResult, serviceProvider.GetService<ILanguageProvider>());
             }
 
             return new Tuple<ConfigurationLoadResult, IServiceProvider>(configurationLoadResult, serviceProvider);
         }
 
-        private static void ShowNewVersionMessage(VersionCheckResult checkResult) {
+        private static void ShowNewVersionMessage(VersionCheckResult checkResult, ILanguageProvider languageProvider) {
             System.Console.WriteLine("-------------------------------------");
-            System.Console.WriteLine(UiStrings.NewVersionAvailable);
-            System.Console.WriteLine(string.Format(UiStrings.CurrentVersion, checkResult.Release.CurrentVersion));
-            System.Console.WriteLine(string.Format(UiStrings.NewVersion, checkResult.Release.TagName));
-            System.Console.WriteLine(string.Format(UiStrings.UpdateAvailableHere, checkResult.Release.Url));
+            System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NewVersionAvailable"));
+            System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "CurrentVersion"), checkResult.Release.CurrentVersion));
+            System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "NewVersion"), checkResult.Release.TagName));
+            System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "UpdateAvailableHere"), checkResult.Release.Url));
             if (!string.IsNullOrEmpty(checkResult.Release.ChangeLog)) {
-                System.Console.WriteLine(UiStrings.ChangeLog);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ChangeLog"));
                 System.Console.WriteLine(checkResult.Release.ChangeLog);
             }
             System.Console.WriteLine("-------------------------------------");
@@ -178,7 +178,8 @@ namespace OctoPlus.Console
             .AddTransient<VariablesWithProfile, VariablesWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleDoJob>()
-            .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache();
+            .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache()
+            .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache();
         }
     }
 }

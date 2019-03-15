@@ -24,7 +24,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
@@ -38,6 +37,8 @@ using OctoPlus.Console.Commands.SubCommands;
 using OctoPlusCore.Utilities;
 using System.IO;
 using OctoPlusCore;
+using OctoPlusCore.Language;
+using System.Resources;
 
 namespace OctoPlus.Console.Commands
 {
@@ -54,7 +55,7 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "deploy";
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar) : base(octoHelper)
+        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
@@ -68,17 +69,17 @@ namespace OctoPlus.Console.Commands
         public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
-            command.Description = OptionsStrings.DeployProjects;
+            command.Description = languageProvider.GetString(LanguageSection.OptionsStrings, "DeployProjects");
 
             ConfigureSubCommand(profile, command);
             ConfigureSubCommand(profileDir, command);
             
-            AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", OptionsStrings.DeployChannel, CommandOptionType.SingleValue));
-            AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue));
-            AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.GroupFilter, CommandOptionType.SingleValue));
-            AddToRegister(DeployOptionNames.SaveProfile, command.Option("-s|--saveprofile", OptionsStrings.SaveProfile, CommandOptionType.SingleValue));
-            AddToRegister(DeployOptionNames.DefaultFallback, command.Option("-d|--fallbacktodefault", OptionsStrings.FallbackToDefault, CommandOptionType.NoValue));
-            AddToRegister(OptionNames.ReleaseName, command.Option("-r|--releasename", OptionsStrings.ReleaseVersion, CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.ChannelName, command.Option("-c|--channel", languageProvider.GetString(LanguageSection.OptionsStrings, "DeployChannel"), CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.Environment, command.Option("-e|--environment", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.GroupFilter, command.Option("-g|--groupfilter", languageProvider.GetString(LanguageSection.OptionsStrings, "GroupFilter"), CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.SaveProfile, command.Option("-s|--saveprofile", languageProvider.GetString(LanguageSection.OptionsStrings, "SaveProfile"), CommandOptionType.SingleValue));
+            AddToRegister(DeployOptionNames.DefaultFallback, command.Option("-d|--fallbacktodefault", languageProvider.GetString(LanguageSection.OptionsStrings, "FallbackToDefault"), CommandOptionType.NoValue));
+            AddToRegister(OptionNames.ReleaseName, command.Option("-r|--releasename", languageProvider.GetString(LanguageSection.OptionsStrings, "ReleaseVersion"), CommandOptionType.SingleValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -86,24 +87,24 @@ namespace OctoPlus.Console.Commands
             var profilePath = GetStringValueFromOption(DeployOptionNames.SaveProfile);
             if (!string.IsNullOrEmpty(profilePath))
             {
-                System.Console.WriteLine(string.Format(UiStrings.GoingToSaveProfile, profilePath));
+                System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "GoingToSaveProfile"), profilePath));
             }
-            progressBar.WriteStatusLine(UiStrings.FetchingProjectList);
+            progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "FetchingProjectList"));
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
             if (found == null)
             {
-                System.Console.WriteLine(UiStrings.ProjectNotFound);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ProjectNotFound"));
                 return -1;
             }
 
-            var channelName = GetStringFromUser(DeployOptionNames.ChannelName, UiStrings.WhichChannelPrompt);
-            var environmentName = GetStringFromUser(DeployOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
-            var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt, allowEmpty: true);
+            var channelName = GetStringFromUser(DeployOptionNames.ChannelName, languageProvider.GetString(LanguageSection.UiStrings, "WhichChannelPrompt"));
+            var environmentName = GetStringFromUser(DeployOptionNames.Environment, languageProvider.GetString(LanguageSection.UiStrings, "WhichEnvironmentPrompt"));
+            var groupRestriction = GetStringFromUser(DeployOptionNames.GroupFilter, languageProvider.GetString(LanguageSection.UiStrings, "RestrictToGroupsPrompt"), allowEmpty: true);
             var forceDefault = GetOption(DeployOptionNames.DefaultFallback).HasValue();
 
-            progressBar.WriteStatusLine(UiStrings.CheckingOptions);
+            progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "CheckingOptions"));
 
             var environment = await FetchEnvironmentFromUserInput(environmentName);
 
@@ -115,7 +116,7 @@ namespace OctoPlus.Console.Commands
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "GettingGroupInfo"));
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -125,7 +126,7 @@ namespace OctoPlus.Console.Commands
 
             if (channel == null)
             {
-                System.Console.WriteLine(UiStrings.NoMatchingChannel);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NoMatchingChannel"));
                 return -1;
             }
 
@@ -169,7 +170,7 @@ namespace OctoPlus.Console.Commands
             }
             var content = StandardSerialiser.SerializeToJsonNet(deployment, true);
             File.WriteAllText(profilePath, content);
-            System.Console.WriteLine(string.Format(UiStrings.ProfileSaved, profilePath));
+            System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "ProfileSaved"), profilePath));
         }
 
         private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, OctoPlusCore.Models.Environment environment, List<Project> projects, bool fallbackToDefaultChannel)
@@ -216,7 +217,7 @@ namespace OctoPlus.Console.Commands
             foreach (var projectStub in projectStubs)
             {
                 progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
-                    String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
+                    String.Format(languageProvider.GetString(LanguageSection.UiStrings, "LoadingInfoFor"), projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
                     if (!groupIds.Contains(projectStub.ProjectGroupId))
@@ -275,12 +276,12 @@ namespace OctoPlus.Console.Commands
 
         private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
-            InteractiveRunner runner = PopulateRunner(String.Format(UiStrings.DeployingTo, channel.Name, environment.Name), UiStrings.PackageNotSelectable, projects);
+            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "DeployingTo"), channel.Name, environment.Name), languageProvider.GetString(LanguageSection.UiStrings, "PackageNotSelectable"), projects);
             var indexes = runner.GetSelectedIndexes();
 
             if (!indexes.Any())
             {
-                System.Console.WriteLine(UiStrings.NothingSelected);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NothingSelected"));
                 return null;
             }
 
@@ -354,7 +355,7 @@ namespace OctoPlus.Console.Commands
 
         private InteractiveRunner PopulateRunner(string prompt, string unselectableText, IEnumerable<Project> projects)
         {
-            var runner = new InteractiveRunner(prompt, unselectableText, UiStrings.ProjectName, UiStrings.CurrentRelease, UiStrings.CurrentPackage, UiStrings.NewPackage);
+            var runner = new InteractiveRunner(prompt, unselectableText, languageProvider, languageProvider.GetString(LanguageSection.UiStrings, "ProjectName"), languageProvider.GetString(LanguageSection.UiStrings, "CurrentRelease"), languageProvider.GetString(LanguageSection.UiStrings, "CurrentPackage"), languageProvider.GetString(LanguageSection.UiStrings, "NewPackage"));
             foreach (var project in projects)
             {
                 var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
@@ -362,8 +363,8 @@ namespace OctoPlus.Console.Commands
                 runner.AddRow(project.Checked, packagesAvailable, new[] {
                     project.ProjectName,
                     project.CurrentRelease.Version,
-                    project.AvailablePackages.Count > 1 ? UiStrings.Multi : project.CurrentRelease.DisplayPackageVersion,
-                    project.AvailablePackages.Count > 1 ? UiStrings.Multi : (packagesAvailable ? project.AvailablePackages.First().SelectedPackage.Version : string.Empty)
+                    project.AvailablePackages.Count > 1 ? languageProvider.GetString(LanguageSection.UiStrings, "Multi") : project.CurrentRelease.DisplayPackageVersion,
+                    project.AvailablePackages.Count > 1 ? languageProvider.GetString(LanguageSection.UiStrings, "Multi") : (packagesAvailable ? project.AvailablePackages.First().SelectedPackage.Version : string.Empty)
                 });
                 
             }

@@ -22,10 +22,10 @@
 
 
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Octopus.Interfaces;
 using System.Threading.Tasks;
 using OctoPlus.Console.Commands.SubCommands;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console.Commands {
     internal class Release : BaseCommand {
@@ -37,7 +37,7 @@ namespace OctoPlus.Console.Commands {
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "release";
 
-        public Release(IOctopusHelper octoHelper, RenameRelease renameRelease, UpdateReleaseVariables updateVars) : base(octoHelper)
+        public Release(IOctopusHelper octoHelper, RenameRelease renameRelease, UpdateReleaseVariables updateVars, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
 
             this._renameRelease = renameRelease;
@@ -47,7 +47,7 @@ namespace OctoPlus.Console.Commands {
         public override void Configure(CommandLineApplication command) 
         {
             base.Configure(command);
-            command.Description = OptionsStrings.Release;
+            command.Description = languageProvider.GetString(LanguageSection.OptionsStrings, "Release");
 
             ConfigureSubCommand(_renameRelease, command);
             ConfigureSubCommand(_updateVars, command);

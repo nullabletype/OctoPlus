@@ -28,13 +28,15 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Octopus;
-using OctoPlusCore.Configuration.Resources;
 using OctoPlusCore.Logging;
+using OctoPlusCore.Language;
 
 namespace OctoPlusCore.Configuration
 {
     public class JsonConfigurationProvider : ConfigurationImplementation
     {
+        public JsonConfigurationProvider(ILanguageProvider languageProvider) : base(languageProvider) { }
+
         private const string ConfigurationFileName = "config.json";
 
         public override async Task<ConfigurationLoadResult> LoadConfiguration()
@@ -47,14 +49,14 @@ namespace OctoPlusCore.Configuration
                 {
                     File.WriteAllText(ConfigurationFileName,
                         JsonConvert.SerializeObject(sampleConfig, Formatting.Indented));
-                    loadResult.Errors.Add(ConfigurationStrings.LoadNoFileFound);
+                    loadResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "LoadNoFileFound"));
                     return loadResult;
                 }
                 catch (Exception e)
                 {
                     LoggingProvider.GetLogger<JsonConfigurationProvider>().Error("Failed to save sample config", e);
                 }
-                loadResult.Errors.Add(ConfigurationStrings.LoadNoFileFoundCantCreate);
+                loadResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "LoadNoFileFoundCantCreate"));
                 return loadResult;
             }
 
@@ -73,7 +75,7 @@ namespace OctoPlusCore.Configuration
             catch (Exception e)
             {
                 LoggingProvider.GetLogger<JsonConfigurationProvider>().Error("Failed to parse config", e);
-                loadResult.Errors.Add(ConfigurationStrings.LoadCouldntParseFile);
+                loadResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "LoadCouldntParseFile"));
                 return loadResult;
             }
         }
@@ -82,15 +84,15 @@ namespace OctoPlusCore.Configuration
         {
             if (string.IsNullOrEmpty(config.OctopusUrl))
             {
-                validationResult.Errors.Add(ConfigurationStrings.ValidationOctopusUrl);
+                validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationOctopusUrl"));
             }
 
             if (string.IsNullOrEmpty(config.OctopusUrl)) {
-                validationResult.Errors.Add(ConfigurationStrings.ValidationOctopusApiKey);
+                validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationOctopusApiKey"));
             }
 
             if (string.IsNullOrEmpty(config.ChannelSeedProjectName)) {
-                validationResult.Errors.Add(ConfigurationStrings.ValidationSeedProject);
+                validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationSeedProject"));
             }
 
             if (!validationResult.Errors.Any())
@@ -103,18 +105,18 @@ namespace OctoPlusCore.Configuration
                     {
                         if (!await octoHelper.ValidateProjectName(config.ChannelSeedProjectName)) 
                         {
-                            validationResult.Errors.Add(ConfigurationStrings.ValidationSeedProjectNotValid);
+                            validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationSeedProjectNotValid"));
                         }
                     } 
                     catch (Exception e) 
                     {
-                        validationResult.Errors.Add(ConfigurationStrings.ValidationSeedProjectNotValid + ": " + e.Message);
+                        validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationSeedProjectNotValid") + ": " + e.Message);
                     }
                     
                 }
                 catch (Exception e)
                 {
-                    validationResult.Errors.Add(ConfigurationStrings.ValidationOctopusApiFailure + ": " + e.Message);
+                    validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationOctopusApiFailure") + ": " + e.Message);
                 }
             }
         }

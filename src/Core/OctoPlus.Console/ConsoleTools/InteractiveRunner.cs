@@ -22,7 +22,7 @@
 
 
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +39,9 @@ namespace OctoPlus.Console.ConsoleTools
         private readonly List<int> _unselectable;
         private readonly string _promptText;
         private readonly string _unselectableText;
+        private readonly ILanguageProvider _languageProvider;
 
-        internal InteractiveRunner(string promptText, string unselectableText, params string[] columns)
+        internal InteractiveRunner(string promptText, string unselectableText, ILanguageProvider languageProvider, params string[] columns)
         {
             _columns = new List<string>(columns);
             _rows = new List<string[]>();
@@ -48,13 +49,14 @@ namespace OctoPlus.Console.ConsoleTools
             _unselectable = new List<int>();
             _promptText = promptText;
             _unselectableText = unselectableText;
+            _languageProvider = languageProvider;
         }
 
         public void AddRow(bool selected, bool selectable = true, params string[] values)
         {
             if (values.Count() != _columns.Count())
             {
-                throw new Exception(String.Format(UiStrings.ErrorColumnHeadingMismatch, values.Count(), _columns.Count()));
+                throw new Exception(String.Format(_languageProvider.GetString(LanguageSection.UiStrings, "ErrorColumnHeadingMismatch"), values.Count(), _columns.Count()));
             }
             _rows.Add(values);
             if (selected && selectable)
@@ -91,7 +93,7 @@ namespace OctoPlus.Console.ConsoleTools
                 System.Console.WriteLine(Environment.NewLine + this._promptText + Environment.NewLine);
                 table.Write(Format.Minimal);
 
-                System.Console.WriteLine(UiStrings.InteractiveRunnerInstructions);
+                System.Console.WriteLine(_languageProvider.GetString(LanguageSection.UiStrings, "InteractiveRunnerInstructions"));
                 var prompt = Prompt.GetString("");
 
                 switch (prompt)
@@ -106,7 +108,7 @@ namespace OctoPlus.Console.ConsoleTools
                         run = false;
                         break;
                     case "e":
-                        System.Console.WriteLine(UiStrings.Exiting);
+                        System.Console.WriteLine(_languageProvider.GetString(LanguageSection.UiStrings, "Exiting"));
                         Environment.Exit(0);
                         break;
                     default:
@@ -161,7 +163,7 @@ namespace OctoPlus.Console.ConsoleTools
             while (!rangeValid)
             {
                 intRange.Clear();
-                var userInput = Prompt.GetString(UiStrings.InteractiveRunnerSelectionInstructions);
+                var userInput = Prompt.GetString(_languageProvider.GetString(LanguageSection.UiStrings, "InteractiveRunnerSelectionInstructions"));
                 if (string.IsNullOrEmpty(userInput))
                 {
                     return new List<int>();
