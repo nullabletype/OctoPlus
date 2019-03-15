@@ -138,7 +138,7 @@ namespace OctoPlusCore.Deployment {
                 if (string.IsNullOrEmpty(project.ReleaseId))
                 {
                     uiLogger.WriteLine("Creating a release for project " + project.ProjectName + "... ");
-                    result = await helper.CreateRelease(project);
+                    result = await helper.CreateRelease(project, deployment.FallbackToDefaultChannel);
                 }
                 else
                 {

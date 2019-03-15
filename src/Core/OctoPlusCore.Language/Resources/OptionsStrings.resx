@@ -148,7 +148,7 @@
     <value>Name the of the environment to deploy to</value>
   </data>
   <data name="FallbackToDefault" xml:space="preserve">
-    <value>Fallback to the default channel if there are no packages available for the selected channel for a project</value>
+    <value>Fallback to the default channel if there are no packages available for the selected channel for a project. Be careful, as this disables validation of packages for channels before deploy.</value>
   </data>
   <data name="ForceDeployOfSamePackage" xml:space="preserve">
     <value>Force redeployment of the same package if no new one exists</value>
