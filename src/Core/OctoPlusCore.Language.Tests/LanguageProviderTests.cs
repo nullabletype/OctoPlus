@@ -23,33 +23,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.Resources;
+using System.Globalization;
+using System.Text;
 using System.Threading;
+using NUnit.Framework;
 
-namespace OctoPlusCore.Language 
+namespace OctoPlusCore.Language.Tests
 {
-    public class LanguageProvider : ILanguageProvider 
+    [TestFixture]
+    public class LanguageProviderTests 
     {
-        private static Dictionary<LanguageSection, ResourceManager> resManLookUp;
-
-        static LanguageProvider()
+        [Test]
+        public void ExceptionIsThrownOnNullKey()
         {
-            resManLookUp = new Dictionary<LanguageSection, ResourceManager>();
+            Assert.Throws<ArgumentNullException>(delegate { new LanguageProvider().GetString(LanguageSection.UiStrings, null); });
         }
 
-        public string GetString(LanguageSection section, string key)
+        [Test]
+        public void CanFetchStringInEnglish()
         {
-            return GetResourceManager(section).GetString(key, Thread.CurrentThread.CurrentCulture);
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB");
+            Assert.IsTrue(new LanguageProvider().GetString(LanguageSection.UiStrings, "OnSource").Equals("On source", StringComparison.CurrentCultureIgnoreCase));
         }
 
-        private ResourceManager GetResourceManager(LanguageSection managerName) 
+        [Test]
+        public void CanFetchStringInWelsh()
         {
-            if (!resManLookUp.ContainsKey(managerName))
-            {
-                resManLookUp.Add(managerName, new ResourceManager(this.GetType().Namespace + ".Resources." + managerName, this.GetType().Assembly));
-            }
-            return resManLookUp[managerName];
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("cy-GB");
+            Assert.IsTrue(new LanguageProvider().GetString(LanguageSection.UiStrings, "OnSource").Equals("Ar Ffynhonnell", StringComparison.CurrentCultureIgnoreCase));
         }
-
     }
 }
