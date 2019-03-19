@@ -56,7 +56,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<TaskDetails> GetTaskDetails(string taskId);
         Task<IEnumerable<TaskStub>> GetDeploymentTasks(int skip, int take);
         Task<string> GetTaskRawLog(string taskId);
-        Task<Release> CreateRelease(ProjectDeployment project);
+        Task<Release> CreateRelease(ProjectDeployment project, bool ignoreChannelRules = false);
         Task<Deployment> CreateDeploymentTask(ProjectDeployment project, string environmentId, string releaseId);
         Task<bool> ValidateProjectName(string name);
         Task<PackageFull> GetFullPackage(PackageStub stub);
@@ -67,6 +67,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<(string error, bool success)> RenameRelease(string releaseId, string newReleaseVersion);
         Task<bool> UpdateReleaseVariables(string releaseId);
         Task RemoveEnvironmentsFromTeams(string envId);
+        Task RemoveEnvironmentsFromLifecycles(string envId);
         Task AddEnvironmentToTeam(string envId, string teamId);
         Task UpdateVariableSet(VariableSet varSet);
         Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic);

@@ -24,9 +24,9 @@
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
+using OctoPlusCore.Language;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus;
@@ -49,7 +49,7 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "promote";
 
-        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, IProgressBar progressBar) : base(octoHelper)
+        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
             this.configuration = configuration;
             this.deployer = deployer;
@@ -60,30 +60,30 @@ namespace OctoPlus.Console.Commands
         public override void Configure(CommandLineApplication command)
         {
             base.Configure(command);
-            command.Description = OptionsStrings.PromoteProjects;
+            command.Description = languageProvider.GetString(LanguageSection.OptionsStrings, "PromoteProjects");
 
-            AddToRegister(PromoteOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue));
-            AddToRegister(PromoteOptionNames.SourceEnvironment, command.Option("-s|--sourcenvironment", OptionsStrings.SourceEnvironment, CommandOptionType.SingleValue));
-            AddToRegister(PromoteOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.GroupFilter, CommandOptionType.SingleValue));
+            AddToRegister(PromoteOptionNames.Environment, command.Option("-e|--environment", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue));
+            AddToRegister(PromoteOptionNames.SourceEnvironment, command.Option("-s|--sourcenvironment", languageProvider.GetString(LanguageSection.OptionsStrings, "SourceEnvironment"), CommandOptionType.SingleValue));
+            AddToRegister(PromoteOptionNames.GroupFilter, command.Option("-g|--groupfilter", languageProvider.GetString(LanguageSection.OptionsStrings, "GroupFilter"), CommandOptionType.SingleValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
-            progressBar.WriteStatusLine(UiStrings.FetchingProjectList);
+            progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "FetchingProjectList"));
             var projectStubs = await octoHelper.GetProjectStubs();
             var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
 
             if (found == null)
             {
-                System.Console.WriteLine(UiStrings.ProjectNotFound);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ProjectNotFound"));
                 return -1;
             }
 
-            var environmentName = GetStringFromUser(PromoteOptionNames.SourceEnvironment, UiStrings.SourceEnvironment);
-            var targetEnvironmentName = GetStringFromUser(PromoteOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
-            var groupRestriction = GetStringFromUser(PromoteOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt);
+            var environmentName = GetStringFromUser(PromoteOptionNames.SourceEnvironment, languageProvider.GetString(LanguageSection.UiStrings, "SourceEnvironment"));
+            var targetEnvironmentName = GetStringFromUser(PromoteOptionNames.Environment, languageProvider.GetString(LanguageSection.UiStrings, "WhichEnvironmentPrompt"));
+            var groupRestriction = GetStringFromUser(PromoteOptionNames.GroupFilter, languageProvider.GetString(LanguageSection.UiStrings, "RestrictToGroupsPrompt"));
 
-            progressBar.WriteStatusLine(UiStrings.CheckingOptions);
+            progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "CheckingOptions"));
             var environment = await FetchEnvironmentFromUserInput(environmentName);
             var targetEnvironment = await FetchEnvironmentFromUserInput(targetEnvironmentName);
 
@@ -95,7 +95,7 @@ namespace OctoPlus.Console.Commands
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "GettingGroupInfo"));
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -140,7 +140,7 @@ namespace OctoPlus.Console.Commands
                 }
                 else
                 {
-                    System.Console.WriteLine(UiStrings.Error + result.ErrorMessage);
+                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Error") + result.ErrorMessage);
                 }
             } while (!deploymentOk);
 
@@ -158,7 +158,7 @@ namespace OctoPlus.Console.Commands
             foreach (var projectStub in projectStubs)
             {
                 progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
-                    String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
+                    String.Format(languageProvider.GetString(LanguageSection.UiStrings, "LoadingInfoFor"), projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
                     if (!groupIds.Contains(projectStub.ProjectGroupId))
@@ -195,12 +195,12 @@ namespace OctoPlus.Console.Commands
 
         private EnvironmentDeployment InteractivePrompt(OctoPlusCore.Models.Environment environment, OctoPlusCore.Models.Environment targetEnvironment, IList<Project> projects, IList<Project> targetProjects)
         {
-            InteractiveRunner runner = PopulateRunner(String.Format(UiStrings.PromotingTo, environment.Name, targetEnvironment.Name), projects, targetProjects);
+            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "PromotingTo"), environment.Name, targetEnvironment.Name), projects, targetProjects);
             var indexes = runner.GetSelectedIndexes();
 
             if (!indexes.Any())
             {
-                System.Console.WriteLine(UiStrings.NothingSelected);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NothingSelected"));
                 return null;
             }
 
@@ -232,9 +232,9 @@ namespace OctoPlus.Console.Commands
             return deployment;
         }
 
-        private static InteractiveRunner PopulateRunner(string prompt, IList<Project> projects, IList<Project> targetProjects)
+        private InteractiveRunner PopulateRunner(string prompt, IList<Project> projects, IList<Project> targetProjects)
         {
-            var runner = new InteractiveRunner(prompt, UiStrings.PackageNotSelectable, UiStrings.ProjectName, UiStrings.OnSource, UiStrings.OnTarget);
+            var runner = new InteractiveRunner(prompt, languageProvider.GetString(LanguageSection.UiStrings, "PackageNotSelectable"), languageProvider, languageProvider.GetString(LanguageSection.UiStrings, "ProjectName"), languageProvider.GetString(LanguageSection.UiStrings, "OnSource"), languageProvider.GetString(LanguageSection.UiStrings, "OnTarget"));
             foreach (var project in projects)
             {
                 var packagesAvailable = project.CurrentRelease != null;

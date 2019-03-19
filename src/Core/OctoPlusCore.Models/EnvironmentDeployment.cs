@@ -38,5 +38,6 @@ namespace OctoPlusCore.Models
         public List<ProjectDeployment> ProjectDeployments { get; set; }
         public string ChannelName { get; set; }
         public bool DeployAsync { get; set; }
+        public bool FallbackToDefaultChannel { get; set; }
     }
 }

@@ -34,6 +34,8 @@ using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
 using OctoPlus.Console.ConsoleTools;
 using System.Text;
+using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console {
     public class ConsoleDoJob : IUiLogger, IConsoleDoJob
@@ -41,12 +43,16 @@ namespace OctoPlus.Console {
         private IDeployer deployer;
         private readonly IOctopusHelper helper;
         private IProgressBar progressBar;
+        private IConfiguration configuration;
+        private ILanguageProvider languageProvider;
 
-        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar)
+        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration, ILanguageProvider languageProvider)
         {
             this.helper = helper;
             this.deployer = deployer;
             this.progressBar = progressBar;
+            this.configuration = configuration;
+            this.languageProvider = languageProvider;
         }
 
         public async Task StartJob(string pathToProfile, string message, string releaseVersion,
@@ -70,28 +76,47 @@ namespace OctoPlus.Console {
                         await
                             this.helper.GetProject(project.ProjectId, job.EnvironmentId,
                                 project.ChannelVersionRange, project.ChannelVersionTag);
+                        var packages =
+                        await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
+                    IList<PackageStep> defaultPackages = null;
                     foreach (var package in project.Packages)
                     {
                         if (package.PackageId == "latest")
                         {
-                            var packages =
-                                await this.helper.GetPackages(octoProject.ProjectId, project.ChannelVersionRange, project.ChannelVersionTag);
-                            package.PackageId = packages.First().SelectedPackage.Id;
-                            package.PackageName = packages.First().SelectedPackage.Version;
-                            package.StepName = packages.First().SelectedPackage.StepName;
+                            // Filter to packages specifically for this package step, then update the package versions
+                            var availablePackages = packages.Where(pack => pack.StepId == package.StepId);
+
+                            // If there are no packages for this step, check if we've been asked to jump back to default channel.
+                            if ((!availablePackages.Any() || availablePackages.First().SelectedPackage == null) && job.FallbackToDefaultChannel && !string.IsNullOrEmpty(configuration.DefaultChannel)) 
+                            {
+                                if (defaultPackages == null) 
+                                {
+                                    var defaultChannel = await this.helper.GetChannelByName(project.ProjectId, configuration.DefaultChannel);
+                                    defaultPackages = await this.helper.GetPackages(project.ProjectId, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                }
+                                availablePackages = defaultPackages.Where(pack => pack.StepId == package.StepId);
+                            }
+
+                            var selectedPackage = availablePackages.First().SelectedPackage;
+
+                            if (selectedPackage != null)
+                            {
+                                package.PackageId = selectedPackage.Id;
+                                package.PackageName = selectedPackage.Version;
+                                package.StepName = selectedPackage.StepName;
+                            } 
+                            else 
+                            {
+                                System.Console.Out.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "NoSuitablePackageFound"), package.StepName, project.ProjectName));
+                                continue;
+                            }
                         }
                     }
                     if (!forceDeploymentIfSamePackage)
                     {
-                        var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
-                        if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id)) 
+                        if (!await IsDeploymentRequired(job, project)) 
                         {
-                            var release = await this.helper.GetRelease(currentRelease.Id);
-                            var currentPackage = release.SelectedPackages[0];
-                            if (project.Packages.All(p => release.SelectedPackages.Any(s => p.StepName == p.StepName && s.Version == p.PackageName)))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
                     }
                     if (!string.IsNullOrEmpty(message))
@@ -113,6 +138,24 @@ namespace OctoPlus.Console {
             {
                 this.WriteLine("Couldn't deploy! " + e.Message + e.StackTrace);
             }
+        }
+
+        private async Task<bool> IsDeploymentRequired(EnvironmentDeployment job, ProjectDeployment project)
+        {
+            var needsDeploy = false;
+            var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
+            if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id))
+            {
+                // Check if we have any packages that are different versions. If they're the same, we don't need to deploy.
+                foreach (var package in project.Packages)
+                {
+                    if (!currentRelease.SelectedPackages.Any(pack => pack.StepName == package.StepName && package.PackageName == pack.Version))
+                    {
+                        needsDeploy = true;
+                    }
+                }
+            }
+            return needsDeploy;
         }
 
         public void WriteLine(string toWrite)

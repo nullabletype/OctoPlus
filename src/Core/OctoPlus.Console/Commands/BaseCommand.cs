@@ -29,10 +29,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NuGet.Versioning;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console.Commands {
     abstract class BaseCommand 
@@ -46,24 +46,26 @@ namespace OctoPlus.Console.Commands {
         private readonly List<BaseCommand> _subCommands;
         protected bool InInteractiveMode { get; private set; }
         protected IOctopusHelper octoHelper;
+        protected ILanguageProvider languageProvider;
 
 
-        protected BaseCommand(IOctopusHelper octoHelper)
+        protected BaseCommand(IOctopusHelper octoHelper, ILanguageProvider languageProvider)
         {
             _optionRegister = new Dictionary<string, CommandOption>();
             _subCommands = new List<BaseCommand>();
             this.octoHelper = octoHelper;
+            this.languageProvider = languageProvider;
         }
 
         public virtual void Configure(CommandLineApplication command) 
         {
             command.HelpOption(HelpOption);
             command.ThrowOnUnexpectedArgument = true;
-            AddToRegister(OptionNames.ApiKey, command.Option("-a|--apikey", OptionsStrings.ApiKey, CommandOptionType.SingleValue));
-            AddToRegister(OptionNames.Url, command.Option("-u|--url", OptionsStrings.Url, CommandOptionType.SingleValue));
+            AddToRegister(OptionNames.ApiKey, command.Option("-a|--apikey", languageProvider.GetString(LanguageSection.OptionsStrings, "ApiKey"), CommandOptionType.SingleValue));
+            AddToRegister(OptionNames.Url, command.Option("-u|--url", languageProvider.GetString(LanguageSection.OptionsStrings, "Url"), CommandOptionType.SingleValue));
             if (this.SupportsInteractiveMode)
             {
-                AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", OptionsStrings.InteractiveDeploy, CommandOptionType.NoValue));
+                AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", languageProvider.GetString(LanguageSection.OptionsStrings, "InteractiveDeploy"), CommandOptionType.NoValue));
             }
             command.OnExecute(async () =>
             {
@@ -155,7 +157,7 @@ namespace OctoPlus.Console.Commands {
 
             do
             {
-                releaseName = GetStringFromUser(OptionNames.ReleaseName, UiStrings.ReleaseNamePrompt, allowEmpty: true);
+                releaseName = GetStringFromUser(OptionNames.ReleaseName, languageProvider.GetString(LanguageSection.UiStrings, "ReleaseNamePrompt"), allowEmpty: true);
             } while (InInteractiveMode && !string.IsNullOrEmpty(releaseName) && !SemanticVersion.TryParse(releaseName, out _));
 
             return releaseName;
@@ -175,7 +177,7 @@ namespace OctoPlus.Console.Commands {
             }
             else
             {
-                System.Console.WriteLine(UiStrings.Error + result.ErrorMessage);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Error") + result.ErrorMessage);
             }
 
             return false;
@@ -187,12 +189,12 @@ namespace OctoPlus.Console.Commands {
 
             if (matchingEnvironments.Count() > 1)
             {
-                System.Console.WriteLine(UiStrings.TooManyMatchingEnvironments + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "TooManyMatchingEnvironments") + string.Join(", ", matchingEnvironments.Select(e => e.Name)));
                 return null;
             }
             else if (!matchingEnvironments.Any())
             {
-                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NoMatchingEnvironments"));
                 return null;
             }
 
@@ -209,10 +211,10 @@ namespace OctoPlus.Console.Commands {
                     {
                         do
                         {
-                            var prompt = String.Format(UiStrings.VariablePrompt, requirement.Name, project.ProjectName);
+                            var prompt = String.Format(languageProvider.GetString(LanguageSection.UiStrings, "VariablePrompt"), requirement.Name, project.ProjectName);
                             if (!string.IsNullOrEmpty(requirement.ExtraOptions))
                             {
-                                prompt = prompt + String.Format(UiStrings.VariablePromptAllowedValues, requirement.ExtraOptions);
+                                prompt = prompt + String.Format(languageProvider.GetString(LanguageSection.UiStrings, "VariablePromptAllowedValues"), requirement.ExtraOptions);
                             }
                             requirement.Value = PromptForStringWithoutQuitting(prompt);
                         } while (InInteractiveMode && string.IsNullOrEmpty(requirement.Value));

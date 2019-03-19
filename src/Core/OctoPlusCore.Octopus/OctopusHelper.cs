@@ -201,12 +201,15 @@ namespace OctoPlusCore.Octopus
         {
             var deployment =
                 (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId), pathParameters: new { take = 1, projects = projectId, environments = envId }));
-            if (deployment != null) {
+            if (deployment != null) 
+            {
                 var release = await GetReleaseInternal(deployment.ReleaseId);
-                if (release != null) {
+                if (release != null) 
+                {
                     var project = await GetProject(projectId);
                     var package = await GetPackageId(project);
-                    if (package != null) {
+                    if (package != null) 
+                    {
                         return await this.ConvertRelease(release);
                     }
                 }
@@ -374,7 +377,7 @@ namespace OctoPlusCore.Octopus
             return package;
         }
 
-        public async Task<Release> CreateRelease(ProjectDeployment project) 
+        public async Task<Release> CreateRelease(ProjectDeployment project, bool ignoreChannelRules = false) 
         {
             var user = await client.Repository.Users.GetCurrent();
             var split = project.Packages.First().PackageName.Split('.');
@@ -391,7 +394,7 @@ namespace OctoPlusCore.Octopus
                 LastModifiedOn = DateTimeOffset.UtcNow,
                 ProjectId = project.ProjectId,
                 ReleaseNotes = project.ReleaseMessage ?? string.Empty,
-                Version = releaseName
+                Version = releaseName,
             };
             foreach (var package in project.Packages)
             {
@@ -399,7 +402,7 @@ namespace OctoPlusCore.Octopus
             }
             var result =
                     await
-                        client.Repository.Releases.Create(release);
+                        client.Repository.Releases.Create(release, ignoreChannelRules: ignoreChannelRules);
             return new Release {
                 Version = result.Version,
                 Id = result.Id,
@@ -486,6 +489,27 @@ namespace OctoPlusCore.Octopus
             {
                 team.EnvironmentIds.Remove(envId);
                 var saved = await client.Repository.Teams.Modify(team);
+            }
+        }
+
+        public async Task RemoveEnvironmentsFromLifecycles(string envId) 
+        {
+            var env = await client.Repository.Environments.Get(envId);
+            var lifecycles = await client.Repository.Lifecycles.FindMany(lifecycle => 
+                { 
+                    return lifecycle.Phases.Any(phase => 
+                        phase.AutomaticDeploymentTargets.Contains(envId) || 
+                        phase.OptionalDeploymentTargets.Contains(envId)
+                    ); 
+                });
+            foreach(var lifecycle in lifecycles) 
+            {
+                foreach (var phase in lifecycle.Phases) 
+                {
+                    phase.AutomaticDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                    phase.OptionalDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                }
+                await client.Repository.Lifecycles.Modify(lifecycle);
             }
         }
 

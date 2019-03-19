@@ -24,7 +24,7 @@
 using System;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands.SubCommands 
@@ -34,17 +34,17 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "addtolifecycle";
 
-        public EnvironmentToLifecycle(IOctopusHelper octopusHelper) : base(octopusHelper) { }
+        public EnvironmentToLifecycle(IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider) { }
 
 
         public override void Configure(CommandLineApplication command)
         {
             base.Configure(command);
 
-            AddToRegister(EnvironmentToLifecycleOptions.EnvId, command.Option("-e|--envid", OptionsStrings.EnvironmentId, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(EnvironmentToLifecycleOptions.LcId, command.Option("-l|--lcid", OptionsStrings.LifecycleId, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(EnvironmentToLifecycleOptions.PhaseId, command.Option("-p|--phasenumber", OptionsStrings.PhaseNumber, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(EnvironmentToLifecycleOptions.Automatic, command.Option("-a|--auto", OptionsStrings.AutomaticDeploy, CommandOptionType.NoValue));
+            AddToRegister(EnvironmentToLifecycleOptions.EnvId, command.Option("-e|--envid", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentId"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnvironmentToLifecycleOptions.LcId, command.Option("-l|--lcid", languageProvider.GetString(LanguageSection.OptionsStrings, "LifecycleId"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnvironmentToLifecycleOptions.PhaseId, command.Option("-p|--phasenumber", languageProvider.GetString(LanguageSection.OptionsStrings, "PhaseNumber"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnvironmentToLifecycleOptions.Automatic, command.Option("-a|--auto", languageProvider.GetString(LanguageSection.OptionsStrings, "AutomaticDeploy"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -56,19 +56,19 @@ namespace OctoPlus.Console.Commands.SubCommands
 
             if (string.IsNullOrEmpty(environmentId)) 
             {
-                System.Console.WriteLine(UiStrings.NoMatchingEnvironments);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NoMatchingEnvironments"));
                 return -1;
             }
 
             if (string.IsNullOrEmpty(lcId)) 
             {
-                System.Console.WriteLine(UiStrings.LifecycleDoesntExist);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "LifecycleDoesntExist"));
                 return -1;
             }
 
             if (string.IsNullOrEmpty(stringPhaseId) || !int.TryParse(stringPhaseId, out int phaseId)) 
             {
-                System.Console.WriteLine(UiStrings.LifecyclePhaseIsInvalid);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "LifecyclePhaseIsInvalid"));
                 return -1;
             }
 
@@ -78,10 +78,10 @@ namespace OctoPlus.Console.Commands.SubCommands
             }
             catch (Exception e) 
             {
-                System.Console.WriteLine(String.Format(UiStrings.CouldntAddEnvToTeam, e.Message));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "CouldntAddEnvToTeam"), e.Message));
                 return -1;
             }
-            System.Console.WriteLine(String.Format(UiStrings.Done, String.Empty));
+            System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "Done"), String.Empty));
             return 0;
         }
 

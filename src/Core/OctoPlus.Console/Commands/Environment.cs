@@ -23,7 +23,6 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
-using OctoPlus.Console.Resources;
 using OctoPlusCore.Octopus;
 using System;
 using System.Collections.Generic;
@@ -31,6 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlus.Console.Commands.SubCommands;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console.Commands {
     internal class Environment : BaseCommand
@@ -40,7 +40,7 @@ namespace OctoPlus.Console.Commands {
         private EnvironmentToTeam envToTeam;
         private EnvironmentToLifecycle envToLifecycle;
 
-        public Environment(IOctopusHelper octoHelper, EnsureEnvironment ensureEnv, DeleteEnvironment delEnv, EnvironmentToTeam envToTeam, EnvironmentToLifecycle envToLifecycle) : base(octoHelper) 
+        public Environment(IOctopusHelper octoHelper, EnsureEnvironment ensureEnv, DeleteEnvironment delEnv, EnvironmentToTeam envToTeam, EnvironmentToLifecycle envToLifecycle, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
             this.ensureEnv = ensureEnv;
             this.delEnv = delEnv;
@@ -59,13 +59,13 @@ namespace OctoPlus.Console.Commands {
             ConfigureSubCommand(envToTeam, command);
             ConfigureSubCommand(envToLifecycle, command);
 
-            command.Description = OptionsStrings.EnvironmentCommands;
+            command.Description = languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentCommands");
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
             var envs = await  OctopusHelper.Default.GetEnvironments();
-            var table = new ConsoleTable(UiStrings.Name, UiStrings.Id);
+            var table = new ConsoleTable(languageProvider.GetString(LanguageSection.UiStrings, "Name"), languageProvider.GetString(LanguageSection.UiStrings, "Id"));
             foreach (var env in envs)
             {
                 table.AddRow(env.Name, env.Id);

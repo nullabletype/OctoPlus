@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands.SubCommands
@@ -39,7 +39,7 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profile";
 
-        public DeployWithProfile(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper) : base(octopusHelper)
+        public DeployWithProfile(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
         {
             this._consoleDoJob = consoleDoJob;
         }
@@ -49,14 +49,14 @@ namespace OctoPlus.Console.Commands.SubCommands
         {
             base.Configure(command);
 
-            AddToRegister(DeployWithProfileOptionNames.File, command.Option("-f|--file", OptionsStrings.ProfileFile, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
-            AddToRegister(DeployWithProfileOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", OptionsStrings.ForceDeployOfSamePackage, CommandOptionType.NoValue));
+            AddToRegister(DeployWithProfileOptionNames.File, command.Option("-f|--file", languageProvider.GetString(LanguageSection.OptionsStrings, "ProfileFile"), CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
+            AddToRegister(DeployWithProfileOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
             var profilePath = GetOption(DeployWithProfileOptionNames.File).Value();
-            System.Console.WriteLine(UiStrings.UsingProfileAtPath + profilePath);
+            System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "UsingProfileAtPath") + profilePath);
             await this._consoleDoJob.StartJob(profilePath, null, null, GetOption(DeployWithProfileOptionNames.ForceRedeploy).HasValue());
             return 0;
         }

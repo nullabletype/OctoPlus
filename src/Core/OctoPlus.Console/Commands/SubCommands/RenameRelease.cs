@@ -30,7 +30,7 @@ using McMaster.Extensions.CommandLineUtils;
 using NuGet.Versioning;
 using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
 
@@ -43,7 +43,7 @@ namespace OctoPlus.Console.Commands.SubCommands
         public override string CommandName => "rename";
         private IProgressBar progressBar;
 
-        public RenameRelease(IOctopusHelper octopusHelper, IProgressBar progressBar) : base(octopusHelper) 
+        public RenameRelease(IOctopusHelper octopusHelper, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
         {
             this.progressBar = progressBar;
         }
@@ -53,17 +53,17 @@ namespace OctoPlus.Console.Commands.SubCommands
         {
             base.Configure(command);
 
-            AddToRegister(RenameReleaseOptionNames.Environment, command.Option("-e|--environment", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(RenameReleaseOptionNames.ReleaseName, command.Option("-r|--releasename", OptionsStrings.ReleaseVersion, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(RenameReleaseOptionNames.GroupFilter, command.Option("-g|--groupfilter", OptionsStrings.GroupFilter, CommandOptionType.SingleValue));
-            AddToRegister(RenameReleaseOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", OptionsStrings.SkipConfirmation, CommandOptionType.NoValue));
+            AddToRegister(RenameReleaseOptionNames.Environment, command.Option("-e|--environment", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(RenameReleaseOptionNames.ReleaseName, command.Option("-r|--releasename", languageProvider.GetString(LanguageSection.OptionsStrings, "ReleaseVersion"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(RenameReleaseOptionNames.GroupFilter, command.Option("-g|--groupfilter", languageProvider.GetString(LanguageSection.OptionsStrings, "GroupFilter"), CommandOptionType.SingleValue));
+            AddToRegister(RenameReleaseOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", languageProvider.GetString(LanguageSection.OptionsStrings, "SkipConfirmation"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
-            var environmentName = GetStringFromUser(RenameReleaseOptionNames.Environment, UiStrings.WhichEnvironmentPrompt);
-            var releaseName = GetStringFromUser(RenameReleaseOptionNames.ReleaseName, UiStrings.ReleaseNamePrompt);
-            var groupRestriction = GetStringFromUser(RenameReleaseOptionNames.GroupFilter, UiStrings.RestrictToGroupsPrompt, allowEmpty: true);
+            var environmentName = GetStringFromUser(RenameReleaseOptionNames.Environment, languageProvider.GetString(LanguageSection.UiStrings, "WhichEnvironmentPrompt"));
+            var releaseName = GetStringFromUser(RenameReleaseOptionNames.ReleaseName, languageProvider.GetString(LanguageSection.UiStrings, "ReleaseNamePrompt"));
+            var groupRestriction = GetStringFromUser(RenameReleaseOptionNames.GroupFilter, languageProvider.GetString(LanguageSection.UiStrings, "RestrictToGroupsPrompt"), allowEmpty: true);
 
             var environment = await FetchEnvironmentFromUserInput(environmentName);
 
@@ -74,14 +74,14 @@ namespace OctoPlus.Console.Commands.SubCommands
 
             if (!SemanticVersion.TryParse(releaseName, out _))
             {
-                System.Console.WriteLine(UiStrings.InvalidReleaseVersion);
+                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "InvalidReleaseVersion"));
                 return -2;
             }
 
             var groupIds = new List<string>();
             if (!string.IsNullOrEmpty(groupRestriction))
             {
-                progressBar.WriteStatusLine(UiStrings.GettingGroupInfo);
+                progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "GettingGroupInfo"));
                 groupIds =
                     (await octoHelper.GetFilteredProjectGroups(groupRestriction))
                     .Select(g => g.Id).ToList();
@@ -96,7 +96,7 @@ namespace OctoPlus.Console.Commands.SubCommands
             foreach (var projectStub in projectStubs)
             {
                 progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
-                    String.Format(UiStrings.LoadingInfoFor, projectStub.ProjectName));
+                    String.Format(languageProvider.GetString(LanguageSection.UiStrings, "LoadingInfoFor"), projectStub.ProjectName));
                 if (!string.IsNullOrEmpty(groupRestriction))
                 {
                     if (!groupIds.Contains(projectStub.ProjectGroupId))
@@ -116,7 +116,7 @@ namespace OctoPlus.Console.Commands.SubCommands
 
             System.Console.WriteLine();
 
-            var table = new ConsoleTable(UiStrings.ProjectName, UiStrings.CurrentRelease);
+            var table = new ConsoleTable(languageProvider.GetString(LanguageSection.UiStrings, "ProjectName"), languageProvider.GetString(LanguageSection.UiStrings, "CurrentRelease"));
             foreach (var release in toRename)
             {
                 table.AddRow(release.ProjectStub.ProjectName, release.Release.Version);
@@ -124,19 +124,19 @@ namespace OctoPlus.Console.Commands.SubCommands
 
             table.Write(Format.Minimal);
 
-            if (Prompt.GetYesNo(String.Format(UiStrings.GoingToRename, releaseName), true))
+            if (Prompt.GetYesNo(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "GoingToRename"), releaseName), true))
             {
                 foreach (var release in toRename)
                 {
-                    System.Console.WriteLine(UiStrings.Processing, release.ProjectStub.ProjectName);
+                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Processing"), release.ProjectStub.ProjectName);
                     var result = await this.octoHelper.RenameRelease(release.Release.Id, releaseName);
                     if (result.success)
                     {
-                        System.Console.WriteLine(UiStrings.Done, release.ProjectStub.ProjectName);
+                        System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Done"), release.ProjectStub.ProjectName);
                     }
                     else
                     {
-                        System.Console.WriteLine(UiStrings.Failed, release.ProjectStub.ProjectName, result.error);
+                        System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Failed"), release.ProjectStub.ProjectName, result.error);
                     }
                 }
             }

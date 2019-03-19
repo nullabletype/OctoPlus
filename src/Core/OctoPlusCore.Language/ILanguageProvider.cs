@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 /*
     OctoPlus Deployment Coordinator. Provides extra tooling to help 
     deploy software through Octopus Deploy.
@@ -21,16 +21,12 @@
 #endregion
 
 
-namespace OctoPlusCore.Configuration.Interfaces
+using System;
+
+namespace OctoPlusCore.Language 
 {
-    public interface IConfiguration
+    public interface ILanguageProvider
     {
-        string ApiKey { get; set; }
-        string OctopusUrl { get; set; }
-        string ChannelSeedProjectName { get; set; }
-        ChangeLogProviderConfiguration ChangeProviderConfiguration { get; set; }
-        bool EnableTrace { get; set; }
-        int CacheTimeoutInSeconds { get; set; }
-        string DefaultChannel { get; set; }
-    }
+        string GetString(LanguageSection section, string key);
+    } 
 }

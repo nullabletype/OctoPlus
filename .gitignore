@@ -20,8 +20,8 @@
 ***credlyLog.txt
 ***launch.json
 ***config.json
-***.vscode
+***.vscode/launch.json
 ***launchSettings.json
 .vs
-
+src/Core/publish/
 

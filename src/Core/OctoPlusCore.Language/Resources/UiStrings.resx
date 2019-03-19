@@ -252,6 +252,9 @@
   <data name="PackageNotSelectable" xml:space="preserve">
     <value>There is no package available to deploy for one of the projects you're trying to select!</value>
   </data>
+  <data name="NoSuitablePackageFound" xml:space="preserve">
+    <value>No suitable package found for step {0} for project {1}</value>
+  </data>
   <data name="ParameterNotANumber" xml:space="preserve">
     <value>Parameter must be a number</value>
   </data>

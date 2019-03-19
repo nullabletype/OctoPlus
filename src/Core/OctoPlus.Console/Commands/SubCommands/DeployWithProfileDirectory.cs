@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 using PeterKottas.DotNetCore.WindowsService;
 using PeterKottas.DotNetCore.WindowsService.Interfaces;
@@ -42,7 +42,7 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profiledirectory";
 
-        public DeployWithProfileDirectory(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper) : base(octopusHelper)
+        public DeployWithProfileDirectory(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
         {
             this._consoleDoJob = consoleDoJob;
         }
@@ -52,18 +52,18 @@ namespace OctoPlus.Console.Commands.SubCommands
         {
             base.Configure(command);
 
-            AddToRegister(DeployWithProfileDirectoryOptionNames.Directory, command.Option("-d|--directory", OptionsStrings.ProfileFileDirectory, CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
-            AddToRegister(DeployWithProfileDirectoryOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", OptionsStrings.ForceDeployOfSamePackage, CommandOptionType.NoValue));
-            AddToRegister(DeployWithProfileDirectoryOptionNames.Monitor, command.Option("-m|--monitor", OptionsStrings.MonitorForPackages, CommandOptionType.SingleValue).Accepts(v => v.RegularExpression("[0-9]*", UiStrings.ParameterNotANumber)));
+            AddToRegister(DeployWithProfileDirectoryOptionNames.Directory, command.Option("-d|--directory", languageProvider.GetString(LanguageSection.OptionsStrings, "ProfileFileDirectory"), CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
+            AddToRegister(DeployWithProfileDirectoryOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
+            AddToRegister(DeployWithProfileDirectoryOptionNames.Monitor, command.Option("-m|--monitor", languageProvider.GetString(LanguageSection.OptionsStrings, "MonitorForPackages"), CommandOptionType.SingleValue).Accepts(v => v.RegularExpression("[0-9]*", languageProvider.GetString(LanguageSection.UiStrings, "ParameterNotANumber"))));
 
-            AddToRegister(DeployWithProfileDirectoryOptionNames.ActionInstall, command.Option("--actioninstall", OptionsStrings.ForceDeployOfSamePackage, CommandOptionType.NoValue));
-            AddToRegister(DeployWithProfileDirectoryOptionNames.ActionRun, command.Option("--actionrun", OptionsStrings.ForceDeployOfSamePackage, CommandOptionType.NoValue));
+            AddToRegister(DeployWithProfileDirectoryOptionNames.ActionInstall, command.Option("--actioninstall", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
+            AddToRegister(DeployWithProfileDirectoryOptionNames.ActionRun, command.Option("--actionrun", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
             var profilePath = GetOption(DeployWithProfileDirectoryOptionNames.Directory).Value();
-            System.Console.WriteLine(UiStrings.UsingProfileDirAtPath + profilePath);
+            System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "UsingProfileDirAtPath") + profilePath);
 
             var option = GetOption(DeployWithProfileDirectoryOptionNames.Monitor);
             bool run = option.HasValue();
@@ -73,7 +73,7 @@ namespace OctoPlus.Console.Commands.SubCommands
             {
                 if (!Directory.Exists(profilePath))
                 {
-                    System.Console.WriteLine(UiStrings.PathDoesntExist);
+                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "PathDoesntExist"));
                     return -1;
                 }
 
@@ -96,7 +96,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                             {
                                 System.Console.WriteLine("Service {0} started", name);
                                 service.Start();
-                                RunProfiles(profilePath, run, waitTime);
+                                RunProfiles(profilePath, run, waitTime).Start();
                             });
 
                         });
@@ -109,7 +109,7 @@ namespace OctoPlus.Console.Commands.SubCommands
             }
             catch (Exception e)
             {
-                System.Console.WriteLine(String.Format(UiStrings.UnexpectedError, e.Message));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "UnexpectedError"), e.Message));
             }
 
             
@@ -122,13 +122,13 @@ namespace OctoPlus.Console.Commands.SubCommands
             {
                 foreach (var file in Directory.GetFiles(profilePath, "*auto.profile"))
                 {
-                    System.Console.WriteLine(String.Format(UiStrings.DeployingUsingConfig, file));
+                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "DeployingUsingConfig"), file));
                     await this._consoleDoJob.StartJob(file, null, null, GetOption(DeployWithProfileDirectoryOptionNames.ForceRedeploy).HasValue());
                 }
 
                 if (run)
                 {
-                    System.Console.WriteLine(String.Format(UiStrings.SleepingForSeconds, waitTIme));
+                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "SleepingForSeconds"), waitTIme));
                     await Task.Delay(waitTIme * 1000);
                 }
 

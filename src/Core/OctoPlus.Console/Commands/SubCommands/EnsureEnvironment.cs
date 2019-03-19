@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.Interfaces;
-using OctoPlus.Console.Resources;
+using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands.SubCommands
@@ -38,15 +38,15 @@ namespace OctoPlus.Console.Commands.SubCommands
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "ensure";
 
-        public EnsureEnvironment(IOctopusHelper octopusHelper) : base(octopusHelper) { }
+        public EnsureEnvironment(IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider) { }
 
 
         public override void Configure(CommandLineApplication command)
         {
             base.Configure(command);
 
-            AddToRegister(EnsureEnvironmentOptionNames.Name, command.Option("-n|--name", OptionsStrings.EnvironmentName, CommandOptionType.SingleValue).IsRequired());
-            AddToRegister(EnsureEnvironmentOptionNames.Description, command.Option("-d|--description", OptionsStrings.Description, CommandOptionType.SingleValue));
+            AddToRegister(EnsureEnvironmentOptionNames.Name, command.Option("-n|--name", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue).IsRequired());
+            AddToRegister(EnsureEnvironmentOptionNames.Description, command.Option("-d|--description", languageProvider.GetString(LanguageSection.OptionsStrings, "Description"), CommandOptionType.SingleValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
@@ -57,15 +57,15 @@ namespace OctoPlus.Console.Commands.SubCommands
             OctoPlusCore.Models.Environment env = null;
             if (found.Any()) 
             {
-                System.Console.WriteLine(String.Format(UiStrings.EnvironmentFound, name));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "EnvironmentFound"), name));
                 env = found.First();
             } 
             else 
             {
-                System.Console.WriteLine(String.Format(UiStrings.EnvironmentNotFound, name));
+                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "EnvironmentNotFound"), name));
                 env = await octoHelper.CreateEnvironment(name, description);
             }
-            System.Console.WriteLine(String.Format(UiStrings.EnvionmentId, env.Id));
+            System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "EnvionmentId"), env.Id));
             return 0;
         }
 
