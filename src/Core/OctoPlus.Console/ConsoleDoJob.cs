@@ -35,6 +35,7 @@ using OctoPlusCore.Utilities;
 using OctoPlus.Console.ConsoleTools;
 using System.Text;
 using OctoPlusCore.Configuration.Interfaces;
+using OctoPlusCore.Language;
 
 namespace OctoPlus.Console {
     public class ConsoleDoJob : IUiLogger, IConsoleDoJob
@@ -43,13 +44,15 @@ namespace OctoPlus.Console {
         private readonly IOctopusHelper helper;
         private IProgressBar progressBar;
         private IConfiguration configuration;
+        private ILanguageProvider languageProvider;
 
-        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration)
+        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration, ILanguageProvider languageProvider)
         {
             this.helper = helper;
             this.deployer = deployer;
             this.progressBar = progressBar;
             this.configuration = configuration;
+            this.languageProvider = languageProvider;
         }
 
         public async Task StartJob(string pathToProfile, string message, string releaseVersion,
@@ -84,7 +87,7 @@ namespace OctoPlus.Console {
                             var availablePackages = packages.Where(pack => pack.StepId == package.StepId);
 
                             // If there are no packages for this step, check if we've been asked to jump back to default channel.
-                            if (!availablePackages.Any() && job.FallbackToDefaultChannel && !string.IsNullOrEmpty(configuration.DefaultChannel)) 
+                            if ((!availablePackages.Any() || availablePackages.First().SelectedPackage == null) && job.FallbackToDefaultChannel && !string.IsNullOrEmpty(configuration.DefaultChannel)) 
                             {
                                 if (defaultPackages == null) 
                                 {
@@ -94,9 +97,19 @@ namespace OctoPlus.Console {
                                 availablePackages = defaultPackages.Where(pack => pack.StepId == package.StepId);
                             }
 
-                            package.PackageId = availablePackages.First().SelectedPackage.Id;
-                            package.PackageName = availablePackages.First().SelectedPackage.Version;
-                            package.StepName = availablePackages.First().SelectedPackage.StepName;
+                            var selectedPackage = availablePackages.First().SelectedPackage;
+
+                            if (selectedPackage != null)
+                            {
+                                package.PackageId = selectedPackage.Id;
+                                package.PackageName = selectedPackage.Version;
+                                package.StepName = selectedPackage.StepName;
+                            } 
+                            else 
+                            {
+                                System.Console.Out.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "NoSuitablePackageFound"), package.StepName, project.ProjectName));
+                                continue;
+                            }
                         }
                     }
                     if (!forceDeploymentIfSamePackage)

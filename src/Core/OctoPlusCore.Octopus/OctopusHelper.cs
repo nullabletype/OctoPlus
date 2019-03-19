@@ -201,12 +201,15 @@ namespace OctoPlusCore.Octopus
         {
             var deployment =
                 (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId), pathParameters: new { take = 1, projects = projectId, environments = envId }));
-            if (deployment != null) {
+            if (deployment != null) 
+            {
                 var release = await GetReleaseInternal(deployment.ReleaseId);
-                if (release != null) {
+                if (release != null) 
+                {
                     var project = await GetProject(projectId);
                     var package = await GetPackageId(project);
-                    if (package != null) {
+                    if (package != null) 
+                    {
                         return await this.ConvertRelease(release);
                     }
                 }
