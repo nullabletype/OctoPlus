@@ -228,37 +228,24 @@ namespace OctoPlus.Console.Commands
 
                 var project = await octoHelper.ConvertProject(projectStub, environment.Id, channel.VersionRange, channel.VersionTag);
                 var currentPackages = project.CurrentRelease.SelectedPackages;
-                List<PackageStub> defaultPackages = null;
                 project.Checked = false;
                 if (project.SelectedPackageStubs != null) 
                 {
-                    foreach(var stub in project.SelectedPackageStubs)
+                    foreach(var package in project.AvailablePackages)
                     {
+                        var stub = package.SelectedPackage;
                         if (stub == null)
                         {
                             if (defaultChannel != null) 
                             {
-                                if (defaultPackages == null) 
-                                {
-                                    project = await octoHelper.ConvertProject(projectStub, environment.Id, defaultChannel.VersionRange, defaultChannel.VersionTag);
-                                    defaultPackages = project.CurrentRelease.SelectedPackages;
-                                }
-
+                                project = await octoHelper.ConvertProject(projectStub, environment.Id, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                stub = project.AvailablePackages.FirstOrDefault(p => p.StepId == package.StepId).SelectedPackage;
                             }
-
-                            continue;
                         }
-                        var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == stub.StepId);
-                        if (matchingCurrent == null && defaultPackages != null) 
-                        {
-                            matchingCurrent = defaultPackages.FirstOrDefault(p => p.StepId == stub.StepId);
-                        }
+                        var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == package.StepId);
                         if (matchingCurrent != null) {
-                            if (matchingCurrent.Version != stub.Version)
-                            {
-                                project.Checked = true;
-                                break;
-                            }
+                            project.Checked = matchingCurrent.Version != stub.Version;
+                            break;
                         }
                         else
                         {
