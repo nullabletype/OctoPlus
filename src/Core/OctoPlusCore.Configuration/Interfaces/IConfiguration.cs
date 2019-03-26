@@ -21,13 +21,15 @@
 #endregion
 
 
+using System.Collections.Generic;
+
 namespace OctoPlusCore.Configuration.Interfaces
 {
     public interface IConfiguration
     {
         string ApiKey { get; set; }
         string OctopusUrl { get; set; }
-        string ChannelSeedProjectName { get; set; }
+        List<string> ChannelSeedProjectNames { get;set; }
         ChangeLogProviderConfiguration ChangeProviderConfiguration { get; set; }
         bool EnableTrace { get; set; }
         int CacheTimeoutInSeconds { get; set; }

@@ -71,13 +71,6 @@ namespace OctoPlus.Console.Commands
         {
             progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "FetchingProjectList"));
             var projectStubs = await octoHelper.GetProjectStubs();
-            var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
-
-            if (found == null)
-            {
-                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ProjectNotFound"));
-                return -1;
-            }
 
             var environmentName = GetStringFromUser(PromoteOptionNames.SourceEnvironment, languageProvider.GetString(LanguageSection.UiStrings, "SourceEnvironment"));
             var targetEnvironmentName = GetStringFromUser(PromoteOptionNames.Environment, languageProvider.GetString(LanguageSection.UiStrings, "WhichEnvironmentPrompt"));

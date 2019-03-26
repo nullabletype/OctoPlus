@@ -21,6 +21,9 @@
 #endregion
 
 
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using OctoPlusCore.Configuration.Interfaces;
 
 namespace OctoPlusCore.Configuration
@@ -35,5 +38,11 @@ namespace OctoPlusCore.Configuration
         public bool EnableTrace { get; set; }
         public int CacheTimeoutInSeconds { get; set; }
         public string DefaultChannel { get; set; }
+
+        [JsonIgnore]
+        public List<string> ChannelSeedProjectNames {
+            get { return ChannelSeedProjectName == null ? new List<string>() : ChannelSeedProjectName.Split(',').Select(c => c.Trim()).ToList(); }
+            set {}
+        }
     }
 }

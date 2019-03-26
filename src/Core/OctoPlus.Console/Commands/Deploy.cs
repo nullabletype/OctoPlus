@@ -91,9 +91,9 @@ namespace OctoPlus.Console.Commands
             }
             progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "FetchingProjectList"));
             var projectStubs = await octoHelper.GetProjectStubs();
-            var found = projectStubs.FirstOrDefault(proj => proj.ProjectName.Equals(configuration.ChannelSeedProjectName, StringComparison.CurrentCultureIgnoreCase));
+            var found = projectStubs.Where(proj => configuration.ChannelSeedProjectNames.Select(c => c.ToLower()).Contains(proj.ProjectName.ToLower()));
 
-            if (found == null)
+            if (!found.Any())
             {
                 System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ProjectNotFound"));
                 return -1;
@@ -122,7 +122,15 @@ namespace OctoPlus.Console.Commands
                     .Select(g => g.Id).ToList();
             }
 
-            var channel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, channelName);
+            Channel channel = null;
+            foreach (var project in found)
+            {
+                channel = await octoHelper.GetChannelByProjectNameAndChannelName(project.ProjectName, channelName);
+                if (channel != null)
+                {
+                    break;
+                }
+            }
 
             if (channel == null)
             {
@@ -133,7 +141,7 @@ namespace OctoPlus.Console.Commands
             Channel defaultChannel = null;
 
             if (forceDefault && !string.IsNullOrEmpty(configuration.DefaultChannel)) {
-                defaultChannel = await octoHelper.GetChannelByProjectNameAndChannelName(found.ProjectName, configuration.DefaultChannel);
+                defaultChannel = await octoHelper.GetChannelByProjectNameAndChannelName(found.First().ProjectName, configuration.DefaultChannel);
             }
 
             progressBar.CleanCurrentLine();
