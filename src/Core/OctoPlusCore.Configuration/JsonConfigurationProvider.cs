@@ -91,7 +91,7 @@ namespace OctoPlusCore.Configuration
                 validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationOctopusApiKey"));
             }
 
-            if (string.IsNullOrEmpty(config.ChannelSeedProjectName)) {
+            if (config.ChannelSeedProjectNames == null || !config.ChannelSeedProjectNames.Any()) {
                 validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationSeedProject"));
             }
 
@@ -103,7 +103,7 @@ namespace OctoPlusCore.Configuration
                     await octoHelper.GetEnvironments();
                     try 
                     {
-                        if (!await octoHelper.ValidateProjectName(config.ChannelSeedProjectName)) 
+                        if (!config.ChannelSeedProjectNames.Select(async c => await octoHelper.ValidateProjectName(c)).Select(c => c.Result).All(c => c)) 
                         {
                             validationResult.Errors.Add(languageProvider.GetString(LanguageSection.ConfigurationStrings, "ValidationSeedProjectNotValid"));
                         }

@@ -86,13 +86,13 @@ namespace OctoPlusCore.Octopus
             return await GetPackages(await GetProject(projectIdOrHref), versionRange, tag);
         }
 
-        private async Task<PackageIdResult> GetPackageId(ProjectResource project) 
+        private async Task<PackageIdResult> GetPackageId(ProjectResource project, string stepName, string actionName) 
         {
             var process = await GetDeploymentProcess(project.DeploymentProcessId);
             if (process != null) {
-                foreach (var step in process.Steps) 
+                foreach (var step in process.Steps.Where(s => s.Name == stepName)) 
                 {
-                    foreach (var action in step.Actions) 
+                    foreach (var action in step.Actions.Where(a => a.Name == actionName)) 
                     {
                         if (action.Properties.ContainsKey("Octopus.Action.Package.FeedId") &&
                             action.Properties["Octopus.Action.Package.FeedId"].Value == "feeds-builtin") 
@@ -206,12 +206,7 @@ namespace OctoPlusCore.Octopus
                 var release = await GetReleaseInternal(deployment.ReleaseId);
                 if (release != null) 
                 {
-                    var project = await GetProject(projectId);
-                    var package = await GetPackageId(project);
-                    if (package != null) 
-                    {
-                        return await this.ConvertRelease(release);
-                    }
+                    return await this.ConvertRelease(release);
                 }
             }
             return new Release { Id = "", Version = "None" };
@@ -780,10 +775,9 @@ namespace OctoPlusCore.Octopus
         private async Task<Release> ConvertRelease(ReleaseResource release)
         {
             var project = await GetProject(release.ProjectId);
-            var packageId = await this.GetPackageId(project);
             var packages =
                 release.SelectedPackages.Select(
-                    p => ConvertPackage(p, packageId == null ? string.Empty : packageId.PackageId)).ToList();
+                    async p => await ConvertPackage(project, p)).Select(t => t.Result).ToList();
             return new Release
             {
                 Id = release.Id,
@@ -793,9 +787,10 @@ namespace OctoPlusCore.Octopus
             };
         }
 
-        private PackageStub ConvertPackage(SelectedPackage package, string packageId)
+        private async Task<PackageStub> ConvertPackage(ProjectResource project, SelectedPackage package)
         {
-            return new PackageStub {Version = package.Version, StepName = package.ActionName, Id = packageId};
+            var packageDetails = await GetPackageId(project, package.ActionName, package.ActionName);
+            return new PackageStub { Version = package.Version, StepName = packageDetails.StepName, StepId = packageDetails.StepId, Id = packageDetails.PackageId };
         }
 
         private PackageStub ConvertPackage(PackageResource package, string stepName)
