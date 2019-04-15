@@ -479,7 +479,14 @@ namespace OctoPlusCore.Octopus
 
         public async Task RemoveEnvironmentsFromTeams(string envId) 
         {
-            var teams = await client.Repository.Teams.FindMany(team => { return team.EnvironmentIds.Contains(envId); });
+            var teams = await client.Repository.Teams.FindMany(team => 
+                { 
+                    if (team == null || team.EnvironmentIds == null)
+                    {
+                        return false;
+                    }
+                    return team.EnvironmentIds.Contains(envId); 
+                });
             foreach (var team in teams) 
             {
                 team.EnvironmentIds.Remove(envId);
@@ -493,16 +500,31 @@ namespace OctoPlusCore.Octopus
             var lifecycles = await client.Repository.Lifecycles.FindMany(lifecycle => 
                 { 
                     return lifecycle.Phases.Any(phase => 
-                        phase.AutomaticDeploymentTargets.Contains(envId) || 
-                        phase.OptionalDeploymentTargets.Contains(envId)
+                        {
+                            if (phase.AutomaticDeploymentTargets != null && phase.AutomaticDeploymentTargets.Contains(envId))
+                            {
+                                return true;
+                            }
+                            if (phase.OptionalDeploymentTargets != null && phase.OptionalDeploymentTargets.Contains(envId))
+                            {
+                                return true;
+                            }
+                            return false;
+                        }
                     ); 
                 });
             foreach(var lifecycle in lifecycles) 
             {
                 foreach (var phase in lifecycle.Phases) 
                 {
-                    phase.AutomaticDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
-                    phase.OptionalDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                    if (phase.AutomaticDeploymentTargets != null)
+                    {
+                        phase.AutomaticDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                    }
+                    if (phase.OptionalDeploymentTargets != null)
+                    {
+                        phase.OptionalDeploymentTargets.RemoveWhere(phaseEnvId => phaseEnvId.Equals(envId));
+                    }
                 }
                 await client.Repository.Lifecycles.Modify(lifecycle);
             }

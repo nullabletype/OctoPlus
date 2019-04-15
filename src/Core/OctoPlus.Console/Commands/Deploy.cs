@@ -251,12 +251,17 @@ namespace OctoPlus.Console.Commands
                             }
                         }
                         var matchingCurrent = currentPackages.FirstOrDefault(p => p.StepId == package.StepId);
-                        if (matchingCurrent != null) {
+                        if (matchingCurrent != null && stub != null) 
+                        {
                             project.Checked = matchingCurrent.Version != stub.Version;
                             break;
                         }
                         else
                         {
+                            if (stub == null)
+                            {
+                                project.Checked = false;
+                            }
                             project.Checked = true;
                             break;
                         }
