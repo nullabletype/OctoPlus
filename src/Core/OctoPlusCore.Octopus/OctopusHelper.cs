@@ -454,7 +454,7 @@ namespace OctoPlusCore.Octopus
         {
             //var taskDeets = await client.Repository.Tasks.FindAll(pathParameters: new { skip, take, name = "Deploy" });
 
-            var taskDeets = await client.Get<ResourceCollection<TaskResource>>(client.RootDocument.Links["Tasks"], new { skip, take, name = "Deploy" });
+            var taskDeets = await client.Get<ResourceCollection<TaskResource>>((await client.Repository.LoadRootDocument()).Links["Tasks"], new { skip, take, name = "Deploy" });
 
             var tasks = new List<TaskStub>();
 
@@ -479,20 +479,20 @@ namespace OctoPlusCore.Octopus
 
         public async Task RemoveEnvironmentsFromTeams(string envId) 
         {
-            var teams = await client.Repository.Teams.FindMany(team => 
-                { 
-                    if (team == null || team.EnvironmentIds == null)
-                    {
-                        return false;
-                    }
-                    return team.EnvironmentIds.Contains(envId); 
-                });
+            var teams = await client.Repository.Teams.FindAll();
             foreach (var team in teams) 
             {
-                team.EnvironmentIds.Remove(envId);
-                var saved = await client.Repository.Teams.Modify(team);
+                var scopes = await client.Repository.Teams.GetScopedUserRoles(team);
+                
+                foreach (var scope in scopes.Where(s => s.EnvironmentIds.Contains(envId))) 
+                {
+                    scope.EnvironmentIds.Remove(envId);
+                    var saved = await client.Repository.ScopedUserRoles.Modify(scope);
+                }
+                
             }
         }
+
 
         public async Task RemoveEnvironmentsFromLifecycles(string envId) 
         {
@@ -538,12 +538,17 @@ namespace OctoPlusCore.Octopus
             {
                 return;
             }
-            if (!team.EnvironmentIds.Contains(envId)) 
+            var scopes = await client.Repository.Teams.GetScopedUserRoles(team);
+            foreach (var scope in scopes) 
             {
-                team.EnvironmentIds.Add(envId);
-                await client.Repository.Teams.Modify(team);
+                if (!scope.EnvironmentIds.Contains(envId))
+                {
+                    scope.EnvironmentIds.Add(envId);
+                    var saved = await client.Repository.ScopedUserRoles.Modify(scope);
+                }
             }
         }
+
 
         public async Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic) {
             LifecycleResource lifecycle;
