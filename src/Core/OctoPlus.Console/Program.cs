@@ -135,6 +135,9 @@ namespace OctoPlus.Console
                 ShowNewVersionMessage(checkResult, serviceProvider.GetService<ILanguageProvider>());
             }
 
+            var changes = serviceProvider.GetService<IChangeLogProvider>();
+            var failures = changes.GetProjectStatusList(OctoPlusCore.ChangeLogs.BuildStatus.Failure, 1, 1);
+
             return new Tuple<ConfigurationLoadResult, IServiceProvider>(configurationLoadResult, serviceProvider);
         }
 

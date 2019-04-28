@@ -286,5 +286,66 @@ namespace OctoPlusCore.ChangeLogs.TeamCity {
                 _configuration.ChangeProviderConfiguration.Password).Changes.FirstOrDefault();
             return toBuildChange;
         }
+
+        public IEnumerable<ChangeLogs.Project> GetProjectStatusList(BuildStatus status, int lookupLimit, int count, bool includeFiltered = false)
+        {
+            this._log.Info("Been asked to fetch a single change with id ");
+            var toBuildChange = this._webRequestHelper.GetXmlWebRequestWithBasicAuth<ProjectList>(
+                _configuration.ChangeProviderConfiguration.BaseUrl +
+                "/app/rest/projects",
+                _configuration.ChangeProviderConfiguration.Username,
+                _configuration.ChangeProviderConfiguration.Password);
+
+            var projects = new List<ChangeLogs.Project>();
+
+            var parents = toBuildChange.Projects.Where(p => !string.IsNullOrEmpty(p.ParentProjectId)).Select(p => p.ParentProjectId).Distinct();
+
+            foreach(var project in toBuildChange.Projects.Where(p => !parents.Contains(p.Id)))
+            {
+                var builds = new List<BuildResult>();
+                var allBuildTypes = this._webRequestHelper.GetXmlWebRequestWithBasicAuth<BuildTypes>(
+                _configuration.ChangeProviderConfiguration.BaseUrl +
+                $"/app/rest/buildTypes?locator=affectedProject:(id:{project.Id})&fields=buildType(id,name,builds($locator(count:{count},status:{status.ToString().ToUpper()},lookupLimit:{lookupLimit}),build(number,status,statusText)))",
+                _configuration.ChangeProviderConfiguration.Username,
+                _configuration.ChangeProviderConfiguration.Password);
+
+                foreach (var allBuilds in allBuildTypes.Builds)
+                {
+                    foreach (var buildConfig in allBuilds.Builds)
+                    {
+                        foreach (var build in buildConfig.Builds)
+                        {
+                            if (!includeFiltered && string.IsNullOrEmpty(build.Status))
+                            {
+                                continue;
+                            }
+                            builds.Add(new BuildResult
+                            {
+                                BuildNumber = build.Number.ToString(),
+                                ConfigurationName = allBuilds.Name,
+                                Id = allBuilds.Id,
+                                Message = build.Statustext,
+                                WebUrl = build.WebUrl,
+                                Status = build.Status == "FAILURE" ? BuildStatus.Failure : (build.Status == "SUCCESS" ? BuildStatus.Success : (build.Status == "ERROR" ? BuildStatus.Error : BuildStatus.NotProvided))
+                            });
+                        }
+                    }
+                }
+
+                if (!includeFiltered && builds.Count == 0)
+                {
+                    continue;
+                }
+                projects.Add(new ChangeLogs.Project
+                {
+                    Builds = builds,
+                    Description = project.Description,
+                    Id = project.Id,
+                    Name = project.Name,
+                    WebUrl = project.WebUrl
+                });
+            }
+            return projects;
+        }
     }
 }
