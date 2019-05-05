@@ -23,9 +23,9 @@ publish:
     only: 
         - master
     script:
-        - apt-get install curl gnupg apt-transport-https
-        - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-        - sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" > /etc/apt/sources.list.d/microsoft.list'
-        - apt-get update
-        - apt-get install -y powershell
+        - curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v6.2.0/powershell-6.2.0-linux-x64.tar.gz
+        - mkdir -p /opt/microsoft/powershell/6.2.0
+        - tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/6.2.0
+        - chmod +x /opt/microsoft/powershell/6.2.0/pwsh
+        - ln -s /opt/microsoft/powershell/6.2.0/pwsh /usr/bin/pwsh
         - pwsh -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
