@@ -23,4 +23,4 @@ publish:
     only: 
         - master
     script:
-        - powershell -File "src/Core/package.ps1 '-nugetKey `"$NUGETKEY`"''"
+        - powershell -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
