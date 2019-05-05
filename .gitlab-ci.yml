@@ -19,7 +19,7 @@ build:
             - octoplus-release/
 
 publish:
-    stage: publish
+    stage: build
     only: 
         - master
     script:
