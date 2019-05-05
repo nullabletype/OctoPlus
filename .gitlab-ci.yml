@@ -20,6 +20,7 @@ build:
 
 publish:
     stage: publish
-    only: master
+    only: 
+        - master
     script:
         - . src/Core/package.ps1 -nugetKey "$nugetkey"
