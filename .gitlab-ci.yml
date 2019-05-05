@@ -23,5 +23,9 @@ publish:
     only: 
         - master
     script:
-        - curl -sSL https://aka.ms/install-powershell.sh | bash /dev/stdin
-        - powershell -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
+        - apt-get install curl gnupg apt-transport-https
+        - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        - sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" > /etc/apt/sources.list.d/microsoft.list'
+        - apt-get update
+        - apt-get install -y powershell
+        - pwsh -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
