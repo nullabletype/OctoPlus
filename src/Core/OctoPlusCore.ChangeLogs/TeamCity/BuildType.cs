@@ -21,16 +21,32 @@
 #endregion
 
 
-using OctoPlusCore.Models.Interfaces;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
-namespace OctoPlusCore.ChangeLogs.Interfaces {
-    public interface IChangeLogProvider
+namespace OctoPlusCore.ChangeLogs.TeamCity
+{
+    [XmlRoot("buildType")]
+    public class BuildType
     {
-        bool CanProvideChangeTracking(IVersionedPackage fromPackage);
-        ChangeLogCollection GetChanges(IVersionedPackage fromPackage, IVersionedPackage toPackage, IVersionedProject project);
-        bool CanProvideChangeTracking(IVersionedPackage fromPackage, IVersionedPackage toPackage);
-        ChangeLogCollection GetChanges(IVersionedPackage toPackage, IVersionedProject project);
-        IEnumerable<ChangeLogs.Project> GetProjectStatusList(BuildStatus status, int lookupLimit, int count, bool includeFilteredConfigurations = false);
+
+        [XmlAttribute("id")]
+        public string Id { get; set; }
+
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+
+        [XmlElement("builds")]
+        public List<BuildConfigs> Builds { get; set; }
+
+    }
+
+    [XmlRoot("builds")]
+    public class BuildConfigs
+    {
+
+        [XmlElement("build")]
+        public List<Build> Builds { get; set; }
+
     }
 }

@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 /*
     OctoPlus Deployment Coordinator. Provides extra tooling to help 
     deploy software through Octopus Deploy.
@@ -21,16 +21,16 @@
 #endregion
 
 
-using OctoPlusCore.Models.Interfaces;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
-namespace OctoPlusCore.ChangeLogs.Interfaces {
-    public interface IChangeLogProvider
+namespace OctoPlusCore.ChangeLogs.TeamCity
+{
+    [XmlRoot("buildTypes")]
+    public class BuildTypes
     {
-        bool CanProvideChangeTracking(IVersionedPackage fromPackage);
-        ChangeLogCollection GetChanges(IVersionedPackage fromPackage, IVersionedPackage toPackage, IVersionedProject project);
-        bool CanProvideChangeTracking(IVersionedPackage fromPackage, IVersionedPackage toPackage);
-        ChangeLogCollection GetChanges(IVersionedPackage toPackage, IVersionedProject project);
-        IEnumerable<ChangeLogs.Project> GetProjectStatusList(BuildStatus status, int lookupLimit, int count, bool includeFilteredConfigurations = false);
+        [XmlElement("buildType")]
+        public List<BuildType> Builds { get; set; }
+
     }
 }
