@@ -12,7 +12,7 @@ $nugetPath = "$scriptPath\nuget"
 
 Get-ChildItem -Path $nugetPath -Include *.* -File -Recurse | foreach { $_.Delete()}
 
-$csprojs = Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name
+$csprojs = Get-ChildItem -Path $scriptPath -Filter *.csproj -Recurse -File -Name
 
 foreach ($current in $csprojs) {
     if ($current -like "*OctoPlus.Console.csproj") {
@@ -26,7 +26,7 @@ foreach ($current in $csprojs) {
 $nupkgs = Get-ChildItem -Path $nugetPath -Filter *.nupkg -Recurse -File -Name
 
 foreach ($current in $nupkgs) {
-    $command = "dotnet nuget push foo.nupkg -k `"$nugetKey`""
+    $command = "dotnet nuget push $current -k `"$nugetKey`""
     Write-Host "Going to push package $current"
     Invoke-Expression $command
 }
