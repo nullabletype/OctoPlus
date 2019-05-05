@@ -23,5 +23,5 @@ publish:
     only: 
         - master
     script:
-        - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin
+        - wget -O - https://aka.ms/install-powershell.sh | sudo bash
         - powershell -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
