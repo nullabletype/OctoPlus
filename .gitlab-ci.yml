@@ -28,4 +28,5 @@ publish:
         - tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/6.2.0
         - chmod +x /opt/microsoft/powershell/6.2.0/pwsh
         - ln -s /opt/microsoft/powershell/6.2.0/pwsh /usr/bin/pwsh
+        - chmod +x src/Core/package.ps1
         - src/Core/package.ps1 -nugetKey "$NUGETKEY"
