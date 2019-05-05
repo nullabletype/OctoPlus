@@ -17,3 +17,9 @@ build:
     artifacts:
         paths:
             - octoplus-release/
+
+publish:
+    stage: publish
+    only: master
+    script:
+        - . src/Core/package.ps1 -nugetKey "$nugetkey"
