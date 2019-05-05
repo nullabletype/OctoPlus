@@ -26,7 +26,7 @@ foreach ($current in $csprojs) {
 $nupkgs = Get-ChildItem -Path $nugetPath -Filter *.nupkg -Recurse -File
 
 foreach ($current in $nupkgs) {
-    $command = "dotnet nuget push `"$($current.FullName)`" -k `"$nugetKey`""
+    $command = "dotnet nuget push `"$($current.FullName)`" -k `"$nugetKey`"  -s https://api.nuget.org/v3/index.json"
     Write-Host "Going to push package $($current.FullName)"
     Invoke-Expression $command
 }
