@@ -23,4 +23,4 @@ publish:
     only: 
         - master
     script:
-        - . src/Core/package.ps1 -nugetKey "$nugetkey"
+        - . src/Core/package.ps1 -nugetKey "$($env:nugetkey)"
