@@ -23,5 +23,5 @@ publish:
     only: 
         - master
     script:
-        - curl -sSL https://aka.ms/install-powershell.sh | sudo bash /dev/stdin
+        - curl -sSL https://aka.ms/install-powershell.sh | bash /dev/stdin
         - powershell -File "src/Core/package.ps1 '-nugetKey $NUGETKEY'"
