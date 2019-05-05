@@ -18,7 +18,7 @@ foreach ($current in $csprojs) {
     if ($current -like "*OctoPlus.Console.csproj") {
         continue
     }
-    $command = "dotnet pack -p:PackageVersion=$version --output `"$nugetPath`" `"$($current.FullPath)`""
+    $command = "dotnet pack -p:PackageVersion=$version --output `"$nugetPath`" `"$($current.FullName)`""
     Write-Host "Going to run: $command"
     Invoke-Expression $command
 }
@@ -26,8 +26,8 @@ foreach ($current in $csprojs) {
 $nupkgs = Get-ChildItem -Path $nugetPath -Filter *.nupkg -Recurse -File
 
 foreach ($current in $nupkgs) {
-    $command = "dotnet nuget push `"$($current.FullPath)`" -k `"$nugetKey`""
-    Write-Host "Going to push package $($current.FullPath)"
+    $command = "dotnet nuget push `"$($current.FullName)`" -k `"$nugetKey`""
+    Write-Host "Going to push package $($current.FullName)"
     Invoke-Expression $command
 }
 
