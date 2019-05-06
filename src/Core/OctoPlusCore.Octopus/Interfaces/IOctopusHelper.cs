@@ -41,6 +41,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task<List<Environment>> GetMatchingEnvironments(string keyword, bool extactMatch = false);
         Task<Environment> GetEnvironment(string idOrName);
         Task<Environment> CreateEnvironment(string name, string description);
+        Task<IEnumerable<Environment>> GetEnvironment(string[] idOrNames);
         Task DeleteEnvironment(string idOrhref);
         Task<Channel> GetChannelByName(string projectIdOrName, string channelName);
         Task<Channel> GetChannel(string channelIdOrName);
@@ -70,6 +71,7 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task RemoveEnvironmentsFromLifecycles(string envId);
         Task AddEnvironmentToTeam(string envId, string teamId);
         Task UpdateVariableSet(VariableSet varSet);
+        Task<IEnumerable<Deployment>> GetDeployments(string[] deploymentIds);
         Task<(bool Success, LifecycleErrorType ErrorType, string Error)> AddEnvironmentToLifecyclePhase(string envId, string lcId, int phaseId, bool automatic);
     }
 }

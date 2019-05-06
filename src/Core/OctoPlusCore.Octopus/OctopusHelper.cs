@@ -256,6 +256,11 @@ namespace OctoPlusCore.Octopus
             return ConvertEnvironment(await client.Repository.Environments.Get(idOrName));
         }
 
+        public async Task<IEnumerable<Environment>> GetEnvironment(string[] idOrNames)
+        {
+            return (await client.Repository.Environments.Get(idOrNames)).Select(e => ConvertEnvironment(e));
+        }
+
         public async Task DeleteEnvironment(string idOrhref) 
         {
             var env = await client.Repository.Environments.Get(idOrhref);
@@ -460,6 +465,11 @@ namespace OctoPlusCore.Octopus
 
             foreach (var currentTask in taskDeets.Items) 
             {
+                String deploymentId = null;
+                if(currentTask.Arguments != null && currentTask.Arguments.ContainsKey("DeploymentId"))
+                {
+                    deploymentId = currentTask.Arguments["DeploymentId"].ToString();
+                }
                 tasks.Add(new TaskStub 
                 {
                     State = currentTask.State == TaskState.Success ? Models.TaskStatus.Done :
@@ -470,11 +480,17 @@ namespace OctoPlusCore.Octopus
                     HasWarningsOrErrors = currentTask.HasWarningsOrErrors,
                     IsComplete = currentTask.IsCompleted,
                     TaskId = currentTask.Id,
-                    Links = currentTask.Links.ToDictionary(l => l.Key, l => l.Value.ToString())
+                    Links = currentTask.Links.ToDictionary(l => l.Key, l => l.Value.ToString()),
+                    DeploymentId = deploymentId
                 });
             }
 
             return tasks;
+        }
+
+        public async Task<IEnumerable<Deployment>> GetDeployments(string[] deploymentIds)
+        {
+            return (await client.Repository.Deployments.Get(deploymentIds)).Select(d => ConvertDeployment(d));
         }
 
         public async Task RemoveEnvironmentsFromTeams(string envId) 

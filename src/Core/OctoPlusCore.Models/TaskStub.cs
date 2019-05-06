@@ -34,5 +34,6 @@ namespace OctoPlusCore.Models
         public bool HasWarningsOrErrors { get; set; }
         public string ErrorMessage { get; set; }
         public Dictionary<string, string> Links { get; set; }
+        public string DeploymentId { get; set; }
     }
 }
