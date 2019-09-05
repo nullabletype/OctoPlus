@@ -38,6 +38,7 @@ namespace OctoPlusCore.Models
         public string ChannelId { get; set; }
         public string ChannelVersionRange { get; set; }
         public string ChannelVersionTag { get; set; }
+        public string ChannelName { get; set; }
         public string ReleaseMessage { get; set; }
         public string ReleaseVersion { get; set; }
         public string LifeCycleId { get; set; }

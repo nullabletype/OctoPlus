@@ -382,9 +382,9 @@ namespace OctoPlusCore.Octopus
             var user = await client.Repository.Users.GetCurrent();
             var split = project.Packages.First().PackageName.Split('.');
             var releaseName = project.ReleaseVersion ?? split[0] + "." + split[1] + ".i";
-            if (project.ReleaseVersion == null && !string.IsNullOrEmpty(project.ChannelVersionTag)) 
+            if (project.ReleaseVersion == null && !string.IsNullOrEmpty(project.ChannelName)) 
             {
-                releaseName += "-" + project.ChannelVersionTag;
+                releaseName += "-" + project.ChannelName;
             }
             var release = new ReleaseResource
             {

@@ -348,6 +348,7 @@ namespace OctoPlus.Console.Commands
                 ChannelId = projectChannel?.Id,
                 ChannelVersionRange = channel?.VersionRange,
                 ChannelVersionTag = channel?.VersionTag,
+                ChannelName = channel?.Name,
                 LifeCycleId = current.LifeCycleId,
                 RequiredVariables = current?.RequiredVariables?.Select(r => new RequiredVariableDeployment { Id = r.Id, ExtraOptions = r.ExtraOptions, Name = r.Name, Type = r.Type, Value = r.Value }).ToList()
             };
