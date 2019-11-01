@@ -2,7 +2,7 @@ version: 2.0
 jobs:
   build:
     docker:
-      image: microsoft/dotnet:latest
+      - image: microsoft/dotnet:latest
     steps:
       - checkout
       - run:
@@ -17,7 +17,7 @@ jobs:
 
   nuget-publish:
     docker:
-      image: microsoft/dotnet:latest
+      - image: microsoft/dotnet:latest
     steps:
       - checkout
       - run:
