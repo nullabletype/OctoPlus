@@ -1,0 +1,43 @@
+version: 2.0
+jobs:
+    build:
+        docker:
+            - image: microsoft/dotnet:latest
+        steps:
+            - checkout
+            - run:
+                name: build
+                command: dotnet build -c Release src/Core/OctoPlus.sln
+            - run:
+                name: publish
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release
+            - store_artifacts:
+                path: octoplus-release/
+                destination: octoplus-release/
+
+    nuget-publish:
+        docker:
+            - image: microsoft/dotnet:latest
+        steps:
+            - checkout
+            - run:
+                name: download-powershellcore
+                command: curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v6.2.0/powershell-6.2.0-linux-x64.tar.gz
+            - run:
+                name: mk-powershell-dir
+                command: mkdir -p /opt/microsoft/powershell/6.2.0
+            - run:
+                name: uncompress-powershell
+                command: tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/6.2.0
+            - run:
+                name: grant-powershell-perms
+                command: chmod +x /opt/microsoft/powershell/6.2.0/pwsh
+            - run:
+                name: add-powershell-symlink
+                command: ln -s /opt/microsoft/powershell/6.2.0/pwsh /usr/bin/pwsh
+            - run:
+                name: set-script-perms
+                command: chmod +x src/Core/package.ps1
+            - run:
+                name: run-package-script
+                command: src/Core/package.ps1 -nugetKey "$NUGETKEY"
