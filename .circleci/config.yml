@@ -4,7 +4,7 @@ jobs:
     docker:
       image: microsoft/dotnet:latest
     steps:
-      - build
+      - checkout
       - run:
         name: build
         command:
@@ -21,7 +21,7 @@ jobs:
     docker:
       image: microsoft/dotnet:latest
     steps:
-      - publish-to-nuget
+      - checkout
       - run:
         name: download-powershellcore
         command:
