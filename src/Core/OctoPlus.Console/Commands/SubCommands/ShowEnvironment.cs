@@ -39,7 +39,7 @@ namespace OctoPlus.Console.Commands.SubCommands
     class ShowEnvironment : BaseCommand
     {
         protected override bool SupportsInteractiveMode => false;
-        public override string CommandName => "delete";
+        public override string CommandName => "show";
         private IProgressBar progressBar;
         IConfiguration configuration;
 

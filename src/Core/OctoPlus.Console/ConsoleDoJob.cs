@@ -93,6 +93,11 @@ namespace OctoPlus.Console {
                                 {
                                     var defaultChannel = await this.helper.GetChannelByName(project.ProjectId, configuration.DefaultChannel);
                                     defaultPackages = await this.helper.GetPackages(project.ProjectId, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                    //  We're now using the default channel, so update the project release to have the correct channel info for the deployment.
+                                    project.ChannelId = defaultChannel.Id;
+                                    project.ChannelName = defaultChannel.Name;
+                                    project.ChannelVersionRange = defaultChannel.VersionRange;
+                                    project.ChannelVersionTag = defaultChannel.VersionTag;
                                 }
                                 availablePackages = defaultPackages.Where(pack => pack.StepId == package.StepId);
                             }

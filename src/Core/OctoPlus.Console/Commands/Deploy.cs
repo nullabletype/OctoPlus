@@ -148,7 +148,7 @@ namespace OctoPlus.Console.Commands
             var projects = await ConvertProjectStubsToProjects(projectStubs, groupRestriction, groupIds, environment, channel, defaultChannel);
             progressBar.CleanCurrentLine();
 
-            var deployment = await GenerateDeployment(channel, environment, projects, forceDefault);
+            var deployment = await GenerateDeployment(channel, defaultChannel, environment, projects, forceDefault);
 
             if (deployment == null)
             {
@@ -181,7 +181,7 @@ namespace OctoPlus.Console.Commands
             System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "ProfileSaved"), profilePath));
         }
 
-        private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, OctoPlusCore.Models.Environment environment, List<Project> projects, bool fallbackToDefaultChannel)
+        private async Task<EnvironmentDeployment> GenerateDeployment(Channel channel, Channel defaultChannel, OctoPlusCore.Models.Environment environment, List<Project> projects, bool fallbackToDefaultChannel)
         {
             EnvironmentDeployment deployment;
 
@@ -190,13 +190,13 @@ namespace OctoPlus.Console.Commands
                 bool deploymentOk;
                 do
                 {
-                    deployment = await InteractivePrompt(channel, environment, projects);
+                    deployment = await InteractivePrompt(channel, defaultChannel, environment, projects);
                     deploymentOk = await ValidateDeployment(deployment, deployer);
                 } while (!deploymentOk);
             }
             else
             {
-                deployment = await PrepareEnvironmentDeployment(channel, environment, projects, all: true);
+                deployment = await PrepareEnvironmentDeployment(channel, defaultChannel, environment, projects, all: true);
                 if (!await ValidateDeployment(deployment, deployer)) return null;
             }
 
@@ -274,7 +274,7 @@ namespace OctoPlus.Console.Commands
             return projects;
         }
 
-        private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
+        private async Task<EnvironmentDeployment> InteractivePrompt(Channel channel, Channel defaultChannel, OctoPlusCore.Models.Environment environment, IList<Project> projects)
         {
             InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "DeployingTo"), channel.Name, environment.Name), languageProvider.GetString(LanguageSection.UiStrings, "PackageNotSelectable"), projects);
             var indexes = runner.GetSelectedIndexes();
@@ -285,12 +285,12 @@ namespace OctoPlus.Console.Commands
                 return null;
             }
 
-            var deployment = await PrepareEnvironmentDeployment(channel, environment, projects, indexes);
+            var deployment = await PrepareEnvironmentDeployment(channel, defaultChannel, environment, projects, indexes);
 
             return deployment;
         }
 
-        private async Task<EnvironmentDeployment> PrepareEnvironmentDeployment(Channel channel, OctoPlusCore.Models.Environment environment, IList<Project> projects, IEnumerable<int> indexes = null, bool all = false)
+        private async Task<EnvironmentDeployment> PrepareEnvironmentDeployment(Channel channel, Channel defaultChannel, OctoPlusCore.Models.Environment environment, IList<Project> projects, IEnumerable<int> indexes = null, bool all = false)
         {
             var deployment = new EnvironmentDeployment
             {
@@ -306,7 +306,7 @@ namespace OctoPlus.Console.Commands
                 {
                     if (project.AvailablePackages.Any())
                     {
-                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, project));
+                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, defaultChannel, project));
                     }
                 }
             }
@@ -318,7 +318,7 @@ namespace OctoPlus.Console.Commands
 
                     if (current.AvailablePackages.Any())
                     {
-                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, current));
+                        deployment.ProjectDeployments.Add(await GenerateProjectDeployment(channel, defaultChannel, current));
                     }
                 }
             }
@@ -326,7 +326,7 @@ namespace OctoPlus.Console.Commands
             return deployment;
         }
 
-        private async Task<ProjectDeployment> GenerateProjectDeployment(Channel channel, Project current)
+        private async Task<ProjectDeployment> GenerateProjectDeployment(Channel channel, Channel defaultChannel, Project current)
         {
 
             if(current.AvailablePackages == null)
@@ -335,6 +335,10 @@ namespace OctoPlus.Console.Commands
             }
 
             var projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, channel.Name);
+            if (defaultChannel != null && projectChannel == null)
+            {
+                projectChannel = await this.octoHelper.GetChannelByName(current.ProjectId, defaultChannel.Name);
+            }
             return new ProjectDeployment
             {
                 ProjectId = current.ProjectId,
@@ -346,9 +350,9 @@ namespace OctoPlus.Console.Commands
                     StepName = x.StepName
                 }).ToList(),
                 ChannelId = projectChannel?.Id,
-                ChannelVersionRange = channel?.VersionRange,
-                ChannelVersionTag = channel?.VersionTag,
-                ChannelName = channel?.Name,
+                ChannelVersionRange = projectChannel?.VersionRange,
+                ChannelVersionTag = projectChannel?.VersionTag,
+                ChannelName = projectChannel?.Name,
                 LifeCycleId = current.LifeCycleId,
                 RequiredVariables = current?.RequiredVariables?.Select(r => new RequiredVariableDeployment { Id = r.Id, ExtraOptions = r.ExtraOptions, Name = r.Name, Type = r.Type, Value = r.Value }).ToList()
             };
