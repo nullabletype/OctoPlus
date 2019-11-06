@@ -13,7 +13,7 @@ jobs:
                 command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release
             - run:
                 name: install-zip
-                command: apt install zip unzip
+                command: apt update && apt install zip unzip
             - run:
                 name: compress
                 command: zip -r "octoplus-latest.zip" "octoplus-release"
