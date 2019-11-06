@@ -11,9 +11,12 @@ jobs:
             - run:
                 name: publish
                 command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release
+            - run:
+                name: compress
+                command: Compress-Archive -Path "octoplus-release/*" -CompressionLevel Optimal -DestinationPath "octoplus-latest.zip"
             - store_artifacts:
-                path: octoplus-release/
-                destination: octoplus-release/
+                path: octoplus-latest.zip
+                destination: octoplus-latest.zip
 
     nuget-publish:
         docker:
