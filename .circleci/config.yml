@@ -16,7 +16,7 @@ jobs:
                 command: apt update && apt install zip unzip
             - run:
                 name: compress
-                command: zip -r "octoplus-latest.zip" "octoplus-release"
+                command: zip -r "octoplus-latest.zip" "octoplus-release/*"
             - store_artifacts:
                 path: octoplus-latest.zip
                 destination: octoplus-latest.zip
