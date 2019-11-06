@@ -55,5 +55,7 @@ namespace OctoPlusCore.VersionChecking.GitLab
             }
             set { }
         }
+
+        public IAsset[] Assets { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     }
 }

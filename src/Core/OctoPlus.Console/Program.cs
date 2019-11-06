@@ -143,7 +143,15 @@ namespace OctoPlus.Console
             System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NewVersionAvailable"));
             System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "CurrentVersion"), checkResult.Release.CurrentVersion));
             System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "NewVersion"), checkResult.Release.TagName));
-            System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "UpdateAvailableHere"), checkResult.Release.Url));
+            if (checkResult.Release.Assets != null && checkResult.Release.Assets.Any())
+            {
+                foreach(var asset in checkResult.Release.Assets)
+                System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "DownloadAvailableHere"), asset.Name, asset.DownloadUrl));
+            }
+            else
+            {
+                System.Console.WriteLine(string.Format(languageProvider.GetString(LanguageSection.UiStrings, "UpdateAvailableHere"), checkResult.Release.Url));
+            }
             if (!string.IsNullOrEmpty(checkResult.Release.ChangeLog)) {
                 System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "ChangeLog"));
                 System.Console.WriteLine(checkResult.Release.ChangeLog);

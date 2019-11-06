@@ -21,16 +21,16 @@
 #endregion
 
 
-namespace OctoPlusCore.VersionChecking
+using Newtonsoft.Json;
+
+namespace OctoPlusCore.VersionChecking.GitHub
 {
-    public interface IRelease
+    internal class Asset : IAsset
     {
-        string Url { get; set; }
-        string Name { get; set; }
-        string CurrentVersion { get; set; }
-        string TagName { get; set; }
-        bool PreRelease { get; set; }
-        string ChangeLog { get; set; }
-        IAsset[] Assets { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("browser_download_url")]
+        public string DownloadUrl { get; set; }
     }
 }

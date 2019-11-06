@@ -22,6 +22,7 @@
 
 
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace OctoPlusCore.VersionChecking.GitHub
 {
@@ -43,5 +44,10 @@ namespace OctoPlusCore.VersionChecking.GitHub
 
         [JsonProperty("body")]
         public string ChangeLog { get; set; }
+
+        [JsonProperty("assets")]
+        public Asset[] Assets { get; set; }
+
+        IAsset[] IRelease.Assets { get => this.Assets.Cast<IAsset>().ToArray(); set => this.Assets = value.Select(a => new Asset { DownloadUrl = a.DownloadUrl, Name = a.Name }).ToArray(); }
     }
 }

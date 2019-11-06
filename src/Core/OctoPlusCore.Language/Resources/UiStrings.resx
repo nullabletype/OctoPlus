@@ -321,4 +321,7 @@
   <data name="WhichEnvironmentPrompt" xml:space="preserve">
     <value>Which environment do you wish to deploy to?</value>
   </data>
+  <data name="DownloadAvailableHere" xml:space="preserve">
+    <value>Download {0} available here: {1}</value>
+  </data>
 </root>
