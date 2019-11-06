@@ -16,10 +16,10 @@ jobs:
                 command: apt update && apt install zip unzip
             - run:
                 name: compress
-                command: pushd octoplus-release && zip -r ..\octoplus-latest.zip * && popd
+                command: pushd octoplus-release && zip -r octoplus-latest.zip * && popd
             - store_artifacts:
-                path: octoplus-latest.zip
-                destination: octoplus-latest.zip
+                path: octoplus-release/octoplus-latest.zip
+                destination: octoplus-release/octoplus-latest.zip
 
     nuget-publish:
         docker:
