@@ -21,6 +21,7 @@
 #endregion
 
 
+using System;
 using System.Collections.Generic;
 
 namespace OctoPlusCore.Models
@@ -37,5 +38,7 @@ namespace OctoPlusCore.Models
         public string DisplayPackageVersion { get; set; }
         public string ReleaseNotes { get; set; }
         public List<PackageStub> SelectedPackages { get; set; }
+        public DateTimeOffset? LastModifiedOn { get; set; }
+        public string LastModifiedBy { get; set; }
     }
 }

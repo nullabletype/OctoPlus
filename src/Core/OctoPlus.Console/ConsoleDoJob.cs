@@ -93,6 +93,11 @@ namespace OctoPlus.Console {
                                 {
                                     var defaultChannel = await this.helper.GetChannelByName(project.ProjectId, configuration.DefaultChannel);
                                     defaultPackages = await this.helper.GetPackages(project.ProjectId, defaultChannel.VersionRange, defaultChannel.VersionTag);
+                                    //  We're now using the default channel, so update the project release to have the correct channel info for the deployment.
+                                    project.ChannelId = defaultChannel.Id;
+                                    project.ChannelName = defaultChannel.Name;
+                                    project.ChannelVersionRange = defaultChannel.VersionRange;
+                                    project.ChannelVersionTag = defaultChannel.VersionTag;
                                 }
                                 availablePackages = defaultPackages.Where(pack => pack.StepId == package.StepId);
                             }
@@ -143,7 +148,7 @@ namespace OctoPlus.Console {
         private async Task<bool> IsDeploymentRequired(EnvironmentDeployment job, ProjectDeployment project)
         {
             var needsDeploy = false;
-            var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
+            var currentRelease = (await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId)).Release;
             if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id))
             {
                 // Check if we have any packages that are different versions. If they're the same, we don't need to deploy.

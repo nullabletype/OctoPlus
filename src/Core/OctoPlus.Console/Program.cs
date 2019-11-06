@@ -160,7 +160,7 @@ namespace OctoPlus.Console
             .AddSingleton<IDeployer, Deployer>()
             .AddTransient<IChangeLogProvider, TeamCity>()
             .AddTransient<IWebRequestHelper, WebRequestHelper>()
-            .AddTransient<IVersionCheckingProvider, GitLabVersionChecker>()
+            .AddTransient<IVersionCheckingProvider, GitHubVersionChecker>()
             .AddTransient<IVersionChecker, VersionChecker>()
             .AddTransient<IConsoleDoJob, ConsoleDoJob>()
             .AddTransient<Deploy, Deploy>()
