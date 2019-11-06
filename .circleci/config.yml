@@ -12,8 +12,11 @@ jobs:
                 name: publish
                 command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release
             - run:
+                name: install-zip
+                command: apt install zip unzip
+            - run:
                 name: compress
-                command: Compress-Archive -Path "octoplus-release/*" -CompressionLevel Optimal -DestinationPath "octoplus-latest.zip"
+                command: zip -r "octoplus-latest.zip" "octoplus-release"
             - store_artifacts:
                 path: octoplus-latest.zip
                 destination: octoplus-latest.zip
