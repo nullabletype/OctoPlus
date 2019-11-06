@@ -197,7 +197,7 @@ namespace OctoPlusCore.Octopus
             return allPackages;
         }
 
-        public async Task<Release> GetReleasedVersion(string projectId, string envId) 
+        public async Task<(Release Release, Deployment Deployment)> GetReleasedVersion(string projectId, string envId) 
         {
             var deployment =
                 (await client.Repository.Deployments.FindOne(resource => Search(resource, projectId, envId), pathParameters: new { take = 1, projects = projectId, environments = envId }));
@@ -206,10 +206,10 @@ namespace OctoPlusCore.Octopus
                 var release = await GetReleaseInternal(deployment.ReleaseId);
                 if (release != null) 
                 {
-                    return await this.ConvertRelease(release);
+                    return (Release: await this.ConvertRelease(release), Deployment: this.ConvertDeployment(deployment));
                 }
             }
-            return new Release { Id = "", Version = "None" };
+            return (new Release { Id = "", Version = "None" }, new Deployment());
         }
 
         public async Task<bool> UpdateReleaseVariables(string releaseId)
@@ -688,7 +688,10 @@ namespace OctoPlusCore.Octopus
             {
                 EnvironmentId = dep.EnvironmentId,
                 ReleaseId = dep.ReleaseId,
-                TaskId = dep.TaskId
+                TaskId = dep.TaskId,
+                LastModifiedBy = dep.LastModifiedBy,
+                LastModifiedOn = dep.LastModifiedOn,
+                Created = dep.Created
             };
         }
 
@@ -698,7 +701,7 @@ namespace OctoPlusCore.Octopus
             var packages = channelRange == null ? null : await this.GetPackages(projectRes, channelRange, tag);
             List<RequiredVariable> requiredVariables = await GetVariables(projectRes.VariableSetId);
             return new Project {
-                CurrentRelease = await this.GetReleasedVersion(project.ProjectId, env),
+                CurrentRelease = (await this.GetReleasedVersion(project.ProjectId, env)).Release,
                 ProjectName = project.ProjectName,
                 ProjectId = project.ProjectId,
                 Checked = true,
@@ -715,7 +718,7 @@ namespace OctoPlusCore.Octopus
             List<RequiredVariable> requiredVariables = await GetVariables(project.VariableSetId);
             return new Project
             {
-                CurrentRelease = await this.GetReleasedVersion(project.Id, env),
+                CurrentRelease = (await this.GetReleasedVersion(project.Id, env)).Release,
                 ProjectName = project.Name,
                 ProjectId = project.Id,
                 Checked = true,
@@ -826,7 +829,10 @@ namespace OctoPlusCore.Octopus
                 Id = release.Id,
                 Version = release.Version,
                 SelectedPackages = packages,
-                DisplayPackageVersion = packages.Any() ? packages.First().Version : string.Empty
+                DisplayPackageVersion = packages.Any() ? packages.First().Version : string.Empty,
+                LastModifiedBy = release.LastModifiedBy,
+                LastModifiedOn = release.LastModifiedOn,
+                ReleaseNotes = release.ReleaseNotes
             };
         }
 

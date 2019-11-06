@@ -143,7 +143,7 @@ namespace OctoPlus.Console {
         private async Task<bool> IsDeploymentRequired(EnvironmentDeployment job, ProjectDeployment project)
         {
             var needsDeploy = false;
-            var currentRelease = await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId);
+            var currentRelease = (await this.helper.GetReleasedVersion(project.ProjectId, job.EnvironmentId)).Release;
             if (currentRelease != null && !string.IsNullOrEmpty(currentRelease.Id))
             {
                 // Check if we have any packages that are different versions. If they're the same, we don't need to deploy.

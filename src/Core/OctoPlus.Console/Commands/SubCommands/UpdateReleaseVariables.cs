@@ -97,7 +97,7 @@ namespace OctoPlus.Console.Commands.SubCommands
                     }
                 }
 
-                var release = await this.octoHelper.GetReleasedVersion(projectStub.ProjectId, environment.Id);
+                var release = (await this.octoHelper.GetReleasedVersion(projectStub.ProjectId, environment.Id)).Release;
                 if (release != null && !release.Version.Equals("none", StringComparison.InvariantCultureIgnoreCase))
                 {
                     toUpdate.Add(new ProjectRelease { Release = release, ProjectStub = projectStub});

@@ -31,6 +31,7 @@ using OctoPlus.Console.ConsoleTools;
 using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Language;
+using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;
 
 namespace OctoPlus.Console.Commands.SubCommands
@@ -77,9 +78,9 @@ namespace OctoPlus.Console.Commands.SubCommands
                         .Select(g => g.Id).ToList();
                 }
 
-                var releases = new List<OctoPlusCore.Models.Release>();
+                var releases = new List<(OctoPlusCore.Models.Release Release, Deployment Deployment)>();
 
-                var table = new ConsoleTable();
+                var table = new ConsoleTable("Project", "Release Name", "Packages", "Deployed On", "Deployed By");
 
                 foreach (var projectStub in projectStubs)
                 {
@@ -91,8 +92,9 @@ namespace OctoPlus.Console.Commands.SubCommands
                         }
                     }
 
-                    releases.Add(await octoHelper.GetReleasedVersion(projectStub.ProjectId, found.Id));
-                    
+                    var release = await octoHelper.GetReleasedVersion(projectStub.ProjectId, found.Id);
+
+                    table.AddRow(projectStub.ProjectName, release.Release.Version);
                 }
 
 

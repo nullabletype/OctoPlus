@@ -31,5 +31,8 @@ namespace OctoPlusCore.Models
         public string TaskId { get; set; }
         public string EnvironmentId { get; set; }
         public string ReleaseId { get; set; }
+        public DateTimeOffset? LastModifiedOn { get; set; }
+        public string LastModifiedBy { get; set; }
+        public DateTimeOffset? Created { get; set; }
     }
 }

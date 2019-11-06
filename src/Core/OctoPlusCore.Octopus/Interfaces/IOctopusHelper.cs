@@ -35,7 +35,7 @@ namespace OctoPlusCore.Octopus.Interfaces
     {
         void SetCacheImplementation(IMemoryCache cache, int cacheTimeout);
         Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag);
-        Task<Release> GetReleasedVersion(string projectId, string envId);
+        Task<(Release Release, Deployment Deployment)> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);
         Task<List<Environment>> GetEnvironments();
         Task<List<Environment>> GetMatchingEnvironments(string keyword, bool extactMatch = false);
