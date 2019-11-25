@@ -1,0 +1,87 @@
+name: .NET Core
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.0.101
+
+    - name: build
+      run: dotnet build -c Release src/Core/OctoPlus.sln
+    - name: publish-portable
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/portable /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-win-x64
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/win-x64 -r win-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-win-x32
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/win-x86 -r win-x86 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-linux-x64
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/linux-x64 -r linux-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-linux-arm
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/linux-arm -r linux-arm /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-mac-x64
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/osx-x64 -r osx-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+    - name: publish-debug-symbols
+      run: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o   /home/runner/work/octoplus-release/debug-symbols-tmp -r win-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true
+    - name: cp-debug-symbols-to-output
+      run: mkdir   /home/runner/work/octoplus-release/debug-symbols && cp   /home/runner/work/octoplus-release/debug-symbols-tmp/*.pdb   /home/runner/work/octoplus-release/debug-symbols
+    - name: install-zip
+      run: sudo apt update && sudo apt install zip unzip
+    - name: make-zip-dir
+      run: mkdir /home/runner/work/octoplus-release/zips
+    - name: compress-portable
+      run: pushd /home/runner/work/octoplus-release/portable && zip -r /home/runner/work/octoplus-release/zips/octoplus-portable.zip * && popd
+    - name: compress-win-x64
+      run: pushd /home/runner/work/octoplus-release/win-x64 && zip -r /home/runner/work/octoplus-release/zips/octoplus-win-x64.zip * && popd
+    - name: compress-win-x86
+      run: pushd /home/runner/work/octoplus-release/win-x86 && zip -r /home/runner/work/octoplus-release/zips/octoplus-win-x86.zip * && popd
+    - name: compress-linux-x64
+      run: pushd /home/runner/work/octoplus-release/linux-x64 && zip -r /home/runner/work/octoplus-release/zips/octoplus-linux-x64.zip * && popd
+    - name: compress-linux-arm
+      run: pushd /home/runner/work/octoplus-release/linux-arm && zip -r /home/runner/work/octoplus-release/zips/octoplus-linux-arm.zip * && popd
+    - name: compress-mac-x64
+      run: pushd /home/runner/work/octoplus-release/osx-x64 && zip -r /home/runner/work/octoplus-release/zips/octoplus-osx-x64.zip * && popd
+    - name: compress-debug
+      run: pushd /home/runner/work/octoplus-release/debug-symbols && zip -r /home/runner/work/octoplus-release/zips/octoplus-debug-symbols.zip * && popd
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-portable
+        path: /home/runner/work/octoplus-release/zips/octoplus-portable.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus--win-x64
+        path: /home/runner/work/octoplus-release/zips/octoplus-win-x64.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-win-x86
+        path: /home/runner/work/octoplus-release/zips/octoplus-win-x86.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-linux-x64
+        path: /home/runner/work/octoplus-release/zips/octoplus-linux-x64.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-linux-arm
+        path: /home/runner/work/octoplus-release/zips/octoplus-linux-arm.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-osx-x64
+        path: /home/runner/work/octoplus-release/zips/octoplus-osx-x64.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: octoplus-debug-symbol
+        path: /home/runner/work/octoplus-release/zips/octoplus-debug-symbols.zip
+    - name: test-for-powershell
+      run: pwsh $PSVersionTable.PSVersion
+    - name: send-nuget-packages
+      if: github.ref == 'refs/heads/master'
+      env:
+        NUGET_KEY: ${{ secrets.nuget_key }}
+      run: sudo src/Core/package.ps1 -nugetKey "$NUGET_KEY"

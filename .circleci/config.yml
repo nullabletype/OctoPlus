@@ -2,28 +2,69 @@ version: 2.0
 jobs:
     build:
         docker:
-            - image: microsoft/dotnet:latest
+            - image: mcr.microsoft.com/dotnet/core/sdk:3.0
         steps:
             - checkout
             - run:
                 name: build
                 command: dotnet build -c Release src/Core/OctoPlus.sln
             - run:
-                name: publish
-                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o ../../../octoplus-release
+                name: publish-portable
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/portable /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-win-x64
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/win-x64 -r win-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-win-x32
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/win-x86 -r win-x86 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-linux-x64
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/linux-x64 -r linux-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-linux-arm
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/linux-arm -r linux-arm /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-mac-x64
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/osx-x64 -r osx-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true /p:CopyOutputSymbolsToPublishDirectory=false
+            - run:
+                name: publish-debug-symbols
+                command: dotnet publish -c Release src/Core/OctoPlus.Console/OctoPlus.Console.csproj -o /octoplus-release/debug-symbols-tmp -r win-x64 /p:PublishSingleFile=true --self-contained true /p:PublishTrimmed=true
+            - run: 
+                name: cp-debug-symbols-to-output
+                command: mkdir /octoplus-release/debug-symbols && cp /octoplus-release/debug-symbols-tmp/*.pdb /octoplus-release/debug-symbols
             - run:
                 name: install-zip
                 command: apt update && apt install zip unzip
             - run:
-                name: compress
-                command: pushd octoplus-release && zip -r octoplus-latest.zip * && popd
+                name: make-zip-dir
+                command: mkdir /octoplus-release/zips
+            - run:
+                name: compress-portable
+                command: pushd /octoplus-release/portable && zip -r /octoplus-release/zips/octoplus-portable.zip * && popd
+            - run:
+                name: compress-win-x64
+                command: pushd /octoplus-release/win-x64 && zip -r /octoplus-release/zips/octoplus-win-x64.zip * && popd
+            - run:
+                name: compress-win-x86
+                command: pushd /octoplus-release/win-x86 && zip -r /octoplus-release/zips/octoplus-win-x86.zip * && popd
+            - run:
+                name: compress-linux-x64
+                command: pushd /octoplus-release/linux-x64 && zip -r /octoplus-release/zips/octoplus-linux-x64.zip * && popd
+            - run:
+                name: compress-linux-arm
+                command: pushd /octoplus-release/linux-arm && zip -r /octoplus-release/zips/octoplus-linux-arm.zip * && popd
+            - run:
+                name: compress-mac-x64
+                command: pushd /octoplus-release/osx-x64 && zip -r /octoplus-release/zips/octoplus-osx-x64.zip * && popd
+            - run:
+                name: compress-debug
+                command: pushd /octoplus-release/debug-symbols && zip -r /octoplus-release/zips/octoplus-debug-symbols.zip * && popd
             - store_artifacts:
-                path: octoplus-release/octoplus-latest.zip
-                destination: octoplus-release/octoplus-latest.zip
+                path: /octoplus-release/zips
 
     nuget-publish:
         docker:
-            - image: microsoft/dotnet:latest
+            - image: mcr.microsoft.com/dotnet/core/sdk:3.0
         steps:
             - checkout
             - run:
@@ -47,3 +88,15 @@ jobs:
             - run:
                 name: run-package-script
                 command: src/Core/package.ps1 -nugetKey "$NUGETKEY"
+
+workflows:
+    version: 2
+    build-and-publish:
+        jobs:
+            - build
+            - nuget-publish:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only: master

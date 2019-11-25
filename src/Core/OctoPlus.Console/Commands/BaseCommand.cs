@@ -67,7 +67,7 @@ namespace OctoPlus.Console.Commands {
             {
                 AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", languageProvider.GetString(LanguageSection.OptionsStrings, "InteractiveDeploy"), CommandOptionType.NoValue));
             }
-            command.OnExecute(async () =>
+            command.OnExecuteAsync(async cancellationToken =>
             {
                 if (this.SupportsInteractiveMode && GetOption(OptionNames.Interactive).HasValue())
                 {

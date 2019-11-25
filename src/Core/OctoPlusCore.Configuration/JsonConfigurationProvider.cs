@@ -30,6 +30,7 @@ using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Octopus;
 using OctoPlusCore.Logging;
 using OctoPlusCore.Language;
+using System.Diagnostics;
 
 namespace OctoPlusCore.Configuration
 {
@@ -37,7 +38,7 @@ namespace OctoPlusCore.Configuration
     {
         public JsonConfigurationProvider(ILanguageProvider languageProvider) : base(languageProvider) { }
 
-        private const string ConfigurationFileName = "config.json";
+        private readonly string ConfigurationFileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "config.json");
 
         public override async Task<ConfigurationLoadResult> LoadConfiguration()
         {
