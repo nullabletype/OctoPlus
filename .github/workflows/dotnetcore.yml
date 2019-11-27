@@ -78,8 +78,6 @@ jobs:
       with:
         name: octoplus-debug-symbol
         path: /home/runner/work/octoplus-release/zips/octoplus-debug-symbols.zip
-    - name: test-for-powershell
-      run: pwsh $PSVersionTable.PSVersion
     - name: send-nuget-packages
       if: github.ref == 'refs/heads/master'
       env:
