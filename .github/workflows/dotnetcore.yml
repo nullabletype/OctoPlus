@@ -1,4 +1,4 @@
-name: .NET Core
+name: OctoPlus Console Build
 
 on: [push]
 
