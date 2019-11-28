@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/nullabletype/OctoPlus/workflows/consolebuild/badge.svg)](https://github.com/nullabletype/OctoPlus/actions)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/nullabletype/OctoPlus/OctoPlus Console Build?logo=github)
 
 # octoplus
 OctoPlus deployment coordinator
