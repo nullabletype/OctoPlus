@@ -22,29 +22,27 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
-using PeterKottas.DotNetCore.WindowsService;
-using PeterKottas.DotNetCore.WindowsService.Interfaces;
+using OctoPlusCore.JobRunners.Interfaces;
+using OctoPlusCore.JobRunners.JobConfigs;
 
 namespace OctoPlus.Console.Commands.SubCommands
 {
-    class DeployWithProfileDirectory : BaseCommand, IMicroService
+    class DeployWithProfileDirectory : BaseCommand
     {
-        private readonly IConsoleDoJob _consoleDoJob;
+        private readonly IJobRunner _consoleDoJob;
+        private readonly DeployWithProfileDirectoryRunner _runner;
 
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profiledirectory";
 
-        public DeployWithProfileDirectory(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
+        public DeployWithProfileDirectory(IJobRunner consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider, DeployWithProfileDirectoryRunner runner) : base(octopusHelper, languageProvider)
         {
             this._consoleDoJob = consoleDoJob;
+            this._runner = runner;
         }
 
 
@@ -55,94 +53,41 @@ namespace OctoPlus.Console.Commands.SubCommands
             AddToRegister(DeployWithProfileDirectoryOptionNames.Directory, command.Option("-d|--directory", languageProvider.GetString(LanguageSection.OptionsStrings, "ProfileFileDirectory"), CommandOptionType.SingleValue).IsRequired().Accepts(v => v.LegalFilePath()));
             AddToRegister(DeployWithProfileDirectoryOptionNames.ForceRedeploy, command.Option("-r|--forceredeploy", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
             AddToRegister(DeployWithProfileDirectoryOptionNames.Monitor, command.Option("-m|--monitor", languageProvider.GetString(LanguageSection.OptionsStrings, "MonitorForPackages"), CommandOptionType.SingleValue).Accepts(v => v.RegularExpression("[0-9]*", languageProvider.GetString(LanguageSection.UiStrings, "ParameterNotANumber"))));
-
+            
             AddToRegister(DeployWithProfileDirectoryOptionNames.ActionInstall, command.Option("--actioninstall", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
             AddToRegister(DeployWithProfileDirectoryOptionNames.ActionRun, command.Option("--actionrun", languageProvider.GetString(LanguageSection.OptionsStrings, "ForceDeployOfSamePackage"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
+
+
             var profilePath = GetOption(DeployWithProfileDirectoryOptionNames.Directory).Value();
             System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "UsingProfileDirAtPath") + profilePath);
 
-            var option = GetOption(DeployWithProfileDirectoryOptionNames.Monitor);
-            bool run = option.HasValue();
-            int.TryParse(option.Value(), out int waitTime);
+            TryGetIntValueFromOption(DeployWithProfileDirectoryOptionNames.Monitor, out int waitTime);
+            var foreRedeploy = GetOption(DeployWithProfileDirectoryOptionNames.ForceRedeploy).HasValue();
 
-            try
+            var config = DeployWithProfileDirectoryConfig.Create(languageProvider, profilePath, waitTime, foreRedeploy);
+
+            if (config.IsFailure)
             {
-                if (!Directory.Exists(profilePath))
+                System.Console.WriteLine(config.Error);
+                return -1;
+            } 
+            else
+            {
+                try
                 {
-                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "PathDoesntExist"));
-                    return -1;
+                    await _runner.Run(config.Value);
                 }
-
-                if (run)
+                catch (Exception e)
                 {
-                    ServiceRunner<DeployWithProfileDirectory>.Run(config =>
-                    {
-                        var name = config.GetDefaultName();
-                        config.SetName("OctoPlus.Service");
-                        config.SetDisplayName("OctoPlus.Service");
-                        config.SetDescription("");
-                        config.Service(serviceConfig =>
-                        {
-                            serviceConfig.ServiceFactory((extraArguements, controller) =>
-                            {
-                                return this;
-                            });
-
-                            serviceConfig.OnStart((service, extraParams) =>
-                            {
-                                System.Console.WriteLine("Service {0} started", name);
-                                service.Start();
-                                RunProfiles(profilePath, run, waitTime).Start();
-                            });
-
-                        });
-                    });
-                }
-                else
-                {
-                    await RunProfiles(profilePath, run, waitTime);
+                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "UnexpectedError"), e.Message));
                 }
             }
-            catch (Exception e)
-            {
-                System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "UnexpectedError"), e.Message));
-            }
 
-            
             return 0;
-        }
-
-        private async Task RunProfiles(string profilePath, bool run, int waitTIme)
-        {
-            do
-            {
-                foreach (var file in Directory.GetFiles(profilePath, "*auto.profile"))
-                {
-                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "DeployingUsingConfig"), file));
-                    await this._consoleDoJob.StartJob(file, null, null, GetOption(DeployWithProfileDirectoryOptionNames.ForceRedeploy).HasValue());
-                }
-
-                if (run)
-                {
-                    System.Console.WriteLine(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "SleepingForSeconds"), waitTIme));
-                    await Task.Delay(waitTIme * 1000);
-                }
-
-            } while (run);
-        }
-
-        public void Start()
-        {
-            
-        }
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
         }
 
         struct DeployWithProfileDirectoryOptionNames

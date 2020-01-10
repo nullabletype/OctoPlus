@@ -115,6 +115,27 @@ namespace OctoPlus.Console.Commands {
             return string.Empty;
         }
 
+        public bool GetBoolValueFromOption(string key)
+        {
+            var option = GetOption(key);
+            if (option.HasValue())
+            {
+                return option.HasValue();
+            }
+            return false;
+        }
+
+        public bool TryGetIntValueFromOption(string key, out int value)
+        {
+            var option = GetOption(key);
+            value = 0;
+            if (option.HasValue())
+            {
+                return Int32.TryParse(option.Value(), out value);
+            }
+            return false;
+        }
+
         protected string GetStringFromUser(string optionName, string prompt, bool allowEmpty = false)
         {
             var option = GetStringValueFromOption(optionName);

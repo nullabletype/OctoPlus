@@ -23,9 +23,9 @@
 
 using System.Threading.Tasks;
 
-namespace OctoPlus.Console.Interfaces
+namespace OctoPlusCore.JobRunners.Interfaces
 {
-    public interface IConsoleDoJob
+    public interface IJobRunner
     {
         Task StartJob(string pathToProfile, string message, string releaseVersion, bool forceDeploymentIfSamePackage);
     }

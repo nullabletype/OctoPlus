@@ -22,20 +22,15 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
-using OctoPlusCore.Models;
 using OctoPlusCore.Models.Variables;
 using OctoPlusCore.Language;
 
-namespace OctoPlus.Console.Commands.SubCommands 
+namespace OctoPlus.Console.Commands.SubCommands
 {
     partial class VariablesWithProfile : BaseCommand
     {

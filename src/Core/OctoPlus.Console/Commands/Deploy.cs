@@ -23,7 +23,6 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
@@ -39,12 +38,13 @@ using System.IO;
 using OctoPlusCore;
 using OctoPlusCore.Language;
 using System.Resources;
+using OctoPlusCore.JobRunners.Interfaces;
 
 namespace OctoPlus.Console.Commands
 {
     class Deploy : BaseCommand {
 
-        private IConsoleDoJob consoleDoJob;
+        private IJobRunner consoleDoJob;
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
@@ -55,7 +55,7 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "deploy";
 
-        public Deploy(IConsoleDoJob consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
+        public Deploy(IJobRunner consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
             this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;

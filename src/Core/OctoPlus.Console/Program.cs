@@ -24,7 +24,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using OctoPlus.Console.Commands;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.ChangeLogs.Interfaces;
 using OctoPlusCore.ChangeLogs.TeamCity;
 using OctoPlusCore.Configuration;
@@ -47,6 +46,7 @@ using System.Linq;
 using System.IO;
 using OctoPlusCore.VersionChecking.GitLab;
 using OctoPlusCore.Language;
+using OctoPlusCore.JobRunners.Interfaces;
 
 namespace OctoPlus.Console
 {
@@ -170,7 +170,7 @@ namespace OctoPlus.Console
             .AddTransient<IWebRequestHelper, WebRequestHelper>()
             .AddTransient<IVersionCheckingProvider, GitHubVersionChecker>()
             .AddTransient<IVersionChecker, VersionChecker>()
-            .AddTransient<IConsoleDoJob, ConsoleDoJob>()
+            .AddTransient<IJobRunner, ConsoleJobRunner>()
             .AddTransient<Deploy, Deploy>()
             .AddTransient<Promote, Promote>()
             .AddTransient<Release, Release>()
@@ -185,9 +185,10 @@ namespace OctoPlus.Console
             .AddTransient<Variable, Variable>()
             .AddTransient<VariablesWithProfile, VariablesWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
-            .AddTransient<IUiLogger, ConsoleDoJob>()
+            .AddTransient<IUiLogger, ConsoleJobRunner>()
             .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache()
-            .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache();
+            .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache()
+            .AddTransient<DeployWithProfileDirectoryRunner, DeployWithProfileDirectoryRunner>();
         }
     }
 }

@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Models;
 using OctoPlusCore.Logging.Interfaces;
@@ -36,9 +35,10 @@ using OctoPlus.Console.ConsoleTools;
 using System.Text;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Language;
+using OctoPlusCore.JobRunners.Interfaces;
 
 namespace OctoPlus.Console {
-    public class ConsoleDoJob : IUiLogger, IConsoleDoJob
+    public class ConsoleJobRunner : IUiLogger, IJobRunner
     {
         private IDeployer deployer;
         private readonly IOctopusHelper helper;
@@ -46,7 +46,7 @@ namespace OctoPlus.Console {
         private IConfiguration configuration;
         private ILanguageProvider languageProvider;
 
-        public ConsoleDoJob(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration, ILanguageProvider languageProvider)
+        public ConsoleJobRunner(IOctopusHelper helper, IDeployer deployer, IProgressBar progressBar, IConfiguration configuration, ILanguageProvider languageProvider)
         {
             this.helper = helper;
             this.deployer = deployer;

@@ -38,11 +38,16 @@ namespace OctoPlusCore.Configuration
     {
         public JsonConfigurationProvider(ILanguageProvider languageProvider) : base(languageProvider) { }
 
-        private readonly string ConfigurationFileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "config.json");
+        private string ConfigurationFileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "config.json");
 
         public override async Task<ConfigurationLoadResult> LoadConfiguration()
         {
             var loadResult = new ConfigurationLoadResult();
+            if(!File.Exists(ConfigurationFileName))
+            {
+                ConfigurationFileName = "config.json";
+            }
+
             if (!File.Exists(ConfigurationFileName))
             {
                 var sampleConfig = this.GetSampleConfig();

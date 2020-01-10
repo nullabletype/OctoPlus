@@ -21,12 +21,9 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using OctoPlus.Console.Interfaces;
+using OctoPlusCore.JobRunners.Interfaces;
 using OctoPlusCore.Language;
 using OctoPlusCore.Octopus.Interfaces;
 
@@ -34,12 +31,12 @@ namespace OctoPlus.Console.Commands.SubCommands
 {
     class DeployWithProfile : BaseCommand
     {
-        private readonly IConsoleDoJob _consoleDoJob;
+        private readonly IJobRunner _consoleDoJob;
 
         protected override bool SupportsInteractiveMode => false;
         public override string CommandName => "profile";
 
-        public DeployWithProfile(IConsoleDoJob consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
+        public DeployWithProfile(IJobRunner consoleDoJob, IOctopusHelper octopusHelper, ILanguageProvider languageProvider) : base(octopusHelper, languageProvider)
         {
             this._consoleDoJob = consoleDoJob;
         }

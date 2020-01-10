@@ -23,7 +23,6 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
-using OctoPlus.Console.Interfaces;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Deployment.Interfaces;
 using OctoPlusCore.Language;
