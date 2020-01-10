@@ -21,7 +21,7 @@
 #endregion
 
 
-namespace OctoPlus.Console.ConsoleTools {
+namespace OctoPlusCore.Interfaces {
     public interface IProgressBar {
         void CleanCurrentLine();
         void WriteProgress(int current, int total, string message);

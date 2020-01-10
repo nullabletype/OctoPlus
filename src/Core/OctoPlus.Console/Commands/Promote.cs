@@ -23,37 +23,31 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using OctoPlus.Console.ConsoleTools;
-using OctoPlusCore.Configuration.Interfaces;
-using OctoPlusCore.Deployment.Interfaces;
+using OctoPlusCore.Interfaces;
+using OctoPlusCore.JobRunners;
+using OctoPlusCore.JobRunners.JobConfigs;
 using OctoPlusCore.Language;
-using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Models;
-using OctoPlusCore.Octopus;
 using OctoPlusCore.Octopus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OctoPlus.Console.Commands
 {
     internal class Promote : BaseCommand
     {
-        private IConfiguration configuration;
-        private IDeployer deployer;
-        private IUiLogger uilogger;
         private IProgressBar progressBar;
+        private PromotionRunner runner;
 
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "promote";
 
-        public Promote(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
+        public Promote(IOctopusHelper octoHelper, IProgressBar progressBar, ILanguageProvider languageProvider, PromotionRunner runner) : base(octoHelper, languageProvider)
         {
-            this.configuration = configuration;
-            this.deployer = deployer;
-            this.uilogger = uilogger;
             this.progressBar = progressBar;
+            this.runner = runner;
         }
         
         public override void Configure(CommandLineApplication command)
@@ -84,144 +78,24 @@ namespace OctoPlus.Console.Commands
                 return -2;
             }
 
-            var groupIds = new List<string>();
-            if (!string.IsNullOrEmpty(groupRestriction))
+            var configResult = PromotionConfig.Create(targetEnvironment, environment, groupRestriction, true);
+
+            if (configResult.IsFailure)
             {
-                progressBar.WriteStatusLine(languageProvider.GetString(LanguageSection.UiStrings, "GettingGroupInfo"));
-                groupIds =
-                    (await octoHelper.GetFilteredProjectGroups(groupRestriction))
-                    .Select(g => g.Id).ToList();
-            }
-
-            progressBar.CleanCurrentLine();
-
-            var (projects, targetProjects) = await GenerateProjectList(projectStubs, groupRestriction, groupIds, environment, targetEnvironment);
-
-            progressBar.CleanCurrentLine();
-
-            var deployment = await GenerateDeployment(environment, targetEnvironment, projects, targetProjects);
-
-            if (deployment == null)
+                System.Console.WriteLine(configResult.Error);
+                return -1;
+            } 
+            else 
             {
-                return -2;
+                return await runner.Run(configResult.Value, this.progressBar, InteractivePrompt, PromptForStringWithoutQuitting);
             }
-
-            await this.deployer.StartJob(deployment, this.uilogger);
-
-            return 0;
         }
 
-        private async Task<EnvironmentDeployment> GenerateDeployment(OctoPlusCore.Models.Environment environment, OctoPlusCore.Models.Environment targetEnvironment, List<Project> projects,
-            List<Project> targetProjects)
+
+        private IEnumerable<int> InteractivePrompt(PromotionConfig config, List<Project> projects, List<Project> targetProjects)
         {
-            var deploymentOk = false;
-            EnvironmentDeployment deployment;
-
-            do
-            {
-                deployment = InteractivePrompt(environment, targetEnvironment, projects, targetProjects);
-                if (deployment == null)
-                {
-                    return deployment;
-                }
-
-                var result = await this.deployer.CheckDeployment(deployment);
-                if (result.Success)
-                {
-                    deploymentOk = true;
-                }
-                else
-                {
-                    System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "Error") + result.ErrorMessage);
-                }
-            } while (!deploymentOk);
-
-            FillRequiredVariables(deployment.ProjectDeployments);
-
-            return deployment;
-        }
-
-        private async Task<(List<Project> projects, List<Project> targetProjects)> GenerateProjectList(List<ProjectStub> projectStubs, string groupRestriction, List<string> groupIds, OctoPlusCore.Models.Environment environment,
-            OctoPlusCore.Models.Environment targetEnvironment)
-        {
-            var projects = new List<Project>();
-            var targetProjects = new List<Project>();
-
-            foreach (var projectStub in projectStubs)
-            {
-                progressBar.WriteProgress(projectStubs.IndexOf(projectStub) + 1, projectStubs.Count(),
-                    String.Format(languageProvider.GetString(LanguageSection.UiStrings, "LoadingInfoFor"), projectStub.ProjectName));
-                if (!string.IsNullOrEmpty(groupRestriction))
-                {
-                    if (!groupIds.Contains(projectStub.ProjectGroupId))
-                    {
-                        continue;
-                    }
-                }
-
-                var project = await octoHelper.ConvertProject(projectStub, environment.Id, null, null);
-                var targetProject = await octoHelper.ConvertProject(projectStub, targetEnvironment.Id, null, null);
-
-                var currentRelease = project.CurrentRelease;
-                var currentTargetRelease = targetProject.CurrentRelease;
-                if (currentRelease == null)
-                {
-                    continue;
-                }
-
-                if (currentTargetRelease != null && currentTargetRelease.Id == currentRelease.Id)
-                {
-                    project.Checked = false;
-                }
-                else
-                {
-                    project.Checked = true;
-                }
-
-                projects.Add(project);
-                targetProjects.Add(targetProject);
-            }
-
-            return (projects, targetProjects);
-        }
-
-        private EnvironmentDeployment InteractivePrompt(OctoPlusCore.Models.Environment environment, OctoPlusCore.Models.Environment targetEnvironment, IList<Project> projects, IList<Project> targetProjects)
-        {
-            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "PromotingTo"), environment.Name, targetEnvironment.Name), projects, targetProjects);
-            var indexes = runner.GetSelectedIndexes();
-
-            if (!indexes.Any())
-            {
-                System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "NothingSelected"));
-                return null;
-            }
-
-            var deployment = new EnvironmentDeployment
-            {
-                ChannelName = string.Empty,
-                DeployAsync = true,
-                EnvironmentId = targetEnvironment.Id,
-                EnvironmentName = targetEnvironment.Name
-            };
-
-            foreach (var index in indexes)
-            {
-                var current = projects[index];
-                var currentTarget = targetProjects[index];
-
-                if (current.CurrentRelease != null)
-                {
-                    deployment.ProjectDeployments.Add(new ProjectDeployment
-                    {
-                        ProjectId = currentTarget.ProjectId,
-                        ProjectName = currentTarget.ProjectName,
-                        LifeCycleId = currentTarget.LifeCycleId,
-                        ReleaseId = current.CurrentRelease.Id
-                    });
-                }
-            }
-
-            return deployment;
+            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "PromotingTo"), config.SourceEnvironment.Name, config.DestinationEnvironment.Name), projects, targetProjects);
+            return runner.GetSelectedIndexes();
         }
 
         private InteractiveRunner PopulateRunner(string prompt, IList<Project> projects, IList<Project> targetProjects)

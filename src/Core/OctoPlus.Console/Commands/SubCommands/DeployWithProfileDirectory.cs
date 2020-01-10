@@ -60,8 +60,6 @@ namespace OctoPlus.Console.Commands.SubCommands
 
         protected override async Task<int> Run(CommandLineApplication command)
         {
-
-
             var profilePath = GetOption(DeployWithProfileDirectoryOptionNames.Directory).Value();
             System.Console.WriteLine(languageProvider.GetString(LanguageSection.UiStrings, "UsingProfileDirAtPath") + profilePath);
 

@@ -39,6 +39,7 @@ using OctoPlusCore;
 using OctoPlusCore.Language;
 using System.Resources;
 using OctoPlusCore.JobRunners.Interfaces;
+using OctoPlusCore.Interfaces;
 
 namespace OctoPlus.Console.Commands
 {

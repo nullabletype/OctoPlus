@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using NuGet.Versioning;
 using OctoPlus.Console.ConsoleTools;
+using OctoPlusCore.Interfaces;
 using OctoPlusCore.Language;
 using OctoPlusCore.Models;
 using OctoPlusCore.Octopus.Interfaces;

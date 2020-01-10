@@ -36,6 +36,7 @@ using System.Text;
 using OctoPlusCore.Configuration.Interfaces;
 using OctoPlusCore.Language;
 using OctoPlusCore.JobRunners.Interfaces;
+using OctoPlusCore.Interfaces;
 
 namespace OctoPlus.Console {
     public class ConsoleJobRunner : IUiLogger, IJobRunner

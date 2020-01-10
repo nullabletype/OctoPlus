@@ -47,6 +47,8 @@ using System.IO;
 using OctoPlusCore.VersionChecking.GitLab;
 using OctoPlusCore.Language;
 using OctoPlusCore.JobRunners.Interfaces;
+using OctoPlusCore.Interfaces;
+using OctoPlusCore.JobRunners;
 
 namespace OctoPlus.Console
 {
@@ -186,9 +188,10 @@ namespace OctoPlus.Console
             .AddTransient<VariablesWithProfile, VariablesWithProfile>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleJobRunner>()
-            .AddTransient<IProgressBar, ProgressBar>().AddMemoryCache()
+            .AddTransient<IProgressBar, ConsoleProgressBar>().AddMemoryCache()
             .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache()
-            .AddTransient<DeployWithProfileDirectoryRunner, DeployWithProfileDirectoryRunner>();
+            .AddTransient<DeployWithProfileDirectoryRunner, DeployWithProfileDirectoryRunner>()
+            .AddTransient<PromotionRunner, PromotionRunner>();
         }
     }
 }

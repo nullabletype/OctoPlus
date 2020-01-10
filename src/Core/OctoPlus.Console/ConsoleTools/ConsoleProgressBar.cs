@@ -21,12 +21,13 @@
 #endregion
 
 
+using OctoPlusCore.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace OctoPlus.Console.ConsoleTools {
-    internal class ProgressBar : IProgressBar {
+    internal class ConsoleProgressBar : IProgressBar {
 
         private int status = 0;
         private string[] clocks = new string[] {"\\", "|", "/", "-"};
