@@ -34,14 +34,14 @@ namespace OctoPlusCore.JobRunners
             this.uiLogger = uiLogger;
         }
 
-        public async Task<int> Run(PromotionConfig config, IProgressBar progressBar, Func<PromotionConfig, List<Project>, List<Project>, IEnumerable<int>> setDeploymentProjects, Func<string, string> userPrompt)
+        public async Task<int> Run(PromotionConfig config, IProgressBar progressBar, Func<PromotionConfig, (List<Project> currentProjects, List<Project> targetProjects), IEnumerable<int>> setDeploymentProjects, Func<string, string> userPrompt)
         {
             this._currentConfig = config;
             this.progressBar = progressBar;
 
             var (projects, targetProjects) = await GenerateProjectList();
 
-            var indexes = setDeploymentProjects(_currentConfig, projects, targetProjects);
+            var indexes = setDeploymentProjects(_currentConfig, (projects, targetProjects));
 
             var deployment = GenerateEnvironmentDeployment(indexes, projects, targetProjects);
 

@@ -92,9 +92,9 @@ namespace OctoPlus.Console.Commands
         }
 
 
-        private IEnumerable<int> InteractivePrompt(PromotionConfig config, List<Project> projects, List<Project> targetProjects)
+        private IEnumerable<int> InteractivePrompt(PromotionConfig config, (List<Project> currentProjects, List<Project> targetProjects) projects)
         {
-            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "PromotingTo"), config.SourceEnvironment.Name, config.DestinationEnvironment.Name), projects, targetProjects);
+            InteractiveRunner runner = PopulateRunner(String.Format(languageProvider.GetString(LanguageSection.UiStrings, "PromotingTo"), config.SourceEnvironment.Name, config.DestinationEnvironment.Name), projects.currentProjects, projects.targetProjects);
             return runner.GetSelectedIndexes();
         }
 

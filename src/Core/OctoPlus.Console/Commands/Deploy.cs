@@ -45,7 +45,6 @@ namespace OctoPlus.Console.Commands
 {
     class Deploy : BaseCommand {
 
-        private IJobRunner consoleDoJob;
         private IConfiguration configuration;
         private IDeployer deployer;
         private IUiLogger uilogger;
@@ -56,9 +55,8 @@ namespace OctoPlus.Console.Commands
         protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "deploy";
 
-        public Deploy(IJobRunner consoleDoJob, IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
+        public Deploy(IConfiguration configuration, IOctopusHelper octoHelper, IDeployer deployer, IUiLogger uilogger, DeployWithProfile profile, DeployWithProfileDirectory profileDir, IProgressBar progressBar, ILanguageProvider languageProvider) : base(octoHelper, languageProvider)
         {
-            this.consoleDoJob = consoleDoJob;
             this.configuration = configuration;
             this.deployer = deployer;
             this.uilogger = uilogger;
