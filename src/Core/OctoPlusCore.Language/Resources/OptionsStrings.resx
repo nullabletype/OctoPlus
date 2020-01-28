@@ -165,6 +165,9 @@
   <data name="MonitorForPackages" xml:space="preserve">
     <value>Stay running monitoring for package updates, pausing for the specified time in seconds</value>
   </data>
+  <data name="NoPrompt" xml:space="preserve">
+    <value>Run without any interaction</value>
+  </data>
   <data name="PhaseNumber" xml:space="preserve">
     <value>Phase number</value>
   </data>

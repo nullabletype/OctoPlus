@@ -191,7 +191,8 @@ namespace OctoPlus.Console
             .AddTransient<IProgressBar, ConsoleProgressBar>().AddMemoryCache()
             .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache()
             .AddTransient<DeployWithProfileDirectoryRunner, DeployWithProfileDirectoryRunner>()
-            .AddTransient<PromotionRunner, PromotionRunner>();
+            .AddTransient<PromotionRunner, PromotionRunner>()
+            .AddTransient<DeployRunner, DeployRunner>();
         }
     }
 }

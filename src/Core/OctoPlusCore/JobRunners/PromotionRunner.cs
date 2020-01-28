@@ -41,31 +41,38 @@ namespace OctoPlusCore.JobRunners
 
             var (projects, targetProjects) = await GenerateProjectList();
 
-            var indexes = setDeploymentProjects(_currentConfig, (projects, targetProjects));
+            List<int> indexes = new List<int>();
+
+            if (config.RunningInteractively)
+            {
+                indexes.AddRange(setDeploymentProjects(_currentConfig, (projects, targetProjects)));
+            }
+            else 
+            {
+                for (int i = 0; i < projects.Count(); i++)
+                {
+                    if (projects[i].Checked)
+                    {
+                        indexes.Add(i);
+                    }
+                }
+            }
 
             var deployment = GenerateEnvironmentDeployment(indexes, projects, targetProjects);
 
-            var deploymentOk = false;
-
-            do
+            if (deployment == null)
             {
-                if (deployment == null)
-                {
-                    return -1;
-                }
+                return -1;
+            }
 
-                var result = await this.deployer.CheckDeployment(deployment);
-                if (result.Success)
-                {
-                    deploymentOk = true;
-                }
-                else
-                {
-                    Console.WriteLine(_languageProvider.GetString(LanguageSection.UiStrings, "Error") + result.ErrorMessage);
-                }
-            } while (!deploymentOk);
+            var result = await this.deployer.CheckDeployment(deployment);
+            if (!result.Success)
+            {
+                Console.WriteLine(_languageProvider.GetString(LanguageSection.UiStrings, "Error") + result.ErrorMessage);
+                return -1;
+            }
 
-            FillRequiredVariables(deployment.ProjectDeployments, userPrompt);
+            deployer.FillRequiredVariables(deployment.ProjectDeployments, userPrompt, _currentConfig.RunningInteractively);
 
             await this.deployer.StartJob(deployment, this.uiLogger);
 
@@ -162,30 +169,9 @@ namespace OctoPlusCore.JobRunners
                 targetProjects.Add(targetProject);
             }
 
+            progressBar.CleanCurrentLine();
+
             return (projects, targetProjects);
-        }
-
-        protected void FillRequiredVariables(List<ProjectDeployment> projects, Func<string, string> userPrompt)
-        {
-            foreach (var project in projects)
-            {
-                if (project.RequiredVariables != null)
-                {
-                    foreach (var requirement in project.RequiredVariables)
-                    {
-                        do
-                        {
-                            var prompt = String.Format(_languageProvider.GetString(LanguageSection.UiStrings, "VariablePrompt"), requirement.Name, project.ProjectName);
-                            if (!string.IsNullOrEmpty(requirement.ExtraOptions))
-                            {
-                                prompt = prompt + String.Format(_languageProvider.GetString(LanguageSection.UiStrings, "VariablePromptAllowedValues"), requirement.ExtraOptions);
-                            }
-                            requirement.Value = userPrompt(prompt);
-                        } while (_currentConfig.RunningInteractively && string.IsNullOrEmpty(requirement.Value));
-                    }
-
-                }
-            }
         }
     }
 }

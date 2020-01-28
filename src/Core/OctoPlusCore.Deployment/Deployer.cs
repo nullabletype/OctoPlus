@@ -35,17 +35,20 @@ using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Octopus.Interfaces;
 using OctoPlusCore.Utilities;
 using OctoPlusCore.Deployment.Resources;
+using OctoPlusCore.Language;
 
 namespace OctoPlusCore.Deployment {
     public class Deployer : IDeployer
     {
         private IOctopusHelper helper;
         private IConfiguration configuration;
+        private ILanguageProvider languageProvider;
 
-        public Deployer(IOctopusHelper helper, IConfiguration configuration)
+        public Deployer(IOctopusHelper helper, IConfiguration configuration, ILanguageProvider languageProvider)
         {
             this.helper = helper;
             this.configuration = configuration;
+            this.languageProvider = languageProvider;
         }
 
         public async Task<DeploymentCheckResult> CheckDeployment(EnvironmentDeployment deployment)
@@ -279,6 +282,33 @@ namespace OctoPlusCore.Deployment {
             } else 
             {
                 uiLogger.WriteLine("Currently queued... waiting");
+            }
+        }
+
+        public void FillRequiredVariables(List<ProjectDeployment> projects, Func<string, string> userPrompt, bool runningInteractively)
+        {
+            if (!runningInteractively)
+            {
+                return;
+            }
+            foreach (var project in projects)
+            {
+                if (project.RequiredVariables != null)
+                {
+                    foreach (var requirement in project.RequiredVariables)
+                    {
+                        do
+                        {
+                            var prompt = String.Format(languageProvider.GetString(LanguageSection.UiStrings, "VariablePrompt"), requirement.Name, project.ProjectName);
+                            if (!string.IsNullOrEmpty(requirement.ExtraOptions))
+                            {
+                                prompt = prompt + String.Format(languageProvider.GetString(LanguageSection.UiStrings, "VariablePromptAllowedValues"), requirement.ExtraOptions);
+                            }
+                            requirement.Value = userPrompt(prompt);
+                        } while (string.IsNullOrEmpty(requirement.Value));
+                    }
+
+                }
             }
         }
     }

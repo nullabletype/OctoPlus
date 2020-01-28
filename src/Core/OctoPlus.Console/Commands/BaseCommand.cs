@@ -65,11 +65,11 @@ namespace OctoPlus.Console.Commands {
             AddToRegister(OptionNames.Url, command.Option("-u|--url", languageProvider.GetString(LanguageSection.OptionsStrings, "Url"), CommandOptionType.SingleValue));
             if (this.SupportsInteractiveMode)
             {
-                AddToRegister(OptionNames.Interactive, command.Option("-i|--interactive", languageProvider.GetString(LanguageSection.OptionsStrings, "InteractiveDeploy"), CommandOptionType.NoValue));
+                AddToRegister(OptionNames.NoPrompt, command.Option("-n|--noprompt", languageProvider.GetString(LanguageSection.OptionsStrings, "InteractiveDeploy"), CommandOptionType.NoValue));
             }
             command.OnExecuteAsync(async cancellationToken =>
             {
-                if (this.SupportsInteractiveMode && GetOption(OptionNames.Interactive).HasValue())
+                if (this.SupportsInteractiveMode && !GetOption(OptionNames.NoPrompt).HasValue())
                 {
                     SetInteractiveMode((true));
                 }
@@ -247,7 +247,7 @@ namespace OctoPlus.Console.Commands {
 
         public struct OptionNames
         {
-            public const string Interactive = "interactive";
+            public const string NoPrompt = "noprompt";
             public const string ApiKey = "apikey";
             public const string Url = "url";
             public const string ReleaseName = "ReleaseName";

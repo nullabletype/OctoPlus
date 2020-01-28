@@ -78,7 +78,7 @@ namespace OctoPlus.Console.Commands
                 return -2;
             }
 
-            var configResult = PromotionConfig.Create(targetEnvironment, environment, groupRestriction, true);
+            var configResult = PromotionConfig.Create(targetEnvironment, environment, groupRestriction, this.InInteractiveMode);
 
             if (configResult.IsFailure)
             {

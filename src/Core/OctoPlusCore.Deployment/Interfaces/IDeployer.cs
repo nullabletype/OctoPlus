@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 using OctoPlusCore.Models.Interfaces;
 using OctoPlusCore.Logging.Interfaces;
 using OctoPlusCore.Models;
+using System.Collections.Generic;
+using System;
 
 namespace OctoPlusCore.Deployment.Interfaces
 {
@@ -32,5 +34,6 @@ namespace OctoPlusCore.Deployment.Interfaces
     {
         Task StartJob(IOctoJob job, IUiLogger uiLogger, bool suppressMessages = false);
         Task<DeploymentCheckResult> CheckDeployment(EnvironmentDeployment deployment);
+        void FillRequiredVariables(List<ProjectDeployment> projects, Func<string, string> userPrompt, bool runningInteractively);
     }
 }

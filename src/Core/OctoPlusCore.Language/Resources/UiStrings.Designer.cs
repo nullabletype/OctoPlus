@@ -70,6 +70,15 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Building deployment job for {0}.
+        /// </summary>
+        internal static string BuildingDeploymentJob {
+            get {
+                return ResourceManager.GetString("BuildingDeploymentJob", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ChangeLog:.
         /// </summary>
         internal static string ChangeLog {

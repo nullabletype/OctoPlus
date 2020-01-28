@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OctoPlusCore.Configuration\OctoPlusCore.Configuration.csproj" />
+    <ProjectReference Include="..\OctoPlusCore.Language\OctoPlusCore.Language.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Models\OctoPlusCore.Deployment.Models.csproj" />
     <ProjectReference Include="..\OctoPlusCore.Octopus\OctoPlusCore.Octopus.csproj" />
   </ItemGroup>

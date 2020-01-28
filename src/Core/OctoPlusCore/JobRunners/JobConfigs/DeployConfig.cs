@@ -13,12 +13,14 @@ namespace OctoPlusCore.JobRunners.JobConfigs
         public Models.Environment Environment { get; private set; }
         public string GroupFilter { get; private set; }
         public bool RunningInteractively { get; private set; }
+        public bool ForceRedeploy { get; private set; }
         public string SaveProfile { get; private set; }
+        public string ReleaseName { get; private set; }
         public bool FallbackToDefaultChannel => DefaultFallbackChannel != null;
 
         private DeployConfig() { }
 
-        public static Result<DeployConfig> Create (Models.Environment env, Models.Channel channel, Models.Channel defaultFallbackChannel, string filter, string saveProfile, bool runningInteractively)
+        public static Result<DeployConfig> Create (Models.Environment env, Models.Channel channel, Models.Channel defaultFallbackChannel, string filter, string saveProfile, bool runningInteractively, bool forceRedeploy = false)
         {
             if (env == null || string.IsNullOrEmpty(env.Id))
             {
@@ -35,11 +37,18 @@ namespace OctoPlusCore.JobRunners.JobConfigs
                 return Result.Failure<DeployConfig>("default channel is not set correctly");
             }
 
-            if (saveProfile != null)
+            if (!string.IsNullOrEmpty(saveProfile))
             {
-                if (!Uri.IsWellFormedUriString(saveProfile, UriKind.RelativeOrAbsolute))
+                try
                 {
-                    return Result.Failure<DeployConfig>("path to save profile is not set correctly");
+                    if (!File.Exists(saveProfile))
+                    {
+                        using (File.Create(saveProfile, 1, FileOptions.DeleteOnClose)) { };
+                    }
+                }
+                catch (Exception e)
+                {
+                    return Result.Failure<DeployConfig>("path to save profile is not set correctly: " + e.Message);
                 }
             }
 
@@ -50,7 +59,8 @@ namespace OctoPlusCore.JobRunners.JobConfigs
                 DefaultFallbackChannel = defaultFallbackChannel,
                 SaveProfile = saveProfile,
                 GroupFilter = filter,
-                RunningInteractively = runningInteractively
+                RunningInteractively = runningInteractively,
+                ForceRedeploy = forceRedeploy
             });
         }
     }
