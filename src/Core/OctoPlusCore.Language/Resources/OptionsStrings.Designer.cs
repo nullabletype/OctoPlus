@@ -79,6 +79,24 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Options pertaining to Channels.
+        /// </summary>
+        internal static string Channel {
+            get {
+                return ResourceManager.GetString("Channel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove any channels for the specified projects that no longer have packages available.
+        /// </summary>
+        internal static string CleanUpChannels {
+            get {
+                return ResourceManager.GetString("CleanUpChannels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The channel to deploy.
         /// </summary>
         internal static string DeployChannel {
@@ -318,6 +336,15 @@ namespace OctoPlusCore.Language.Resources {
         internal static string TeamId {
             get {
                 return ResourceManager.GetString("TeamId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runs in test mode (no changes made).
+        /// </summary>
+        internal static string TestMode {
+            get {
+                return ResourceManager.GetString("TestMode", resourceCulture);
             }
         }
         

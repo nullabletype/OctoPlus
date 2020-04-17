@@ -115,6 +115,15 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t remove the channel {0} from {1} as its used in the following releases: {2}.
+        /// </summary>
+        internal static string CouldntRemoveChannelReleases {
+            get {
+                return ResourceManager.GetString("CouldntRemoveChannelReleases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current Package.
         /// </summary>
         internal static string CurrentPackage {
@@ -484,7 +493,7 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is no package available to deploy for one of the projects you&apos;re trying to select!.
+        ///   Looks up a localized string similar to There is no package available to deploy for the following projects: .
         /// </summary>
         internal static string PackageNotSelectable {
             get {
@@ -565,6 +574,15 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing Channel {0} from Project {1}.
+        /// </summary>
+        internal static string RemovingChannel {
+            get {
+                return ResourceManager.GetString("RemovingChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to restrict to certain product groups?.
         /// </summary>
         internal static string RestrictToGroupsPrompt {
@@ -597,6 +615,15 @@ namespace OctoPlusCore.Language.Resources {
         internal static string TeamDoesntExist {
             get {
                 return ResourceManager.GetString("TeamDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [TEST].
+        /// </summary>
+        internal static string Test {
+            get {
+                return ResourceManager.GetString("Test", resourceCulture);
             }
         }
         

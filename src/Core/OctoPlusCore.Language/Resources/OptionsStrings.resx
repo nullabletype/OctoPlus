@@ -123,6 +123,12 @@
   <data name="AutomaticDeploy" xml:space="preserve">
     <value>Automatic deploy</value>
   </data>
+  <data name="Channel" xml:space="preserve">
+    <value>Options pertaining to Channels</value>
+  </data>
+  <data name="CleanUpChannels" xml:space="preserve">
+    <value>Remove any channels for the specified projects that no longer have packages available</value>
+  </data>
   <data name="DeployChannel" xml:space="preserve">
     <value>The channel to deploy</value>
   </data>
@@ -203,6 +209,9 @@
   </data>
   <data name="TeamId" xml:space="preserve">
     <value>Team Id</value>
+  </data>
+  <data name="TestMode" xml:space="preserve">
+    <value>Runs in test mode (no changes made)</value>
   </data>
   <data name="Url" xml:space="preserve">
     <value>Url for your octopus install</value>

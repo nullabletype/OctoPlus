@@ -21,6 +21,8 @@
 #endregion
 
 
+using System.Text.RegularExpressions;
+
 namespace OctoPlusCore.Models
 {
     public class Channel
@@ -29,5 +31,26 @@ namespace OctoPlusCore.Models
         public string Name { get; set; }
         public string VersionRange { get; set; }
         public string VersionTag { get; set; }
+
+        public bool ValidateVersion(string version)
+        {
+            var versionSplit = version.Split('-');
+            var success = true;
+            if (!string.IsNullOrEmpty(VersionRange))
+            {
+                var range = NuGet.Versioning.VersionRange.Parse(VersionRange);
+                var semVersion = NuGet.Versioning.NuGetVersion.Parse(version);
+                success = range.Satisfies(semVersion);
+            }
+
+            if (success)
+            {
+                if (!string.IsNullOrEmpty(VersionTag))
+                {
+                    success = Regex.IsMatch(versionSplit.Length > 1 ? versionSplit[1] : string.Empty, VersionTag);
+                }
+            }
+            return success;
+        }
     }
 }

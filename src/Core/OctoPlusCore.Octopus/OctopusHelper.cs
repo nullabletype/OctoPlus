@@ -81,9 +81,9 @@ namespace OctoPlusCore.Octopus
             }
         }
 
-        public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag) 
+        public async Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag, int take = 5) 
         {
-            return await GetPackages(await GetProject(projectIdOrHref), versionRange, tag);
+            return await GetPackages(await GetProject(projectIdOrHref), versionRange, tag, take);
         }
 
         private async Task<PackageIdResult> GetPackageId(ProjectResource project, string stepName, string actionName) 
@@ -171,19 +171,18 @@ namespace OctoPlusCore.Octopus
                         CacheObject("feeds-builtin", template);
                     }
 
-                    var packages =
-                        await
-                            client.Get<List<PackageFromBuiltInFeedResource>>(template,
-                                new
-                                {
-                                    packageId = package.PackageId,
-                                    partialMatch = false,
-                                    includeMultipleVersions = true,
-                                    take,
-                                    includePreRelease = true,
-                                    versionRange,
-                                    preReleaseTag = tag
-                                });
+                    var param = (dynamic)new
+                    {
+                        packageId = package.PackageId,
+                        partialMatch = false,
+                        includeMultipleVersions = true,
+                        take,
+                        includePreRelease = true,
+                        versionRange,
+                        preReleaseTag = tag
+                    };
+
+                    var packages = await client.Get<List<PackageFromBuiltInFeedResource>>(template, param);
 
                     var finalPackages = new List<PackageStub>();
                     foreach (var currentPackage in packages)
@@ -342,11 +341,24 @@ namespace OctoPlusCore.Octopus
             return ConvertChannel(await client.Repository.Channels.Get(channelIdOrHref));
         }
 
-        public async Task<List<Channel>> GetChannelsForProject(string projectIdOrHref) 
+        public async Task<List<Channel>> GetChannelsForProject(string projectIdOrHref, int take = 30) 
         {
             var project = await GetProject(projectIdOrHref);
-            var channels = await client.Repository.Projects.GetChannels(project);
+            var channels = await client.List<ChannelResource>(project.Link("Channels"), new { take = 9999 });
             return channels.Items.Select(ConvertChannel).ToList();
+        }
+
+        public async Task<(bool Success, IEnumerable<Release> Releases)> RemoveChannel(string channelId)
+        {
+            var channel = await client.Repository.Channels.Get(channelId);
+            var allReleases = await client.Repository.Channels.GetAllReleases(channel);
+            if (!allReleases.Any())
+            {
+                await client.Repository.Channels.Delete(channel);
+                return (true, null);
+            }
+
+            return (false, allReleases.Select(async r => await ConvertRelease(r)).Select(t => t.Result));
         }
 
         public async Task<Release> GetRelease(string releaseIdOrHref) 

@@ -125,22 +125,18 @@ namespace OctoPlus.Console.ConsoleTools
 
         private void SelectProjectsForDeployment(bool select)
         {
-            var range = GetRangeFromPrompt(_rows.Count());
-
-            if (_unselectable.Any(u => range.Contains(u + 1)))
-            {
-                System.Console.WriteLine(_unselectable);
-                System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine(_unselectableText);
-                System.Console.ResetColor();
-                Thread.Sleep(3000);
-                return;
-            }
+            IEnumerable<int> range = GetRangeFromPrompt(_rows.Count());
+            List<int> unselectable = new List<int>();
 
             foreach (var index in range)
             {
                 if (select)
                 {
+                    if(_unselectable.Contains(index-1))
+                    {
+                        unselectable.Add(index);
+                        continue;
+                    }
                     if (!_selected.Contains(index-1))
                     {
                         _selected.Add(index-1);
@@ -154,6 +150,21 @@ namespace OctoPlus.Console.ConsoleTools
                     }
                 }
             }
+
+            if (unselectable.Any())
+            {
+                string projectList = string.Join(", ", unselectable.Select(index => _rows[index][0]));
+                WriteError(_unselectableText + $" {projectList}");
+            }
+        }
+
+        protected void WriteError(string text)
+        {
+            System.Console.WriteLine(_unselectable);
+            System.Console.ForegroundColor = ConsoleColor.Red;
+            System.Console.WriteLine(text);
+            System.Console.ResetColor();
+            Thread.Sleep(3000);
         }
 
         protected IEnumerable<int> GetRangeFromPrompt(int max)

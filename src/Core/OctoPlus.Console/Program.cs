@@ -84,6 +84,8 @@ namespace OctoPlus.Console
             app.Command(release.CommandName, env => release.Configure(env));
             var variable = container.GetService<Variable>();
             app.Command(variable.CommandName, vari => variable.Configure(vari));
+            var channel = container.GetService<Channel>();
+            app.Command(channel.CommandName, vari => channel.Configure(vari));
 
             app.OnExecute(() =>
             {
@@ -186,13 +188,16 @@ namespace OctoPlus.Console
             .AddTransient<EnvironmentToLifecycle, EnvironmentToLifecycle>()
             .AddTransient<Variable, Variable>()
             .AddTransient<VariablesWithProfile, VariablesWithProfile>()
+            .AddTransient<Channel, Channel>()
+            .AddTransient<CleanupChannels, CleanupChannels>()
             .AddTransient<Commands.Environment, Commands.Environment>()
             .AddTransient<IUiLogger, ConsoleJobRunner>()
             .AddTransient<IProgressBar, ConsoleProgressBar>().AddMemoryCache()
             .AddTransient<ILanguageProvider, LanguageProvider>().AddMemoryCache()
             .AddTransient<DeployWithProfileDirectoryRunner, DeployWithProfileDirectoryRunner>()
             .AddTransient<PromotionRunner, PromotionRunner>()
-            .AddTransient<DeployRunner, DeployRunner>();
+            .AddTransient<DeployRunner, DeployRunner>()
+            .AddTransient<ChannelsRunner, ChannelsRunner>();
         }
     }
 }

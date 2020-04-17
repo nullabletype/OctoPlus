@@ -106,7 +106,7 @@ namespace OctoPlus.Console.Commands
                 return -2;
             }
 
-            Channel channel = null;
+            OctoPlusCore.Models.Channel channel = null;
             foreach (var project in found)
             {
                 channel = await octoHelper.GetChannelByProjectNameAndChannelName(project.ProjectName, channelName);
@@ -122,7 +122,7 @@ namespace OctoPlus.Console.Commands
                 return -1;
             }
 
-            Channel defaultChannel = null;
+            OctoPlusCore.Models.Channel defaultChannel = null;
 
             if (forceDefault && !string.IsNullOrEmpty(configuration.DefaultChannel)) {
                 defaultChannel = await octoHelper.GetChannelByProjectNameAndChannelName(found.First().ProjectName, configuration.DefaultChannel);

@@ -34,7 +34,7 @@ namespace OctoPlusCore.Octopus.Interfaces
     public interface IOctopusHelper
     {
         void SetCacheImplementation(IMemoryCache cache, int cacheTimeout);
-        Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag);
+        Task<IList<PackageStep>> GetPackages(string projectIdOrHref, string versionRange, string tag, int take = 5);
         Task<(Release Release, Deployment Deployment)> GetReleasedVersion(string projectId, string envId);
         bool Search(DeploymentResource deploymentResource, string projectId, string envId);
         Task<List<Environment>> GetEnvironments();
@@ -45,10 +45,11 @@ namespace OctoPlusCore.Octopus.Interfaces
         Task DeleteEnvironment(string idOrhref);
         Task<Channel> GetChannelByName(string projectIdOrName, string channelName);
         Task<Channel> GetChannel(string channelIdOrName);
-        Task<List<Channel>> GetChannelsForProject(string projectIdOrHref);
+        Task<List<Channel>> GetChannelsForProject(string projectIdOrHref, int take = 30);
         Task<Project> GetProjectByName(string name, string environment, string channelRange, string tag);
         Task<Channel> GetChannelByProjectNameAndChannelName(string name, string channelName);
         Task<List<Channel>> GetChannelsByProjectName(string name);
+        Task<(bool Success, IEnumerable<Release> Releases)> RemoveChannel(string channelId);
         Task<List<ProjectGroup>> GetFilteredProjectGroups(string filter);
         Task<List<ProjectGroup>> GetProjectGroups();
         Task<List<Project>> GetProjects(string environment, string channelRange, string tag);
