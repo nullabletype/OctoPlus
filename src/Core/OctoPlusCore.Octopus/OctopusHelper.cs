@@ -856,7 +856,7 @@ namespace OctoPlusCore.Octopus
 
         private PackageStub ConvertPackage(PackageResource package, string stepName)
         {
-            return new PackageStub {Id = package.PackageId, Version = package.Version, StepName = stepName};
+            return new PackageStub {Id = package.PackageId, Version = package.Version, StepName = stepName, PublishedOn = package.Published.HasValue ? package.Published.Value.LocalDateTime as DateTime? : null };
         }
 
         private async Task<DeploymentProcessResource> GetDeploymentProcess(string deploymentProcessId)

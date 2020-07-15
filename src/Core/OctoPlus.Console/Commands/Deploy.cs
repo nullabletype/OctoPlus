@@ -151,16 +151,38 @@ namespace OctoPlus.Console.Commands
 
         private InteractiveRunner PopulateRunner(string prompt, string unselectableText, IEnumerable<Project> projects)
         {
-            var runner = new InteractiveRunner(prompt, unselectableText, languageProvider, languageProvider.GetString(LanguageSection.UiStrings, "ProjectName"), languageProvider.GetString(LanguageSection.UiStrings, "CurrentRelease"), languageProvider.GetString(LanguageSection.UiStrings, "CurrentPackage"), languageProvider.GetString(LanguageSection.UiStrings, "NewPackage"));
+            var runner = new InteractiveRunner(prompt, 
+                unselectableText, 
+                languageProvider, 
+                languageProvider.GetString(LanguageSection.UiStrings, "ProjectName"), 
+                languageProvider.GetString(LanguageSection.UiStrings, "CurrentRelease"), 
+                languageProvider.GetString(LanguageSection.UiStrings, "CurrentPackage"), 
+                languageProvider.GetString(LanguageSection.UiStrings, "NewPackage"), 
+                languageProvider.GetString(LanguageSection.UiStrings, "OldestPackagePublish"),
+                languageProvider.GetString(LanguageSection.UiStrings, "PackageAgeDays")
+                );
+
             foreach (var project in projects)
             {
                 var packagesAvailable = project.AvailablePackages.Count > 0 && project.AvailablePackages.All(p => p.SelectedPackage != null);
-                
+
+                DateTime? lastModified = null;
+
+                foreach (var package in project.AvailablePackages)
+                {
+                    if ((lastModified == null && package.SelectedPackage != null && package.SelectedPackage.PublishedOn.HasValue) || (package.SelectedPackage != null && package.SelectedPackage.PublishedOn.HasValue && package.SelectedPackage.PublishedOn < lastModified)) 
+                    {
+                        lastModified = package.SelectedPackage.PublishedOn;
+                    }
+                }
+
                 runner.AddRow(project.Checked, packagesAvailable, new[] {
                     project.ProjectName,
                     project.CurrentRelease.Version,
                     project.AvailablePackages.Count > 1 ? languageProvider.GetString(LanguageSection.UiStrings, "Multi") : project.CurrentRelease.DisplayPackageVersion,
-                    project.AvailablePackages.Count > 1 ? languageProvider.GetString(LanguageSection.UiStrings, "Multi") : (packagesAvailable ? project.AvailablePackages.First().SelectedPackage.Version : string.Empty)
+                    project.AvailablePackages.Count > 1 ? languageProvider.GetString(LanguageSection.UiStrings, "Multi") : (packagesAvailable ? project.AvailablePackages.First().SelectedPackage.Version : string.Empty),
+                    lastModified.HasValue ? $"{lastModified.Value.ToShortDateString()} : {lastModified.Value.ToShortTimeString()}" : string.Empty,
+                    lastModified.HasValue ? $"{DateTime.Now.Subtract(lastModified.Value).Days.ToString()}{(lastModified.Value < DateTime.Now.AddDays(-7) ? "*" : string.Empty)}" : string.Empty
                 });
                 
             }

@@ -475,6 +475,15 @@ namespace OctoPlusCore.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Oldest package date.
+        /// </summary>
+        internal static string OldestPackagePublish {
+            get {
+                return ResourceManager.GetString("OldestPackagePublish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to On source.
         /// </summary>
         internal static string OnSource {
@@ -489,6 +498,24 @@ namespace OctoPlusCore.Language.Resources {
         internal static string OnTarget {
             get {
                 return ResourceManager.GetString("OnTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Age (Days).
+        /// </summary>
+        internal static string PackageAgeDays {
+            get {
+                return ResourceManager.GetString("PackageAgeDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package last mod.
+        /// </summary>
+        internal static string PackageLastModified {
+            get {
+                return ResourceManager.GetString("PackageLastModified", resourceCulture);
             }
         }
         

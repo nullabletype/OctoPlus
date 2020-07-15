@@ -38,7 +38,7 @@ namespace OctoPlus.Console.Commands.SubCommands
     internal class RenameRelease : BaseCommand
     {
 
-        protected override bool SupportsInteractiveMode => false;
+        protected override bool SupportsInteractiveMode => true;
         public override string CommandName => "rename";
         private IProgressBar progressBar;
 
@@ -55,7 +55,6 @@ namespace OctoPlus.Console.Commands.SubCommands
             AddToRegister(RenameReleaseOptionNames.Environment, command.Option("-e|--environment", languageProvider.GetString(LanguageSection.OptionsStrings, "EnvironmentName"), CommandOptionType.SingleValue).IsRequired());
             AddToRegister(RenameReleaseOptionNames.ReleaseName, command.Option("-r|--releasename", languageProvider.GetString(LanguageSection.OptionsStrings, "ReleaseVersion"), CommandOptionType.SingleValue).IsRequired());
             AddToRegister(RenameReleaseOptionNames.GroupFilter, command.Option("-g|--groupfilter", languageProvider.GetString(LanguageSection.OptionsStrings, "GroupFilter"), CommandOptionType.SingleValue));
-            AddToRegister(RenameReleaseOptionNames.SkipConfirmation, command.Option("-s|--skipconfirmation", languageProvider.GetString(LanguageSection.OptionsStrings, "SkipConfirmation"), CommandOptionType.NoValue));
         }
 
         protected override async Task<int> Run(CommandLineApplication command)

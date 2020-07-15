@@ -336,4 +336,13 @@
   <data name="Test" xml:space="preserve">
     <value>[TEST]</value>
   </data>
+  <data name="OldestPackagePublish" xml:space="preserve">
+    <value>Oldest package date</value>
+  </data>
+  <data name="PackageAgeDays" xml:space="preserve">
+    <value>Age (Days)</value>
+  </data>
+  <data name="PackageLastModified" xml:space="preserve">
+    <value>Package last mod</value>
+  </data>
 </root>

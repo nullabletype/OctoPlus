@@ -22,6 +22,7 @@
 
 
 using OctoPlusCore.Models;
+using System;
 
 namespace OctoPlusCore
 {
@@ -31,6 +32,7 @@ namespace OctoPlusCore
         public string Version { get; set; }
         public string StepName { get; set; }
         public string StepId { get; set; }
+        public DateTime? PublishedOn { get; set; }
     }
 
     public class PackageFull 
